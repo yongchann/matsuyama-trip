@@ -3,220 +3,255 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>마쓰야마 여행</title>
+<title>룝빕 마쓰야마가요</title>
+<meta property="og:title" content="룝빕 마쓰야마가요">
+<meta property="og:description" content="마쓰야마 3박 4일 · 우리 여행 핸드북 🍊">
+<meta property="og:image" content="https://yongchann.github.io/matsuyama-trip/bg.jpg">
+<meta property="og:url" content="https://yongchann.github.io/matsuyama-trip/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@400;500;600;700;800;900&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@400;500;600;700;800;900&family=Zen+Kaku+Gothic+New:wght@500;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#EEE9E0; --card:#FBF9F3; --card2:#F1ECE1; --ink:#28231C; --muted:#8A8073;
-    --line:#E4DED0; --accent:#BF5E44; --accent-weak:#F0E2DB; --teal:#4A7A71; --amber:#C4964F;
-    --purple:#8A6BC4; --grey:#8A9089;
-    --sh:0 1px 2px rgba(40,32,24,.05),0 8px 22px rgba(40,32,24,.08);
-    --sh2:0 14px 40px rgba(40,32,24,.18);
+    --bg:#F3F1EC; --card:#FCFBF8; --card2:#F0EDE5; --ink:#1A1B18; --muted:#948F87;
+    --line:#E5E0D6; --accent:#1E7A57; --accent-ink:#1A6B4C; --accent-weak:#E8F0EA;
+    --coral:#D25E57; --amber:#C08A40; --brown:#9C6B3F; --olive:#78873B; --pink:#C06F98;
+    --purple:#7B6BAE; --blue:#4C7FB4; --gold:#C29A3E;
+    --sh:0 1px 2px rgba(26,27,24,.04),0 5px 16px rgba(26,27,24,.06);
+    --sh2:0 14px 40px rgba(26,27,24,.18);
     --f:'Gothic A1',system-ui,-apple-system,sans-serif; --jp:'Zen Kaku Gothic New',var(--f);
-    --w:560px;
+    --w:520px;
   }
   @media (prefers-color-scheme:dark){:root{
-    --bg:#14120E; --card:#1E1B15; --card2:#26221B; --ink:#F0EBE0; --muted:#9E9486;
-    --line:#2C271F; --accent:#D97B5F; --accent-weak:#2E1F18; --teal:#5FA192; --amber:#D2A863;
-    --purple:#A98FE6; --grey:#8A9089;
-    --sh:0 1px 2px rgba(0,0,0,.35),0 8px 22px rgba(0,0,0,.45); --sh2:0 14px 40px rgba(0,0,0,.6);
+    --bg:#141412; --card:#1D1D19; --card2:#252520; --ink:#EDEBE3; --muted:#9A958B;
+    --line:#2C2B26; --accent:#4FB488; --accent-ink:#4FB488; --accent-weak:#17271F;
+    --sh:0 1px 2px rgba(0,0,0,.3),0 6px 16px rgba(0,0,0,.45); --sh2:0 14px 40px rgba(0,0,0,.6);
   }}
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{margin:0;}
-  body{background:var(--bg);color:var(--ink);font-family:var(--f);line-height:1.55;-webkit-font-smoothing:antialiased;position:relative;}
-  body::before{content:"";position:fixed;inset:0;z-index:-1;background:url(bg.jpg) center/cover;opacity:.085;filter:blur(2px) saturate(.9);}
-  @media (prefers-color-scheme:dark){body::before{opacity:.06;}}
+  body{background:var(--bg);color:var(--ink);font-family:var(--f);font-size:15px;line-height:1.55;
+    -webkit-font-smoothing:antialiased;position:relative;}
+  body::before{content:"";position:fixed;inset:0;z-index:-1;background:url(bg.jpg) center/cover;opacity:.05;filter:blur(3px);}
   .app{max-width:var(--w);margin:0 auto;position:relative;}
   a{color:inherit;text-decoration:none;}
-  h1,h2,h3,h4{margin:0;font-weight:800;letter-spacing:-.02em;text-wrap:balance;}
+  h1,h2,h3,h4{margin:0;font-weight:800;letter-spacing:-.02em;}
+  button{font-family:inherit;cursor:pointer;}
   .tnum{font-variant-numeric:tabular-nums;}
   .jp{font-family:var(--jp);}
 
-  /* view routing */
-  .view{display:none;padding:0 16px calc(96px + env(safe-area-inset-bottom));min-height:100vh;}
-  .view.on{display:block;animation:vin .28s cubic-bezier(.22,.61,.36,1);}
-  @keyframes vin{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
-  @media (prefers-reduced-motion:reduce){.view.on{animation:none;}}
+  /* routing */
+  .view{display:none;padding:0 16px calc(94px + env(safe-area-inset-bottom));}
+  .view.on{display:block;animation:vin .26s cubic-bezier(.22,.61,.36,1);}
+  @keyframes vin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){.view.on{animation:none}}
+  .vhead{padding:24px 2px 8px;position:sticky;top:0;z-index:20;background:linear-gradient(var(--bg) 72%,transparent);}
+  .vhead .k{font-size:.7rem;font-weight:800;letter-spacing:.12em;color:var(--accent-ink);text-transform:uppercase;}
+  .vhead h1{font-size:1.7rem;margin-top:1px;}
+  .vhead .sub{color:var(--muted);font-size:.85rem;margin-top:3px;}
 
-  .vhead{padding:26px 2px 12px;position:sticky;top:0;z-index:20;background:linear-gradient(var(--bg) 70%,transparent);}
-  .vhead .k{font-size:.72rem;font-weight:800;letter-spacing:.12em;color:var(--accent);text-transform:uppercase;}
-  .vhead h1{font-size:1.85rem;margin-top:2px;}
-  .sub{color:var(--muted);font-size:.87rem;}
-
-  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--sh);padding:16px 17px;}
-  .row{display:flex;gap:11px;}
+  .lbl{font-size:.8rem;font-weight:800;color:var(--muted);margin:22px 4px 9px;letter-spacing:.01em;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--sh);padding:16px;}
   .stack{display:grid;gap:11px;}
   .pill{display:inline-flex;align-items:center;gap:5px;background:var(--card2);border:1px solid var(--line);
-    border-radius:999px;padding:5px 11px;font-size:.78rem;font-weight:600;color:var(--muted);}
-  .b-accent{color:var(--accent);} .fw8{font-weight:800;}
+    border-radius:999px;padding:5px 10px;font-size:.76rem;font-weight:700;color:var(--muted);}
+  .b-acc{color:var(--accent-ink);font-weight:800;}
 
-  /* HOME hero */
-  .hero{position:relative;border-radius:22px;overflow:hidden;padding:110px 20px 20px;color:#fff;box-shadow:var(--sh2);
-    background:linear-gradient(180deg,rgba(24,16,10,.03) 0%,rgba(24,16,10,.28) 50%,rgba(24,16,10,.76) 100%),url(bg.jpg) center 24%/cover;}
-  .hero .hk,.hero h1,.hero .hd{text-shadow:0 1px 12px rgba(0,0,0,.4);}
-  .hero .hk{font-family:var(--jp);font-size:.75rem;letter-spacing:.16em;opacity:.92;}
-  .hero h1{font-size:2.5rem;line-height:1;margin:8px 0 6px;letter-spacing:-.03em;}
-  .hero .hd{font-size:.92rem;opacity:.95;font-weight:600;}
-  .hero .dday{position:absolute;top:18px;right:18px;background:rgba(255,255,255,.22);backdrop-filter:blur(4px);
-    border-radius:12px;padding:7px 12px;font-weight:800;font-size:.9rem;}
-  .hero .wnow{display:flex;align-items:center;gap:9px;margin-top:16px;background:rgba(255,255,255,.15);
-    border-radius:14px;padding:10px 13px;}
-  .hero .wnow .t{font-size:1.5rem;line-height:1;}
-  .hero .wnow .wt{font-weight:800;font-size:1.15rem;}
-  .hero .wnow .wm{font-size:.76rem;opacity:.9;}
-  .hero .wnow .live{margin-left:auto;font-size:.62rem;font-weight:800;letter-spacing:.1em;
-    background:rgba(255,255,255,.25);border-radius:999px;padding:3px 8px;display:flex;align-items:center;gap:5px;}
-  .hero .wnow .live::before{content:"";width:6px;height:6px;border-radius:50%;background:#fff;animation:blink 1.7s infinite;}
+  /* HERO */
+  .hero{position:relative;border-radius:22px;overflow:hidden;color:#fff;box-shadow:var(--sh2);margin-top:18px;
+    min-height:238px;display:flex;flex-direction:column;justify-content:flex-end;background:#2a2926;}
+  .hero-ph{position:absolute;inset:0;z-index:0}
+  .hero-ph .ly{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity 1.6s ease}
+  .hero-ph .ly.on{opacity:1}
+  .hero-sh{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(14,11,7,.08),rgba(14,11,7,.26) 44%,rgba(14,11,7,.80))}
+  .hero-c{position:relative;z-index:2;padding:92px 20px 18px}
+  .hero .hk{font-family:var(--jp);font-size:.72rem;letter-spacing:.16em;opacity:.92;text-shadow:0 1px 8px rgba(0,0,0,.5);}
+  .hero h1{font-size:2.35rem;line-height:1;margin:7px 0 5px;letter-spacing:-.03em;text-shadow:0 2px 14px rgba(0,0,0,.45);}
+  .hero .hd{font-size:.9rem;opacity:.96;font-weight:600;text-shadow:0 1px 8px rgba(0,0,0,.5);}
+  .hero .dday{position:absolute;top:16px;right:16px;z-index:3;background:rgba(255,255,255,.92);color:var(--accent-ink);
+    border-radius:11px;padding:6px 11px;font-weight:900;font-size:.86rem;box-shadow:0 4px 12px rgba(0,0,0,.2);}
+  .hero .wnow{display:flex;align-items:center;gap:9px;margin-top:15px;background:rgba(255,255,255,.16);
+    backdrop-filter:blur(6px);border-radius:14px;padding:10px 13px;}
+  .hero .wnow .t{font-size:1.5rem;line-height:1}
+  .hero .wnow .wt{font-weight:800;font-size:1.1rem}
+  .hero .wnow .wm{font-size:.74rem;opacity:.92}
+  .hero .wnow .live{margin-left:auto;font-size:.6rem;font-weight:800;letter-spacing:.1em;background:rgba(255,255,255,.28);
+    border-radius:999px;padding:3px 8px;display:flex;align-items:center;gap:5px}
+  .hero .wnow .live::before{content:"";width:6px;height:6px;border-radius:50%;background:#fff;animation:blink 1.7s infinite}
   @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 
-  /* forecast strip */
-  .fc{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
-  .fc .d{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 6px;text-align:center;box-shadow:var(--sh);}
-  .fc .dd{font-size:.72rem;color:var(--muted);font-weight:700;}
-  .fc .di{font-size:1.5rem;margin:5px 0 3px;}
-  .fc .dt{font-weight:800;font-size:.92rem;}
-  .fc .dt small{color:var(--muted);font-weight:600;}
-  .fc .dr{font-size:.66rem;color:var(--teal);font-weight:700;margin-top:3px;}
-  .fc .dr.hi{color:var(--accent);}
+  /* forecast */
+  .fc{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .fc .d{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 6px;text-align:center;box-shadow:var(--sh)}
+  .fc .dd{font-size:.72rem;color:var(--muted);font-weight:700}
+  .fc .di{font-size:1.5rem;margin:5px 0 3px}
+  .fc .dt{font-weight:800;font-size:.92rem}
+  .fc .dt small{color:var(--muted);font-weight:600}
+  .fc .dr{font-size:.66rem;font-weight:700;color:var(--blue);margin-top:5px}
+  .fc .dr.hi{color:var(--accent-ink)}
 
-  .lbl2{font-size:.7rem;font-weight:800;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;margin:22px 2px 9px;}
+  /* today song (home) */
+  .song1{display:flex;align-items:center;gap:12px;background:linear-gradient(120deg,var(--accent-weak),var(--card));
+    border:1px solid var(--line);border-radius:18px;padding:13px 15px;box-shadow:var(--sh)}
+  .song1 .disc{width:42px;height:42px;border-radius:50%;flex:none;background:
+    radial-gradient(circle at 50% 50%,var(--card) 0 18%,var(--accent) 19% 100%);
+    display:flex;align-items:center;justify-content:center;animation:spin 6s linear infinite}
+  .song1 .disc::after{content:"";width:9px;height:9px;border-radius:50%;background:var(--card)}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @media (prefers-reduced-motion:reduce){.song1 .disc{animation:none}}
+  .song1 .s1t{font-family:var(--jp);font-weight:700;font-size:1rem;line-height:1.2}
+  .song1 .s1a{font-size:.76rem;color:var(--muted);margin-top:1px}
+  .song1 .s1b{margin-left:auto;display:flex;gap:7px;flex:none}
+  .ic-btn{width:38px;height:38px;border-radius:12px;border:none;display:flex;align-items:center;justify-content:center;font-size:1.05rem}
+  .ic-play{background:var(--accent);color:#fff}
+  .ic-roll{background:var(--card2);color:var(--ink);border:1px solid var(--line)}
 
-  /* quick grid */
-  .quick{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
-  .qbtn{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px 15px;box-shadow:var(--sh);
-    display:flex;flex-direction:column;gap:7px;cursor:pointer;text-align:left;}
-  .qbtn .qi{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.05rem;}
-  .qbtn .qt{font-weight:800;font-size:.98rem;}
-  .qbtn .qs{font-size:.76rem;color:var(--muted);}
+  /* phrase */
+  .ph{display:flex;align-items:center;gap:11px;background:var(--card);border:1px solid var(--line);
+    border-radius:15px;padding:12px 14px;box-shadow:var(--sh);cursor:pointer}
+  .ph:active{background:var(--card2)}
+  .ph .spk{width:34px;height:34px;border-radius:11px;background:var(--accent-weak);color:var(--accent-ink);
+    display:flex;align-items:center;justify-content:center;font-size:1.02rem;flex:none}
+  .ph .pk{font-weight:700;font-size:.9rem}
+  .ph .pj{font-family:var(--jp);color:var(--accent-ink);font-size:.98rem;margin-top:1px}
+  .ph .pr{color:var(--muted);font-size:.76rem;margin-top:1px}
+  .phg{font-size:.82rem;font-weight:800;color:var(--ink);margin:16px 4px 8px}
 
-  .info-hi{background:var(--accent-weak);border:1px solid transparent;border-radius:16px;padding:14px 16px;}
-  .info-hi h4{color:var(--accent);font-size:.95rem;}
-  .info-hi p{margin:5px 0 0;font-size:.83rem;color:var(--ink);}
+  /* quick */
+  .quick{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .qbtn{display:flex;flex-direction:column;align-items:flex-start;gap:2px;background:var(--card);border:1px solid var(--line);
+    border-radius:16px;padding:14px 15px;text-align:left;box-shadow:var(--sh)}
+  .qbtn:active{transform:scale(.98)}
+  .qi{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.15rem;margin-bottom:6px}
+  .qt{font-weight:800;font-size:.96rem}
+  .qs{font-size:.75rem;color:var(--muted)}
 
-  /* flight ticket */
-  .ticket{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);overflow:hidden;}
-  .ticket .tr{display:flex;align-items:center;padding:14px 16px;gap:12px;}
-  .ticket .tr+.tr{border-top:1px dashed var(--line);}
-  .ticket .tcode{font-weight:800;font-size:1.35rem;}
-  .ticket .tarr{color:var(--muted);}
-  .ticket .tmeta{font-size:.76rem;color:var(--muted);margin-top:2px;}
-  .ticket .tlead{font-size:.7rem;font-weight:800;color:var(--accent);letter-spacing:.05em;}
+  /* todo bucket */
+  .todo{display:flex;flex-wrap:wrap;gap:8px}
+  .todo button{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 13px;
+    font-weight:700;font-size:.85rem;color:var(--ink);box-shadow:var(--sh);display:inline-flex;align-items:center;gap:6px}
+  .todo button.done{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .todo button.done .tem{filter:none}
+  .todo .tem{opacity:.95}
 
-  /* day tabs (plan) */
-  .daytabs{display:flex;gap:7px;overflow-x:auto;padding:4px 2px 10px;position:sticky;top:74px;z-index:19;
-    background:linear-gradient(var(--bg) 75%,transparent);-ms-overflow-style:none;scrollbar-width:none;}
-  .daytabs::-webkit-scrollbar{display:none;}
+  /* mission / ticket */
+  .miss{background:var(--accent-weak);border:1px solid transparent;border-radius:18px;padding:15px 16px}
+  .miss h4{font-size:1rem;color:var(--accent-ink)}
+  .miss p{margin:6px 0 0;font-size:.86rem;color:var(--ink);opacity:.9}
+  .ticket .tr{display:flex;align-items:center;gap:10px;padding:11px 0}
+  .ticket .tr+.tr{border-top:1px dashed var(--line)}
+  .tlead{font-size:.74rem;color:var(--muted);font-weight:700}
+  .tcode{font-size:1.32rem;font-weight:900}
+  .tarr{color:var(--muted);font-weight:700;font-size:.9rem}
+  .tmeta{font-size:.76rem;color:var(--muted);margin-top:2px}
+
+  /* plan */
+  .daytabs{display:flex;gap:7px;overflow-x:auto;padding:2px 0 4px;scrollbar-width:none}
+  .daytabs::-webkit-scrollbar{display:none}
   .dt{flex:none;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:8px 13px;
-    font-weight:800;font-size:.82rem;color:var(--muted);cursor:pointer;box-shadow:var(--sh);white-space:nowrap;}
-  .dt small{display:block;font-size:.64rem;font-weight:700;opacity:.8;}
-  .dt.on{background:var(--ink);color:var(--bg);border-color:var(--ink);}
+    font-weight:800;font-size:.84rem;color:var(--muted);display:flex;flex-direction:column;line-height:1.2}
+  .dt small{font-weight:600;font-size:.68rem;opacity:.8}
+  .dt.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .day-title{font-size:1.15rem;font-weight:800;margin-top:14px}
+  .day-date{color:var(--muted);font-size:.82rem;margin-top:1px}
+  .dchips{display:flex;flex-wrap:wrap;gap:6px;margin:11px 0 4px}
+  .tl2{margin-top:8px}
+  .ti{display:flex;gap:12px;padding:11px 0}
+  .ti+.ti{border-top:1px solid var(--line)}
+  .tt{flex:none;width:52px;font-weight:800;font-size:.82rem;color:var(--accent-ink)}
+  .tx{font-size:.9rem}
 
-  .day-title{font-size:1.25rem;margin:4px 2px 2px;}
-  .day-date{color:var(--muted);font-size:.82rem;font-weight:700;margin:0 2px 12px;}
-  .dchips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 13px;}
+  /* map */
+  .map{height:340px;border-radius:18px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--sh);margin-top:6px;z-index:0}
+  .mtools{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
+  .mbtn{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:8px 13px;font-weight:700;font-size:.82rem;color:var(--ink)}
+  .mbtn.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .legend{display:flex;flex-wrap:wrap;gap:11px;margin-top:11px;font-size:.78rem;color:var(--muted)}
+  .legend .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:middle;border:1.5px solid var(--card)}
+  .bigpin .bp{font-size:20px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5));text-align:center}
+  .leaflet-tooltip.lbl{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:6px;font-size:10.5px;font-weight:800;padding:1px 6px;box-shadow:var(--sh)}
+  .leaflet-tooltip.lbl::before{display:none}
+  .np{width:22px;height:22px;border-radius:50%;color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.5)}
+  .leaflet-popup-content{font-family:var(--f);font-size:.85rem;margin:11px 13px}
+  .leaflet-popup-content .j{font-family:var(--jp);color:var(--muted);font-size:.78rem}
+  .leaflet-popup-content a{color:var(--accent-ink);font-weight:800}
 
-  .tl{position:relative;padding-left:20px;}
-  .tl::before{content:"";position:absolute;left:5px;top:6px;bottom:6px;width:2px;background:var(--line);}
-  .tl .ti{position:relative;padding:0 0 15px;}
-  .tl .ti::before{content:"";position:absolute;left:-18px;top:5px;width:9px;height:9px;border-radius:50%;
-    background:var(--accent);border:2px solid var(--card);}
-  .tl .tt{font-weight:800;font-size:.82rem;color:var(--accent);}
-  .tl .tx{font-size:.9rem;margin-top:2px;}
+  /* filters + food */
+  .filters{display:flex;gap:7px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none;margin-top:12px}
+  .filters::-webkit-scrollbar{display:none}
+  .fchip{flex:none;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-weight:700;font-size:.8rem;color:var(--muted);display:flex;align-items:center;gap:6px}
+  .fchip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .fchip .fd{width:9px;height:9px;border-radius:50%}
+  .locbtn{width:100%;margin-top:10px;background:var(--accent-weak);color:var(--accent-ink);border:1px solid transparent;border-radius:13px;padding:11px;font-weight:800;font-size:.86rem}
+  .food{display:flex;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px 14px;box-shadow:var(--sh);margin-bottom:9px;align-items:flex-start}
+  .food .fd{width:11px;height:11px;border-radius:50%;flex:none;margin-top:5px}
+  .food .fmain{flex:1;min-width:0}
+  .food .fn{font-weight:800;font-size:.98rem}
+  .food .fn .j{font-family:var(--jp);color:var(--muted);font-weight:500;font-size:.76rem;margin-left:5px}
+  .food .fmeta{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px;align-items:center}
+  .food .frate{font-weight:800;font-size:.8rem;color:var(--amber)}
+  .food .fcat{font-size:.7rem;font-weight:800;color:#fff;border-radius:6px;padding:2px 7px}
+  .food .fdist{font-size:.74rem;font-weight:700;color:var(--accent-ink)}
+  .food .fmenu{margin-top:8px;display:grid;gap:4px}
+  .food .fm1{font-size:.8rem}
+  .food .fm1 b{color:var(--ink)}
+  .food .fm1 span{color:var(--muted)}
+  .food .fo{font-size:.76rem;color:var(--muted);margin-top:6px}
+  .food .fg{align-self:center;color:var(--muted);font-weight:800;flex:none}
 
-  /* maps */
-  .map{width:100%;height:340px;border-radius:16px;border:1px solid var(--line);box-shadow:var(--sh);z-index:0;}
-  #plan-map{height:220px;}
-  .mtools{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap;}
-  .mbtn{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:8px 13px;font-weight:700;
-    font-size:.82rem;color:var(--ink);cursor:pointer;box-shadow:var(--sh);}
-  .mbtn.on,.mbtn:active{background:var(--ink);color:var(--bg);border-color:var(--ink);}
-  .legend{display:flex;flex-wrap:wrap;gap:11px;margin-top:11px;font-size:.76rem;color:var(--muted);}
-  .legend span{display:inline-flex;align-items:center;gap:5px;}
-  .dot{width:10px;height:10px;border-radius:50%;border:2px solid var(--card);box-shadow:0 0 0 1px rgba(0,0,0,.12);}
-  .leaflet-popup-content{font-family:var(--f);font-size:.86rem;margin:11px 13px;}
-  .leaflet-popup-content b{font-size:.95rem;} .leaflet-popup-content .j{color:var(--muted);font-size:.78rem;}
-  .leaflet-popup-content a{color:var(--accent);font-weight:800;display:inline-block;margin-top:6px;}
-  .bigpin{background:none;border:none;} .bigpin .bp{font-size:21px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5));text-align:center;}
-  .leaflet-tooltip.lbl{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:6px;
-    font-size:11px;font-weight:800;padding:1px 6px;box-shadow:var(--sh);white-space:nowrap;}
-  .leaflet-tooltip.lbl::before{border-top-color:var(--line);}
-  .np{width:22px;height:22px;border-radius:50%;color:#fff;font-size:12px;font-weight:800;display:flex;
-    align-items:center;justify-content:center;border:2px solid var(--card);box-shadow:0 1px 3px rgba(0,0,0,.5);}
-
-  /* eat list */
-  .filters{display:flex;gap:7px;overflow-x:auto;padding:2px 2px 12px;scrollbar-width:none;}
-  .filters::-webkit-scrollbar{display:none;}
-  .food{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);
-    border-radius:15px;padding:12px 14px;box-shadow:var(--sh);margin-bottom:9px;}
-  .food .fd{width:11px;height:11px;border-radius:50%;flex:none;}
-  .food .fn{font-weight:800;font-size:.94rem;}
-  .food .fn .j{font-family:var(--jp);color:var(--muted);font-weight:500;font-size:.8rem;margin-left:5px;}
-  .food .fno{font-size:.78rem;color:var(--muted);margin-top:1px;}
-  .food .fg{margin-left:auto;flex:none;color:var(--accent);font-weight:800;font-size:1.05rem;padding:4px 6px;}
-  .food.pk{border-color:var(--accent);background:linear-gradient(0deg,var(--accent-weak),var(--card));}
+  /* must-eat check */
+  .must{display:flex;flex-wrap:wrap;gap:7px}
+  .must button{background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:7px 12px;font-weight:700;font-size:.8rem;color:var(--ink)}
+  .must button.done{background:var(--accent);color:#fff;border-color:var(--accent);text-decoration:line-through;opacity:.85}
 
   /* accordion (info) */
-  .acc{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);margin-bottom:11px;overflow:hidden;}
-  .acc>summary{list-style:none;cursor:pointer;padding:15px 16px;font-weight:800;font-size:1rem;display:flex;align-items:center;gap:10px;}
-  .acc>summary::-webkit-details-marker{display:none;}
-  .acc>summary .ci{font-size:1.1rem;}
-  .acc>summary .ar{margin-left:auto;color:var(--muted);transition:transform .2s;font-weight:700;}
-  .acc[open]>summary .ar{transform:rotate(90deg);}
-  .acc .body{padding:0 16px 16px;}
-  .kv{font-size:.87rem;display:grid;gap:7px;}
-  .kv b{color:var(--ink);}
-  .kv .k{color:var(--muted);font-weight:800;font-size:.75rem;text-transform:uppercase;letter-spacing:.04em;}
+  .acc{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);margin-bottom:10px;overflow:hidden}
+  .acc>summary{list-style:none;display:flex;align-items:center;gap:11px;padding:15px 16px;font-weight:800;font-size:.98rem;cursor:pointer}
+  .acc>summary::-webkit-details-marker{display:none}
+  .acc .ci{width:32px;height:32px;border-radius:10px;background:var(--accent-weak);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;font-size:1rem;flex:none}
+  .acc .ar{margin-left:auto;color:var(--muted);transition:transform .2s}
+  .acc[open] .ar{transform:rotate(90deg)}
+  .acc .body{padding:0 16px 16px}
+  .kv{display:grid;gap:9px}
+  .kv>div{font-size:.87rem}
+  .kv .k{display:block;font-weight:800;color:var(--accent-ink);font-size:.8rem;margin-bottom:1px}
 
   /* checklist */
-  .cprog{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
-  .ctrack{flex:1;height:9px;background:var(--card2);border-radius:99px;overflow:hidden;border:1px solid var(--line);}
-  .cfill{height:100%;width:0;background:var(--accent);transition:width .3s;}
-  .chk h4{font-size:.9rem;margin:14px 0 4px;}
-  .chk label{display:flex;gap:10px;align-items:flex-start;padding:7px 4px;border-radius:9px;font-size:.88rem;cursor:pointer;}
-  .chk label:active{background:var(--card2);}
-  .chk input{width:19px;height:19px;margin:1px 0 0;accent-color:var(--accent);flex:none;}
-  .chk input:checked+span{color:var(--muted);text-decoration:line-through;}
+  .cprog{display:flex;align-items:center;gap:11px;margin-bottom:10px}
+  .ctrack{flex:1;height:9px;background:var(--card2);border-radius:99px;overflow:hidden}
+  .cfill{height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .3s}
+  .cgrp{font-weight:800;font-size:.82rem;margin:12px 0 7px}
+  .chk label{display:flex;gap:9px;align-items:center;padding:6px 2px;font-size:.86rem;cursor:pointer}
+  .chk input{width:19px;height:19px;accent-color:var(--accent);flex:none}
+  .chk input:checked+span{color:var(--muted);text-decoration:line-through}
 
-  /* phrases */
-  .ph{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:11px 14px;box-shadow:var(--sh);margin-bottom:8px;}
-  .ph .pk{font-weight:800;font-size:.88rem;}
-  .ph .pj{font-family:var(--jp);color:var(--teal);font-size:1.02rem;margin-top:2px;}
-  .ph .pr{color:var(--muted);font-size:.8rem;}
+  /* music (info) */
+  .mus{background:var(--accent-weak);border-radius:15px;padding:14px}
+  .mus .ml{font-family:var(--jp);font-size:.66rem;letter-spacing:.12em;color:var(--accent-ink);font-weight:700}
+  .mus .mt{font-family:var(--jp);font-size:1.25rem;font-weight:700;margin-top:4px}
+  .mus .ma{font-size:.82rem;color:var(--muted);margin-top:3px}
+  .mact{display:flex;gap:8px;margin-top:13px}
+  .mroll,.mplay{flex:1;border:none;border-radius:11px;padding:11px;font-weight:800;font-size:.88rem;text-align:center}
+  .mroll{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+  .mplay{background:var(--accent);color:#fff}
+  .song{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 12px;margin-bottom:7px}
+  .song .sj{font-family:var(--jp);font-size:.7rem;color:#fff;background:var(--accent);border-radius:6px;padding:4px 7px;flex:none}
+  .song .st{font-family:var(--jp);font-weight:700;font-size:.88rem}
+  .song .sa{color:var(--muted);font-size:.74rem}
+  .song .sg{margin-left:auto;color:var(--muted);font-weight:800}
 
-  /* music */
-  .mus{border-radius:18px;padding:18px 18px 16px;color:#fff;box-shadow:var(--sh2);
-    background:linear-gradient(135deg,#7A5AD1,#E0533A 96%);}
-  .mus .ml{font-family:var(--jp);font-size:.68rem;letter-spacing:.14em;opacity:.85;}
-  .mus .mt{font-family:var(--jp);font-size:1.45rem;margin-top:5px;line-height:1.2;}
-  .mus .ma{opacity:.9;font-size:.9rem;margin-top:4px;}
-  .mus .mact{display:flex;gap:9px;margin-top:16px;}
-  .mus .mact>*{flex:1;text-align:center;font-weight:800;padding:12px 0;border-radius:12px;font-size:.92rem;border:none;cursor:pointer;}
-  .mus .mroll{background:rgba(255,255,255,.2);color:#fff;}
-  .mus .mplay{background:#fff;color:#7A2FD1;}
-  .song{display:flex;align-items:center;gap:11px;background:var(--card);border:1px solid var(--line);border-radius:13px;
-    padding:10px 13px;box-shadow:var(--sh);margin-bottom:8px;}
-  .song .sj{font-family:var(--jp);font-size:.72rem;color:#fff;background:var(--purple);border-radius:7px;padding:5px 8px;flex:none;}
-  .song .st{font-family:var(--jp);font-weight:700;font-size:.9rem;}
-  .song .sa{color:var(--muted);font-size:.77rem;}
-  .song .sg{margin-left:auto;color:var(--accent);font-weight:800;}
+  footer{color:var(--muted);font-size:.76rem;text-align:center;padding:24px 0 8px;line-height:1.7}
 
-  /* tab bar (real nav) */
-  .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:100;display:flex;justify-content:center;
-    background:color-mix(in srgb,var(--card) 90%,transparent);backdrop-filter:blur(14px);
-    border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);}
-  .tabbar .in{max-width:var(--w);width:100%;display:flex;}
-  .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 0 8px;color:var(--muted);
-    cursor:pointer;background:none;border:none;position:relative;}
-  .tab svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s;}
-  .tab .tl{font-size:.66rem;font-weight:800;}
-  .tab.on{color:var(--accent);}
-  .tab.on svg{transform:translateY(-1px) scale(1.06);}
-  .tab.on::before{content:"";position:absolute;top:0;width:26px;height:3px;border-radius:0 0 4px 4px;background:var(--accent);}
-
-  footer{text-align:center;color:var(--muted);font-size:.72rem;margin-top:26px;}
+  /* tabbar */
+  .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:1000;background:color-mix(in srgb,var(--card) 88%,transparent);
+    backdrop-filter:blur(14px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+  .tabbar .in{max-width:var(--w);margin:0 auto;display:flex}
+  .tab{flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 0 8px;color:var(--muted)}
+  .tab svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .tab .tl{font-size:.66rem;font-weight:800}
+  .tab.on{color:var(--accent-ink)}
 </style>
 </head>
 <body>
@@ -224,50 +259,72 @@
 
   <!-- ========== HOME ========== -->
   <section class="view on" id="v-home">
-    <div style="height:20px"></div>
     <div class="hero">
-      <div class="hk">松山 · EHIME</div>
-      <h1>마쓰야마</h1>
-      <div class="hd">3박 4일 · 9.22(화) — 9.25(금)</div>
+      <div class="hero-ph" id="hero-ph"></div>
+      <div class="hero-sh"></div>
       <div class="dday" id="dday">D-?</div>
-      <div class="wnow">
-        <div class="t" id="wi">⏳</div>
-        <div><div class="wt" id="wt">불러오는 중</div><div class="wm" id="wm">마쓰야마 현재 날씨</div></div>
-        <div class="live">LIVE</div>
+      <div class="hero-c">
+        <div class="hk">松山 · EHIME · 旅のしおり</div>
+        <h1>마쓰야마</h1>
+        <div class="hd">3박 4일 · 9.22(화) — 9.25(금)</div>
+        <div class="wnow">
+          <div class="t" id="wi">⏳</div>
+          <div><div class="wt" id="wt">불러오는 중</div><div class="wm" id="wm">마쓰야마 현재 날씨</div></div>
+          <div class="live">LIVE</div>
+        </div>
       </div>
     </div>
 
-    <div class="lbl2">여행 기간 날씨</div>
+    <div class="lbl">여행 기간 날씨</div>
     <div class="fc" id="fc"><div class="d"><div class="dd">…</div></div></div>
 
-    <div class="lbl2">바로가기</div>
-    <div class="quick">
-      <button class="qbtn" data-go="v-plan"><div class="qi" style="background:var(--accent-weak);color:var(--accent)">📅</div><div class="qt">오늘 일정</div><div class="qs">Day별 동선·지도</div></button>
-      <button class="qbtn" data-go="v-map"><div class="qi" style="background:#E4EFEC;color:var(--teal)">🗺️</div><div class="qt">지도</div><div class="qs">전체 스팟 한눈에</div></button>
-      <button class="qbtn" data-go="v-eat"><div class="qi" style="background:var(--accent-weak);color:var(--accent)">🍜</div><div class="qt">맛집</div><div class="qs">혁누추천·현지 맛집</div></button>
-      <button class="qbtn" data-go="v-info"><div class="qi" style="background:var(--card2);color:var(--ink)">🧳</div><div class="qt">여행 정보</div><div class="qs">항공·숙소·준비물</div></button>
+    <div class="lbl">오늘의 곡 🎧</div>
+    <div class="song1">
+      <div class="disc"></div>
+      <div style="min-width:0">
+        <div class="s1t" id="s1t">눌러서 재생</div>
+        <div class="s1a" id="s1a">일본 명곡 랜덤</div>
+      </div>
+      <div class="s1b">
+        <button class="ic-btn ic-roll" id="s1roll">🎲</button>
+        <a class="ic-btn ic-play" id="s1play" href="https://music.youtube.com/" target="_blank" rel="noopener">▶</a>
+      </div>
     </div>
 
-    <div class="lbl2">도착하면 제일 먼저</div>
-    <div class="info-hi">
+    <div class="lbl">오늘 익혀둘 표현 <span style="font-weight:600;color:var(--muted)">· 탭하면 발음 재생 🔊</span></div>
+    <div class="stack" id="home-phrases"></div>
+
+    <div class="lbl">바로가기</div>
+    <div class="quick">
+      <button class="qbtn" data-go="v-plan"><div class="qi" style="background:var(--accent-weak);color:var(--accent-ink)">📅</div><div class="qt">일정</div><div class="qs">Day별 동선·지도</div></button>
+      <button class="qbtn" data-go="v-eat"><div class="qi" style="background:#FFE7EA;color:var(--coral)">🍜</div><div class="qt">맛집</div><div class="qs">평점·추천메뉴·거리</div></button>
+      <button class="qbtn" data-go="v-map"><div class="qi" style="background:#E4EFEC;color:#2E7D74">🗺️</div><div class="qt">지도</div><div class="qs">전체 스팟</div></button>
+      <button class="qbtn" data-go="v-info"><div class="qi" style="background:var(--card2);color:var(--ink)">🧳</div><div class="qt">정보</div><div class="qs">숙소·준비·회화</div></button>
+    </div>
+
+    <div class="lbl">우리끼리 버킷리스트 <span style="font-weight:600;color:var(--muted)">· 하면 탭!</span></div>
+    <div class="todo" id="todo"></div>
+
+    <div class="lbl">도착하면 제일 먼저</div>
+    <div class="miss">
       <h4>🇰🇷 공항서 한국인 무료 혜택 챙기기</h4>
       <p>마쓰야마공항 <b>1층 인포메이션</b>에 <b>여권 제시</b> → ① 명소 8곳 <b>쿠폰북</b>(성·온천·리프트) ② <b>공항↔시내↔도고 무료 셔틀</b>. 도착 즉시 필수!</p>
     </div>
 
-    <div class="lbl2">항공편</div>
-    <div class="ticket">
-      <div class="tr"><div><div class="tlead">가는 편 · 9.22 화</div><div><span class="tcode">08:40</span> <span class="tarr">→ ~10:30</span></div><div class="tmeta">인천 T1 → 마쓰야마 (MYJ) · 직항 1h50m</div></div><div style="margin-left:auto;font-size:1.5rem">🛫</div></div>
-      <div class="tr"><div><div class="tlead">오는 편 · 9.25 금</div><div><span class="tcode">11:15</span> <span class="tarr">→ ~13:05</span></div><div class="tmeta">마쓰야마 → 인천 T1 · 공항 9시까지</div></div><div style="margin-left:auto;font-size:1.5rem">🛬</div></div>
+    <div class="lbl">항공편</div>
+    <div class="card ticket">
+      <div class="tr"><div><div class="tlead">가는 편 · 9.22 화</div><div><span class="tcode tnum">08:40</span> <span class="tarr">→ ~10:30</span></div><div class="tmeta">인천 T1 → 마쓰야마(MYJ) · 직항 1h50m</div></div><div style="margin-left:auto;font-size:1.4rem">🛫</div></div>
+      <div class="tr"><div><div class="tlead">오는 편 · 9.25 금</div><div><span class="tcode tnum">11:15</span> <span class="tarr">→ ~13:05</span></div><div class="tmeta">마쓰야마 → 인천 T1 · 공항 9시까지</div></div><div style="margin-left:auto;font-size:1.4rem">🛬</div></div>
     </div>
     <footer>제주항공 7C · 2명 · 왕복 직항</footer>
   </section>
 
   <!-- ========== PLAN ========== -->
   <section class="view" id="v-plan">
-    <div class="vhead"><div class="k">Itinerary</div><h1>일정</h1></div>
+    <div class="vhead"><div class="k">Itinerary</div><h1>일정</h1><div class="sub">굵직한 것만 · 나머진 그때그때 자유롭게</div></div>
     <div class="daytabs" id="daytabs"></div>
     <div id="day-body"></div>
-    <div class="lbl2">그날 동선</div>
+    <div class="lbl">그날 동선</div>
     <div id="plan-map" class="map"></div>
     <div id="day-eats"></div>
   </section>
@@ -277,27 +334,31 @@
     <div class="vhead"><div class="k">Map</div><h1>지도</h1><div class="sub">핀 탭 → 구글맵 리뷰·길찾기</div></div>
     <div id="ov-map" class="map"></div>
     <div class="mtools">
-      <button class="mbtn" data-ov="main">공항·숙소·시내</button>
+      <button class="mbtn on" data-ov="main">공항·숙소·시내</button>
       <button class="mbtn" data-ov="all">전체(로드트립)</button>
     </div>
     <div class="legend">
       <span>🏨숙소 · ✈️공항</span>
       <span><span class="dot" style="background:#2E7D74"></span>명소</span>
-      <span><span class="dot" style="background:#E0533A"></span>추천 맛집</span>
+      <span><span class="dot" style="background:#FF5D73"></span>혁누추천</span>
       <span><span class="dot" style="background:#7A5AD1"></span>우치코·시모나다</span>
     </div>
   </section>
 
   <!-- ========== EAT ========== -->
   <section class="view" id="v-eat">
-    <div class="vhead"><div class="k">Eat &amp; Drink</div><h1>맛집</h1><div class="sub">구글맵 리뷰·네이버 랭킹·혁누추천</div></div>
+    <div class="vhead"><div class="k">Eat &amp; Play</div><h1>맛집 · 스팟</h1><div class="sub">구글 평점 · 추천메뉴 · 내 위치 기준 거리</div></div>
     <div id="food-map" class="map"></div>
     <div class="mtools">
-      <button class="mbtn" data-fm="city">🏙️ 시내</button>
+      <button class="mbtn on" data-fm="city">🏙️ 시내</button>
       <button class="mbtn" data-fm="dogo">♨️ 도고</button>
       <button class="mbtn" data-fm="all">전체</button>
     </div>
-    <div class="filters" id="food-filters"></div>
+    <button class="locbtn" id="locbtn">📍 내 위치 기준 거리 보기</button>
+    <div class="filters" id="filters"></div>
+    <div class="lbl">🍽️ 먹킷리스트 <span style="font-weight:600;color:var(--muted)">· 먹으면 탭!</span></div>
+    <div class="must" id="must"></div>
+    <div class="lbl">스팟 <span id="food-count" style="font-weight:600;color:var(--muted)"></span></div>
     <div id="food-list"></div>
   </section>
 
@@ -306,55 +367,56 @@
     <div class="vhead"><div class="k">Guide</div><h1>여행 정보</h1></div>
 
     <details class="acc" open><summary><span class="ci">🏨</span>숙소<span class="ar">›</span></summary><div class="body kv">
-      <div><span class="k">히요리 (1·2박)</span> 오카이도 중심 · <b>노면전차 정류장 앞</b> · 도고 차 3분. 2026.4 신축, 해피아워. ⚠️3박까지 객실청소 없음. <a class="b-accent fw8" href="https://www.google.com/maps/search/?api=1&amp;query=HIYORI HOTEL 松山" target="_blank" rel="noopener">지도↗</a></div>
-      <div><span class="k">도고칸 (3박)</span> 도고온천역 도보 7분 · 구로카와 기쇼 설계 료칸 · <b>가이세키 극찬</b>. <a class="b-accent fw8" href="https://www.google.com/maps/search/?api=1&amp;query=道後館 松山" target="_blank" rel="noopener">지도↗</a></div>
-      <div><span class="k">짐</span> 히요리→도고칸 노면전차 20분. 짐배송 문의 가능.</div>
+      <div><span class="k">히요리 (1·2박)</span> 오카이도 중심 · <b>노면전차 정류장 앞</b> · 도고 차 3분. 2026.4 신축, 해피아워. ⚠️3박까지 객실청소 없음. <a class="b-acc" href="https://www.google.com/maps/search/?api=1&amp;query=HIYORI HOTEL 松山" target="_blank" rel="noopener">지도↗</a></div>
+      <div><span class="k">도고칸 (3박)</span> 도고온천역 도보 7분 · 구로카와 기쇼 설계 료칸 · <b>가이세키 극찬</b>. <a class="b-acc" href="https://www.google.com/maps/search/?api=1&amp;query=道後館 松山" target="_blank" rel="noopener">지도↗</a></div>
+      <div><span class="k">짐 이동</span> 히요리→도고칸 노면전차 20분. 짐배송 문의 가능.</div>
     </div></details>
 
     <details class="acc"><summary><span class="ci">🚌</span>교통<span class="ar">›</span></summary><div class="body kv">
       <div><span class="k">한국인 무료 셔틀 ⭐</span> 공항↔시내↔도고 · 여권 제시 무료 · 7정류장.</div>
       <div><span class="k">노면전차</span> 1회 ¥180(거리무관) · 1일권 있음(4번+ 타면 이득).</div>
-      <div><span class="k">봇짱열차</span> ⚠️ 주말·공휴일만 운행(9/23 추분 가능성).</div>
+      <div><span class="k">봇짱열차</span> ⚠️ 주말·공휴일만(9/23 추분 가능성).</div>
       <div><span class="k">JR (2일차)</span> 시모나다 이요나다선 배차 1~2h — 시각표 필수.</div>
     </div></details>
 
     <details class="acc"><summary><span class="ci">💴</span>환전 · 결제<span class="ar">›</span></summary><div class="body kv">
-      <div><span class="k">환전</span> 토스뱅크 엔화는 보통 <b>국내(인천) 수령</b> — 앱에서 수령처 확인, 인천 T1서 받아가기 권장. 소도시라 현금 중요.</div>
-      <div><span class="k">카드</span> 비자/마스터 큰 차이 없음. 일본은 비자·JCB 커버리지 넓음. 소형점은 현금. <b>엔화(현지통화)로 결제</b> 선택.</div>
+      <div><span class="k">환전</span> 토스뱅크 엔화는 보통 <b>국내(인천) 수령</b> — 앱서 수령처 확인, 인천 T1서 받아가기 권장. 소도시라 현금 중요.</div>
+      <div><span class="k">카드</span> 비자/마스터 큰 차이 없음. 소형점은 현금. <b>엔화(현지통화)로 결제</b> 선택.</div>
+      <div><span class="k">밤맥주 🍺</span> 편의점 필터 참고 · 로손·패미마·세븐 다 있음.</div>
     </div></details>
 
     <details class="acc"><summary><span class="ci">🗾</span>기본 상식<span class="ar">›</span></summary><div class="body kv">
       <div><span class="k">도고온천</span> 일본 최고(最古) 온천 중 하나 · 2024 재개관 · 「센과 치히로」 영감지.</div>
       <div><span class="k">마쓰야마성</span> 현존 12천수 · 체어리프트 강추 · 막차 ~17시.</div>
-      <div><span class="k">전기</span> 100V, A타입 어댑터 필요 · 시차 없음.</div>
+      <div><span class="k">전기·시차</span> 100V A타입 어댑터 · 시차 없음.</div>
       <div><span class="k">미칸</span> 에히메 = 귤의 고장 · 미칸주스 수도꼭지 명물.</div>
     </div></details>
 
     <details class="acc"><summary><span class="ci">✅</span>준비물 체크리스트<span class="ar">›</span></summary><div class="body">
-      <div class="cprog"><div class="ctrack"><div class="cfill" id="cfill"></div></div><div id="ccount" class="fw8 tnum" style="font-size:.82rem">0/0</div><button class="mbtn" id="creset">초기화</button></div>
+      <div class="cprog"><div class="ctrack"><div class="cfill" id="cfill"></div></div><div id="ccount" class="tnum" style="font-weight:800;font-size:.82rem">0/0</div><button class="mbtn" id="creset">초기화</button></div>
       <div class="chk" id="chk"></div>
     </div></details>
 
-    <details class="acc"><summary><span class="ci">🗣️</span>기초 회화<span class="ar">›</span></summary><div class="body" id="phrases"></div></details>
+    <details class="acc"><summary><span class="ci">🗣️</span>기초 회화 <span style="font-weight:600;color:var(--muted);font-size:.8rem">· 탭→발음</span><span class="ar">›</span></summary><div class="body" id="phrases"></div></details>
 
     <details class="acc"><summary><span class="ci">🎵</span>여행 BGM<span class="ar">›</span></summary><div class="body">
       <div class="mus">
         <div class="ml">今日の一曲 · 지금 이 곡</div>
         <div class="mt" id="mt">🎲 눌러봐</div>
-        <div class="ma" id="ma">아이묭·아라시·후지이 카제·요아소비…</div>
+        <div class="ma" id="ma">요네즈 켄시·아이묭·아라시·후지이 카제…</div>
         <div class="mact"><button class="mroll" id="mroll">🎲 랜덤</button><a class="mplay" id="mplay" href="https://music.youtube.com/" target="_blank" rel="noopener">▶ 유튜브뮤직</a></div>
       </div>
       <div style="height:12px"></div>
       <div id="songs"></div>
     </div></details>
 
-    <footer>마쓰야마 여행 핸드북 · 旅のしおり<br>지도 © OpenStreetMap · 날씨 © Open-Meteo</footer>
+    <footer>마쓰야마 여행 핸드북 · 旅のしおり<br>지도 © OpenStreetMap · 날씨 © Open-Meteo · 발음 © 브라우저 TTS</footer>
   </section>
 
 </div>
 
 <nav class="tabbar"><div class="in">
-  <button class="tab on" data-v="v-home"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg><span class="tl">오늘</span></button>
+  <button class="tab on" data-v="v-home"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg><span class="tl">홈</span></button>
   <button class="tab" data-v="v-plan"><svg viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg><span class="tl">일정</span></button>
   <button class="tab" data-v="v-map"><svg viewBox="0 0 24 24"><path d="M12 21s-6.5-5.5-6.5-10.5A6.5 6.5 0 0112 4a6.5 6.5 0 016.5 6.5C18.5 15.5 12 21 12 21z"/><circle cx="12" cy="10.5" r="2.3"/></svg><span class="tl">지도</span></button>
   <button class="tab" data-v="v-eat"><svg viewBox="0 0 24 24"><path d="M6 3v8M9 3v8a3 3 0 01-6 0V3M7.5 11v10"/><path d="M17 3c-1.7 0-3 3-3 6.5S15.5 14 17 14v7"/></svg><span class="tl">맛집</span></button>
@@ -366,6 +428,8 @@
 (function(){
   var TILE='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
   function gm(q){return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q);}
+  function ytm(a,t){return 'https://music.youtube.com/search?q='+encodeURIComponent(a+' '+t);}
+  function speak(t){try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang='ja-JP';u.rate=.9;speechSynthesis.speak(u);}catch(e){}}
 
   /* ---------- routing ---------- */
   var tabs=document.querySelectorAll('.tab'), views=document.querySelectorAll('.view');
@@ -373,15 +437,15 @@
     views.forEach(function(s){s.classList.toggle('on',s.id===v);});
     tabs.forEach(function(t){t.classList.toggle('on',t.dataset.v===v);});
     window.scrollTo(0,0);
-    if(v==='v-map') ensureOv();
-    if(v==='v-eat') ensureFood();
-    if(v==='v-plan') ensurePlan();
+    if(v==='v-map')ensureOv();
+    if(v==='v-eat')ensureFood();
+    if(v==='v-plan')ensurePlan();
   }
   tabs.forEach(function(t){t.addEventListener('click',function(){show(t.dataset.v);});});
   document.querySelectorAll('[data-go]').forEach(function(b){b.addEventListener('click',function(){show(b.dataset.go);});});
 
   /* ---------- data ---------- */
-  var COL={stay:'#E1962F',sight:'#2E7D74',road:'#7A5AD1',transit:'#8A9089',food:'#E0533A'};
+  var COL={stay:'#E1962F',sight:'#2E7D74',road:'#7A5AD1',transit:'#8A9089',pick:'#FF5D73'};
   var PLACES=[
     {n:'마쓰야마공항',j:'松山空港',lat:33.8272,lng:132.6997,c:'transit',q:'松山空港',big:'✈️'},
     {n:'히요리',j:'HIYORI',lat:33.8399,lng:132.7686,c:'stay',q:'HIYORI HOTEL 松山',big:'🏨'},
@@ -391,55 +455,76 @@
     {n:'오카이도',j:'大街道',lat:33.8420,lng:132.7686,c:'sight',q:'大街道 松山'},
     {n:'이시테지',j:'石手寺',lat:33.8497,lng:132.8010,c:'sight',q:'石手寺'},
     {n:'반스이소',j:'萬翠荘',lat:33.8433,lng:132.7648,c:'sight',q:'萬翠荘'},
-    {n:'아미모토 별저',j:'網元別邸',lat:33.8412,lng:132.7693,c:'food',q:'網元 別邸 松山 一番町'},
-    {n:'아즈마야',j:'炭火焼鳥 東屋',lat:33.8391,lng:132.7690,c:'food',q:'炭火焼鳥 東屋 松山'},
-    {n:'우나기 오구라',j:'うなぎおぐら',lat:33.8506,lng:132.7846,c:'food',q:'うなぎ おぐら 道後'},
+    {n:'아미모토 별저',j:'網元別邸',lat:33.8412,lng:132.7693,c:'pick',q:'網元 別邸 松山 一番町'},
+    {n:'아즈마야',j:'炭火焼鳥 東屋',lat:33.8391,lng:132.7690,c:'pick',q:'炭火焼鳥 東屋 松山'},
+    {n:'우나기 오구라',j:'うなぎおぐら',lat:33.8506,lng:132.7846,c:'pick',q:'うなぎ おぐら 道後'},
+    {n:'빌트모어 커피',j:'Biltmore',lat:33.8388,lng:132.7648,c:'pick',q:'Biltmore Coffee 松山 港町'},
     {n:'우치코 옛거리',j:'内子',lat:33.5389,lng:132.6538,c:'road',q:'内子座'},
     {n:'시모나다역',j:'下灘駅',lat:33.6816,lng:132.6300,c:'road',q:'下灘駅'},
     {n:'후타미 해변',j:'双海',lat:33.6470,lng:132.6160,c:'road',q:'ふたみシーサイド公園 双海 夕日'}
   ];
-  var FC={pick:'#E0533A',local:'#D14D41',izakaya:'#E1962F',eel:'#8A5A2B',cafe:'#2E7D74'};
-  var FCN={pick:'혁누추천',local:'향토·우동',izakaya:'이자카야·고기',eel:'장어',cafe:'카페·디저트'};
+  var FC={pick:'#FF5D73',eat:'#F0872E',nopo:'#A6743E',hidden:'#7C9E3C',dessert:'#E86FA6',cafe:'#8A6BC4',shop:'#4C8DF6',photo:'#E0B341',konbini:'#12C46A'};
+  var FCN={pick:'혁누추천',eat:'맛집',nopo:'노포',hidden:'숨은맛집',dessert:'디저트',cafe:'카페',shop:'쇼핑·백화점',photo:'사진·추억',konbini:'편의점'};
+  var FORD=['pick','eat','nopo','hidden','dessert','cafe','shop','photo','konbini'];
   var FOODS=[
-    {n:'아미모토 별저',j:'網元別邸',lat:33.8412,lng:132.7693,cat:'pick',a:'city',q:'網元 別邸 松山 一番町',o:'혁누추천 · 해산물 이자카야'},
-    {n:'아즈마야',j:'炭火焼鳥 東屋',lat:33.8391,lng:132.7690,cat:'pick',a:'city',q:'炭火焼鳥 東屋 松山',o:'혁누추천 · 숯불 야키토리'},
-    {n:'우나기 오구라',j:'うなぎおぐら',lat:33.8506,lng:132.7846,cat:'pick',a:'dogo',q:'うなぎ おぐら 道後',o:'혁누추천 · 도고 장어'},
-    {n:'빌트모어 커피',j:'Biltmore Coffee',lat:33.8388,lng:132.7648,cat:'pick',a:'city',q:'Biltmore Coffee 松山 港町',o:'혁누추천 · 프렌치토스트 꼭!'},
-    {n:'고시키',j:'五志喜',lat:33.8410,lng:132.7670,cat:'local',a:'city',q:'五志喜 松山',o:'380년 노포 타이메시'},
-    {n:'카도야',j:'かどや',lat:33.8420,lng:132.7689,cat:'local',a:'city',q:'かどや 松山 大街道',o:'도미밥 명가, 웨이팅'},
-    {n:'아사히',j:'アサヒ',lat:33.8405,lng:132.7666,cat:'local',a:'city',q:'アサヒ 鍋焼きうどん 松山',o:'나베야키우동 · 낮에만'},
-    {n:'코토리',j:'ことり',lat:33.8388,lng:132.7670,cat:'local',a:'city',q:'ことり 鍋焼きうどん 松山',o:'나베야키우동'},
-    {n:'봇짱',j:'坊っちゃん',lat:33.8512,lng:132.7852,cat:'local',a:'dogo',q:'坊っちゃん 道後 商店街',o:'도고 명물'},
-    {n:'로벤토 본점',j:'炉辺人',lat:33.8425,lng:132.7681,cat:'izakaya',a:'city',q:'炉辺人 松山',o:'원목 로바타야키'},
-    {n:'불독',j:'ブルドッグ',lat:33.8398,lng:132.7687,cat:'izakaya',a:'city',q:'ブルドッグ 松山 カレー',o:'규카츠 카레 노포'},
-    {n:'오니쿠토365',j:'お肉と365',lat:33.8422,lng:132.7700,cat:'izakaya',a:'city',q:'お肉と365 松山',o:'와규 야키니쿠'},
-    {n:'오이덴야',j:'おいでん家',lat:33.8516,lng:132.7857,cat:'izakaya',a:'dogo',q:'おいでん家 道後',o:'도고 산지직송 회'},
-    {n:'우나이치',j:'うな一',lat:33.8400,lng:132.7662,cat:'eel',a:'city',q:'うな一 松山 銀天街',o:'긴텐가이 장어 명가'},
-    {n:'유케무리 카페',j:'湯けむりカフェ',lat:33.8525,lng:132.7852,cat:'cafe',a:'dogo',q:'道後 湯けむりカフェ',o:'120년 고민가·당고'},
-    {n:'마치야',j:'町屋',lat:33.8515,lng:132.7860,cat:'cafe',a:'dogo',q:'道後 町屋 カフェ',o:'고민가·정원 다다미'},
-    {n:'아카렌가야',j:'赤煉瓦屋',lat:33.8415,lng:132.7695,cat:'cafe',a:'city',q:'松山 赤煉瓦 珈琲',o:'레트로 킷사'},
-    {n:'키리노모리',j:'霧の森',lat:33.8420,lng:132.7690,cat:'cafe',a:'city',q:'霧の森菓子工房 松山店',o:'통판 1위 다이후쿠'}
+    {n:'아미모토 별저',j:'網元別邸',lat:33.8412,lng:132.7693,cat:'pick',a:'city',r:4.2,q:'網元 別邸 松山 一番町',m:[['모듬 사시미','산지직송 해산물이 간판'],['타이메시','에히메 대표 도미밥']],o:'혁누추천 · 해산물 이자카야'},
+    {n:'아즈마야',j:'炭火焼鳥 東屋',lat:33.8391,lng:132.7690,cat:'pick',a:'city',r:4.1,q:'炭火焼鳥 東屋 松山',m:[['모듬 야키토리','숯불향 대표'],['츠쿠네','부드러운 완자 인기']],o:'혁누추천 · 숯불 야키토리'},
+    {n:'우나기 오구라',j:'うなぎおぐら',lat:33.8506,lng:132.7846,cat:'pick',a:'dogo',r:4.3,q:'うなぎ おぐら 道後',m:[['우나주(장어덮밥)','바삭+촉촉 간판'],['세이로무시','찜장어 별미']],o:'혁누추천 · 도고 장어'},
+    {n:'빌트모어 커피',j:'Biltmore Coffee',lat:33.8388,lng:132.7648,cat:'pick',a:'city',r:4.4,q:'Biltmore Coffee 松山 港町',m:[['프렌치토스트','혁누 강력추천 필수!'],['핸드드립','로스팅 좋음']],o:'혁누추천'},
+    {n:'고시키',j:'五志喜',lat:33.8410,lng:132.7670,cat:'nopo',a:'city',r:3.9,q:'五志喜 松山',m:[['우와지마 타이메시','380년 노포 간판'],['소바고메지루','향토 별미']],o:'380년 타이메시 노포'},
+    {n:'아사히 (나베야키우동)',j:'アサヒ',lat:33.8405,lng:132.7666,cat:'nopo',a:'city',r:4.0,q:'アサヒ 鍋焼きうどん 松山',m:[['나베야키우동','달큰 국물 원조'],['이나리즈시','세트로']],o:'나베야키우동 노포 · 낮에만'},
+    {n:'로켄만토',j:'労研饅頭',lat:33.8402,lng:132.7665,cat:'nopo',a:'city',r:4.0,q:'労研饅頭 松山',m:[['로켄만토','마쓰야마 100년 찐빵'],['팥','대표 속']],o:'100년 전통 찐빵'},
+    {n:'우스즈미 요칸',j:'薄墨羊羹',lat:33.8514,lng:132.7850,cat:'nopo',a:'dogo',r:4.1,q:'薄墨羊羹 道後',m:[['우스즈미 요칸','도고 화과자 노포'],['모나카','선물용']],o:'도고 화과자 노포'},
+    {n:'봇짱',j:'坊っちゃん',lat:33.8512,lng:132.7852,cat:'nopo',a:'dogo',r:3.8,q:'坊っちゃん 道後 商店街',m:[['봇짱 정식','도고 아케이드 명물'],['타이메시','정통 도미밥']],o:'도고 명물집'},
+    {n:'카도야',j:'かどや',lat:33.8420,lng:132.7689,cat:'eat',a:'city',r:4.0,q:'かどや 松山 大街道',m:[['우와지마 타이메시','도미밥 명가'],['지야코텐','에히메 어묵']],o:'도미밥 명가 · 웨이팅'},
+    {n:'코토리',j:'ことり',lat:33.8388,lng:132.7670,cat:'eat',a:'city',r:4.1,q:'ことり 鍋焼きうどん 松山',m:[['나베야키우동','진한 국물 인기'],['오뎅','곁들임']],o:'나베야키우동 인기'},
+    {n:'로벤토 본점',j:'炉辺人',lat:33.8425,lng:132.7681,cat:'eat',a:'city',r:4.2,q:'炉辺人 松山',m:[['로바타 해산물구이','원목 화덕구이'],['제철 사시미','신선도 좋음']],o:'원목 로바타야키'},
+    {n:'오니쿠토365',j:'お肉と365',lat:33.8422,lng:132.7700,cat:'eat',a:'city',r:4.3,q:'お肉と365 松山',m:[['우설(규탄) 소금구이','투두: 우설 먹기 🐄'],['오늘의 와규 세트','가성비 야키니쿠']],o:'와규·우설 야키니쿠'},
+    {n:'미쓰하마야키',j:'三津浜焼き',lat:33.8412,lng:132.7682,cat:'eat',a:'city',r:4.0,q:'三津浜焼き 松山',m:[['미쓰하마야키','마쓰야마식 오코노미야키'],['소바이리','면 추가']],o:'마쓰야마식 오코노미야키'},
+    {n:'다코야끼 야타이',j:'たこ焼き',lat:33.8417,lng:132.7690,cat:'eat',a:'city',r:4.0,q:'たこ焼き 松山 大街道',m:[['다코야끼','겉바속촉 문어빵 🐙'],['소스+가츠오','정통']],o:'투두: 다코야끼 먹기'},
+    {n:'오이덴야',j:'おいでん家',lat:33.8516,lng:132.7857,cat:'eat',a:'dogo',r:4.0,q:'おいでん家 道後',m:[['제철 사시미','산지직송 회'],['지야코텐','안주 인기']],o:'도고 산지직송 회'},
+    {n:'우나이치',j:'うな一',lat:33.8400,lng:132.7662,cat:'hidden',a:'city',r:4.3,q:'うな一 松山 銀天街',m:[['우나동','긴텐가이 숨은 장어'],['키모스이','장어 간 국물']],o:'긴텐가이 숨은 장어'},
+    {n:'불독',j:'ブルドッグ',lat:33.8398,lng:132.7687,cat:'hidden',a:'city',r:4.1,q:'ブルドッグ 松山 カレー',m:[['규카츠 카레','레트로 노포 간판'],['하야시라이스','오랜 인기']],o:'규카츠 카레 노포'},
+    {n:'이마바리 야키토리',j:'今治焼き鳥',lat:33.8408,lng:132.7679,cat:'hidden',a:'city',r:4.0,q:'今治焼き鳥 松山',m:[['테판 야키토리','철판 눌러구이'],['카와','바삭 인기']],o:'철판 눌러굽는 닭꼬치'},
+    {n:'10 FACTORY',j:'10ファクトリー',lat:33.8418,lng:132.7686,cat:'dessert',a:'city',r:4.2,q:'10ファクトリー 松山 大街道',m:[['미칸 젤라또','에히메 감귤 100%'],['생미칸주스','품종별 선택']],o:'미칸 디저트 전문'},
+    {n:'키리노모리 다이후쿠',j:'霧の森',lat:33.8420,lng:132.7690,cat:'dessert',a:'city',r:4.4,q:'霧の森菓子工房 松山店',m:[['키리노모리 다이후쿠','통판 1위 말차떡'],['롤케이크','품절 잦음']],o:'통판 1위 다이후쿠'},
+    {n:'봇짱 당고',j:'坊っちゃん団子',lat:33.8520,lng:132.7855,cat:'dessert',a:'dogo',r:4.0,q:'坊っちゃん団子 道後',m:[['봇짱 당고','3색 경단 명물'],['미타라시','간장소스']],o:'도고 3색 경단'},
+    {n:'포엠',j:'ぽえむ 母恵夢',lat:33.8415,lng:132.7684,cat:'dessert',a:'city',r:4.0,q:'母恵夢 松山',m:[['포엠','에히메 대표 명과'],['미니 포엠','선물용']],o:'에히메 대표 명과'},
+    {n:'유케무리 카페',j:'湯けむりカフェ',lat:33.8525,lng:132.7852,cat:'cafe',a:'dogo',r:4.2,q:'道後 湯けむりカフェ',m:[['당고 파르페','120년 고민가'],['미칸 소다','상큼']],o:'120년 고민가 카페'},
+    {n:'마치야',j:'町屋',lat:33.8515,lng:132.7860,cat:'cafe',a:'dogo',r:4.1,q:'道後 町屋 カフェ',m:[['수제버거(점심)','고민가 카페'],['자가로스팅 커피','정원뷰']],o:'고민가·정원 다다미'},
+    {n:'아카렌가야',j:'赤煉瓦屋',lat:33.8415,lng:132.7695,cat:'cafe',a:'city',r:4.0,q:'松山 赤煉瓦 珈琲',m:[['블렌드 커피','레트로 킷사'],['나폴리탄','옛날 경양식']],o:'레트로 킷사텐'},
+    {n:'스타벅스 도고',j:'スターバックス道後',lat:33.8522,lng:132.7858,cat:'cafe',a:'dogo',r:4.1,q:'スターバックス 道後',m:[['시즌 프라푸치노','온천가 뷰 매장'],['지역 굿즈','기념']],o:'온천가 스벅'},
+    {n:'이요테츠 다카시마야',j:'いよてつ高島屋',lat:33.8393,lng:132.7658,cat:'shop',a:'city',r:4.2,q:'いよてつ高島屋 松山',m:[['옥상 대관람차 구루린','야경 뷰'],['지하 명과','기념품']],o:'백화점 · 옥상 관람차'},
+    {n:'미쓰코시 마쓰야마',j:'三越',lat:33.8419,lng:132.7691,cat:'shop',a:'city',r:4.0,q:'松山三越',m:[['데파치카 식품관','선물·간식'],['브랜드관','쇼핑']],o:'오카이도 백화점'},
+    {n:'오카이도·긴텐가이',j:'大街道',lat:33.8416,lng:132.7686,cat:'shop',a:'city',r:4.3,q:'大街道 松山',m:[['아케이드 쇼핑','드럭·잡화·기념품'],['맛집 밀집','저녁 산책']],o:'아케이드 상점가'},
+    {n:'돈키호테 마쓰야마',j:'ドン・キホーテ',lat:33.8409,lng:132.7676,cat:'shop',a:'city',r:4.1,q:'ドン・キホーテ 松山',m:[['잡화·간식 싹쓸이','기념품'],['면세','여권 지참']],o:'잡화·간식 쇼핑'},
+    {n:'도고 기모노 렌탈',j:'道後着物レンタル',lat:33.8518,lng:132.7856,cat:'photo',a:'dogo',r:4.4,q:'道後 着物レンタル',m:[['기모노+온천가 산책','인생샷'],['헤어세트','옵션']],o:'착물 대여 · 추억사진'},
+    {n:'프리쿠라 (게임센터)',j:'プリクラ',lat:33.8414,lng:132.7688,cat:'photo',a:'city',r:4.0,q:'ゲームセンター プリクラ 松山 大街道',m:[['프리쿠라','둘이 추억사진'],['크레인게임','인형뽑기']],o:'추억 사진·게임'},
+    {n:'로손 (오카이도)',j:'ローソン',lat:33.8407,lng:132.7688,cat:'konbini',a:'city',r:3.9,q:'ローソン 松山 大街道',m:[['생·캔맥주','밤맥주 보급 🍺'],['가라아게쿤','인기 간식']],o:'히요리 근처 · 밤맥주'},
+    {n:'패밀리마트 (도고)',j:'ファミリーマート',lat:33.8518,lng:132.7852,cat:'konbini',a:'dogo',r:3.9,q:'ファミリーマート 道後温泉',m:[['맥주·하이볼','밤맥주 🍺'],['파미치키','치킨']],o:'도고칸 근처 · 밤맥주'},
+    {n:'세븐일레븐 (시역)',j:'セブンイレブン',lat:33.8396,lng:132.7660,cat:'konbini',a:'city',r:4.0,q:'セブンイレブン 松山市駅',m:[['아이스 군고구마(冷やし焼き芋)','투두: 꼭 먹기 🍠'],['맥주·안주','밤맥주 🍺']],o:'시내 · 밤맥주·군고구마'}
   ];
+  var MUST=['타이메시','나베야키우동','지야코텐','미칸주스','봇짱당고','이마바리야키토리','이치로쿠타르트','프렌치토스트(빌트모어)'];
   var DAYS=[
-    {n:1,date:'9.22 화',t:'도착 · 마쓰야마 시내',col:'#E0533A',
-     chips:['ICN 08:40→MYJ','공항 쿠폰북','히요리'],
-     slots:[['오전','MYJ 도착→인포메이션서 쿠폰북·무료셔틀(여권)→시내→짐→코메다 브런치'],['점심','오카이도 잇푸도 라멘 / 고시키 타이메시'],['오후','마쓰야마성(체어리프트!)→사카노우에 뮤지엄→반스이소'],['저녁','오카이도 쇼핑 · 이자카야 아미모토/아즈마야']],
-     pts:[[33.8272,132.6997,'공항'],[33.8399,132.7686,'히요리'],[33.8457,132.7657,'마쓰야마성'],[33.8433,132.7648,'반스이소'],[33.8412,132.7690,'오카이도']],
-     eats:['아미모토 별저','아즈마야','고시키']},
-    {n:2,date:'9.23 수',t:'러닝 · 우치코 · 시모나다',col:'#7A5AD1',
-     chips:['히요리','09:00 미용실','열차','시모나다 일몰'],
-     slots:[['04:00','러닝 42km → 복귀·샤워'],['09:00','미용실(~1h) → JR 이동'],['낮','우치코 옛거리 + 점심'],['오후','이요나다선 열차 → 시모나다 방면 (배차 1~2h 주의)'],['~18:00','시모나다역/후타미 해변 일몰 → 복귀·저녁']],
+    {n:1,date:'9.22 화',t:'도착 · 마쓰야마 시내',col:'#FF5D73',
+     chips:['오후 도착','쿠폰북·무료셔틀','히요리'],
+     slots:[['도착','공항서 쿠폰북·무료셔틀(여권) → 시내 → 짐'],['낮','마쓰야마성(체어리프트) · 오카이도 산책'],['저녁','오카이도 이자카야(아미모토/아즈마야)']],
+     pts:[[33.8272,132.6997,'공항'],[33.8399,132.7686,'히요리'],[33.8457,132.7657,'마쓰야마성'],[33.8412,132.7690,'오카이도']],
+     eats:['아미모토 별저','아즈마야']},
+    {n:2,date:'9.23 수',t:'우치코 · 시모나다 노을',col:'#7A5AD1',
+     chips:['오전 미용실','열차','시모나다 일몰'],
+     slots:[['오전','미용실(~1h) → JR로 이동'],['낮','우치코 옛거리 산책 + 점심'],['저녁','시모나다역/후타미 해변 노을 → 복귀']],
      pts:[[33.8399,132.7686,'히요리'],[33.5389,132.6538,'우치코'],[33.6816,132.6300,'시모나다역'],[33.6470,132.6160,'후타미(노을)']],
      line:[[33.8399,132.7686],[33.5389,132.6538],[33.6816,132.6300],[33.6470,132.6160],[33.8399,132.7686]],
      eats:[]},
-    {n:3,date:'9.24 목',t:'도고온천 · 회복데이',col:'#2E7D74',
-     chips:['도고칸 체크인','본관 2층 개인실'],
-     slots:[['오전','이사니와 신사 · 감성카페(유케무리/마치야) → 도고칸 체크인'],['오후','도고온천 본관 2층 개인실 · 상점가 · 대관람차 구루린 · 미칸주스'],['저녁','우나기 오구라/오이덴야 · 유카타 야간산책']],
+    {n:3,date:'9.24 목',t:'도고온천 · 회복',col:'#2E7D74',
+     chips:['도고칸','본관 2층 개인실'],
+     slots:[['오전','이사니와 신사 · 감성카페 → 도고칸 체크인'],['오후','도고온천 본관 개인실 · 상점가 · 미칸주스'],['저녁','우나기 오구라 · 유카타 야간산책']],
      pts:[[33.8515,132.7869,'이사니와 신사'],[33.8536,132.7855,'도고칸'],[33.8519,132.7863,'도고온천 본관'],[33.8506,132.7846,'우나기 오구라']],
-     eats:['우나기 오구라','오이덴야','유케무리 카페']},
+     eats:['우나기 오구라','유케무리 카페']},
     {n:4,date:'9.25 금',t:'출국',col:'#8A9089',
-     chips:['~8:20 무료셔틀','MYJ 11:15→ICN'],
-     slots:[['아침','도고 아침 족욕/조식 · 짐 정리'],['이동','공항 무료셔틀(시각 확인) → 9시까지 도착']],
+     chips:['무료셔틀','MYJ 11:15'],
+     slots:[['아침','도고 아침 족욕 · 짐 정리'],['이동','무료셔틀 → 공항 9시까지']],
      pts:[[33.8536,132.7855,'도고칸'],[33.8272,132.6997,'공항']],
      eats:[]}
   ];
@@ -447,44 +532,77 @@
     ['g','🙋 우리 소개'],
     ['한국에서 여행 왔어요','韓国から旅行に来ました','칸코쿠카라 료코-니 키마시타'],
     ['둘이 사귄 지 3년 됐어요','付き合って3年です','츠키앗테 산넨데스'],
-    ['제가 두 살 연하예요','僕が2歳年下です','보쿠가 니사이 토시시타데스'],
     ['같이 살고 있어요','一緒に住んでいます','잇쇼니 슨데이마스'],
-    ['저는 서버 개발자예요','僕はサーバーエンジニアです','보쿠와 사-바- 엔지니아데스'],
-    ['여자친구는 디자이너예요','彼女はデザイナーです','카노죠와 데자이나-데스'],
-    ['g','💬 스몰톡'],
+    ['저는 개발자, 여자친구는 디자이너예요','僕はエンジニアで彼女はデザイナーです','보쿠와 엔지니아데 카노죠와 데자이나-데스'],
+    ['g','💬 인사·스몰톡'],
+    ['안녕하세요','こんにちは','콘니치와'],
     ['감사합니다','ありがとうございます','아리가토- 고자이마스'],
-    ['저기요/실례합니다','すみません','스미마셍'],
-    ['맛있어요!','おいしいです！','오이시-데스'],
+    ['저기요 / 실례합니다','すみません','스미마셍'],
+    ['맛있어요!','おいしいです','오이시-데스'],
     ['사진 찍어주실 수 있어요?','写真を撮ってもらえますか','샤신오 톳테 모라에마스카'],
     ['g','🍽️ 주문·실전'],
     ['이거 주세요','これください','코레 쿠다사이'],
     ['추천이 뭐예요?','おすすめは何ですか','오스스메와 난데스카'],
+    ['두 명이에요','二人です','후타리데스'],
+    ['생맥주 두 잔 주세요','生ビール二つください','나마비-루 후타츠 쿠다사이'],
     ['얼마예요?','いくらですか','이쿠라데스카'],
     ['카드 되나요?','カードは使えますか','카-도와 츠카에마스카'],
     ['계산해 주세요','お会計お願いします','오카이케- 오네가이시마스'],
     ['화장실 어디예요?','トイレはどこですか','토이레와 도코데스카']
   ];
   var CHK=[
-    ['📄 서류',['여권(유효 6개월+)','제주항공 e-티켓','숙소 예약확인','여행자보험','eSIM 설치확인','Visit Japan Web(입국·세관 QR)']],
-    ['💴 돈',['엔화 현금(50만원분)','해외결제 카드','동전지갑','국내 신분증']],
-    ['📱 전자기기',['보조배터리(기내)','110V A타입 어댑터','러닝워치+충전기','멀티충전기','이어폰']],
-    ['👕 의류',['반팔 3~4','얇은 겉옷','편한 바지','속옷·양말','편한 운동화','슬리퍼·모자']],
-    ['🏃 러닝',['러닝화','러닝복 상하','에너지젤','물집방지']],
+    ['📄 서류',['여권(6개월+)','제주항공 e티켓','숙소 예약확인','여행자보험','eSIM','Visit Japan Web QR']],
+    ['💴 돈',['엔화 현금','해외카드','동전지갑']],
+    ['📱 전자',['보조배터리(기내)','110V A타입 어댑터','충전기·멀티','이어폰']],
+    ['👕 의류',['반팔 3~4','얇은 겉옷','편한 바지','속옷·양말','운동화','슬리퍼·모자']],
     ['💊 상비약',['소화·지사제','진통제','감기약','밴드','멀미약','파스']],
-    ['♨️ 온천·기타',['수건(도고 대여 유료)','우산·우비','에코백','목베개·안대','물티슈·마스크']]
+    ['♨️ 기타',['수건(도고 대여 유료)','우산·우비','에코백','목베개·안대','물티슈·마스크']]
   ];
-  var SONGS=[['あいみょん','マリーゴールド','아이묭·마리골드'],['あいみょん','裸の心','아이묭'],['あいみょん','愛を伝えたいだとか','아이묭'],['嵐','Love so sweet','아라시'],['嵐','カイト','아라시·카이토'],['嵐','Happiness','아라시'],['藤井風','まつり','후지이 카제·마츠리'],['藤井風','死ぬのがいいわ','후지이 카제'],['藤井風','きらり','후지이 카제'],['YOASOBI','夜に駆ける','요아소비'],['YOASOBI','アイドル','요아소비·아이돌'],['YOASOBI','群青','요아소비'],['Official髭男dism','Pretender','히게단'],['Official髭男dism','Subtitle','히게단'],['King Gnu','白日','킹누'],['米津玄師','Lemon','요네즈 켄시'],['米津玄師','KICK BACK','요네즈 켄시'],['Vaundy','怪獣の花唄','바운디'],['LiSA','紅蓮華','리사'],['宇多田ヒカル','First Love','우타다 히카루'],['スピッツ','チェリー','스핏츠·체리'],['back number','高嶺の花子さん','백넘버']];
+  var SONGS=[
+    ['米津玄師','Lemon','요네즈 켄시 · 레몬',3],['米津玄師','KICK BACK','요네즈 켄시',3],['米津玄師','感電','요네즈 켄시',3],
+    ['米津玄師','死神','요네즈 켄시',3],['米津玄師','さよーならまたいつか！','요네즈 켄시',3],['米津玄師','馬と鹿','요네즈 켄시',2],['米津玄師','Flamingo','요네즈 켄시',2],['米津玄師','Lady','요네즈 켄시',2],
+    ['あいみょん','マリーゴールド','아이묭 · 마리골드',2],['あいみょん','裸の心','아이묭',2],['あいみょん','愛を伝えたいだとか','아이묭',2],['あいみょん','君はロックを聴かない','아이묭',1],['あいみょん','ハルノヒ','아이묭',1],
+    ['嵐','Love so sweet','아라시',2],['嵐','カイト','아라시 · 카이토',2],['嵐','Happiness','아라시',2],['嵐','Monster','아라시',1],['嵐','truth','아라시',1],
+    ['藤井風','まつり','후지이 카제 · 마츠리',2],['藤井風','死ぬのがいいわ','후지이 카제',2],['藤井風','きらり','후지이 카제',2],['藤井風','満ちてゆく','후지이 카제',1],
+    ['YOASOBI','夜に駆ける','요아소비',1],['YOASOBI','アイドル','요아소비 · 아이돌',1],['YOASOBI','群青','요아소비',1],
+    ['Official髭男dism','Pretender','히게단',1],['Official髭男dism','Subtitle','히게단',1],
+    ['King Gnu','白日','킹누',1],['King Gnu','一途','킹누',1],
+    ['Vaundy','怪獣の花唄','바운디',1],['Vaundy','踊り子','바운디',1],
+    ['LiSA','紅蓮華','리사',1],['宇多田ヒカル','First Love','우타다 히카루',1],
+    ['スピッツ','チェリー','스핏츠 · 체리',1],['back number','高嶺の花子さん','백넘버',1],
+    ['Mrs. GREEN APPLE','ケセラセラ','미세스 그린애플',1],['Creepy Nuts','Bling-Bang-Bang-Born','크리피 너츠',1],['tuki.','晩餐歌','츠키',1]
+  ];
+  var POOL=[]; SONGS.forEach(function(s){for(var i=0;i<(s[3]||1);i++)POOL.push(s);});
+
+  /* ---------- hero photo rotation ---------- */
+  (function(){
+    var box=document.getElementById('hero-ph');if(!box)return;
+    var imgs=['ph1.jpg','ph2.jpg','ph3.jpg','ph4.jpg','ph5.jpg','ph6.jpg'];
+    for(var i=imgs.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=imgs[i];imgs[i]=imgs[j];imgs[j]=t;}
+    var layers=imgs.map(function(src){var d=document.createElement('div');d.className='ly';d.style.backgroundImage='url('+src+')';box.appendChild(d);var im=new Image();im.src=src;return d;});
+    var cur=0;layers[0].classList.add('on');
+    if(layers.length>1)setInterval(function(){var nx=(cur+1)%layers.length,prev=cur;layers[nx].classList.add('on');
+      setTimeout(function(){layers[prev].classList.remove('on');},1700);cur=nx;},5000);
+  })();
+
+  /* ---------- todo bucket ---------- */
+  var TODO=[['🏃','런닝하기'],['🍺','맥주 마시기'],['🍻','또 맥주 마시기'],['📸','같이 사진 찍기'],['🤳','서로 사진 찍어주기'],['🎧','일본 노래 듣기'],['🏮','노포 가기'],['🐙','다코야끼 먹기'],['🐄','우설(규탄) 먹기'],['🍠','세븐 아이스 군고구마']];
+  (function(){var t=document.getElementById('todo');if(!t)return;
+    TODO.forEach(function(x,i){var b=document.createElement('button');b.innerHTML='<span class="tem">'+x[0]+'</span>'+x[1];var k='todo_'+i;
+      try{if(localStorage.getItem(k)==='1')b.classList.add('done');}catch(e){}
+      b.addEventListener('click',function(){b.classList.toggle('done');try{localStorage.setItem(k,b.classList.contains('done')?'1':'0');}catch(e){}});t.appendChild(b);});
+  })();
 
   /* ---------- D-day + weather ---------- */
   (function(){
     var start=new Date(2026,8,22), end=new Date(2026,8,26), now=new Date();
     var el=document.getElementById('dday'), d0=new Date(now.getFullYear(),now.getMonth(),now.getDate());
     var diff=Math.round((start-d0)/86400000);
-    if(diff>0) el.textContent='D-'+diff;
-    else if(now<end){ el.textContent='여행 '+(Math.floor((d0-start)/86400000)+1)+'일차'; }
-    else el.textContent='여행 종료';
+    if(diff>0)el.textContent='D-'+diff;
+    else if(now<end)el.textContent='여행 '+(Math.floor((d0-start)/86400000)+1)+'일차';
+    else el.textContent='잘 다녀왔어요';
   })();
-  var WMO={0:['☀️','맑음'],1:['🌤️','대체로 맑음'],2:['⛅','구름 조금'],3:['☁️','흐림'],45:['🌫️','안개'],48:['🌫️','안개'],51:['🌦️','이슬비'],53:['🌦️','이슬비'],55:['🌦️','이슬비'],61:['🌧️','비'],63:['🌧️','비'],65:['🌧️','강한 비'],71:['❄️','눈'],73:['❄️','눈'],80:['🌦️','소나기'],81:['🌦️','소나기'],82:['🌦️','소나기'],95:['⛈️','뇌우'],96:['⛈️','뇌우'],99:['⛈️','뇌우']};
+  var WMO={0:['☀️','맑음'],1:['🌤️','대체로 맑음'],2:['⛅','구름 조금'],3:['☁️','흐림'],45:['🌫️','안개'],48:['🌫️','안개'],51:['🌦️','이슬비'],53:['🌦️','이슬비'],55:['🌦️','이슬비'],61:['🌧️','비'],63:['🌧️','비'],65:['🌧️','강한 비'],71:['❄️','눈'],80:['🌦️','소나기'],81:['🌦️','소나기'],82:['🌦️','소나기'],95:['⛈️','뇌우'],96:['⛈️','뇌우'],99:['⛈️','뇌우']};
   function wmo(c){return WMO[c]||['🌡️','-'];}
   var DOW=['일','월','화','수','목','금','토'], TRIP={'2026-09-22':1,'2026-09-23':1,'2026-09-24':1,'2026-09-25':1};
   fetch('https://api.open-meteo.com/v1/forecast?latitude=33.8416&longitude=132.7686&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FTokyo&forecast_days=16')
@@ -495,11 +613,11 @@
         document.getElementById('wm').textContent='마쓰야마 · 습도 '+d.current.relative_humidity_2m+'% · 바람 '+Math.round(d.current.wind_speed_10m)+'km/h';}
       var dd=d.daily, box=document.getElementById('fc'), idx=[];
       dd.time.forEach(function(t,i){if(TRIP[t])idx.push(i);});
-      if(!idx.length) idx=[0,1,2,3];
+      if(!idx.length)idx=[0,1,2,3];
       box.innerHTML='';
       idx.forEach(function(i){var w=wmo(dd.weather_code[i]),dt=new Date(dd.time[i]+'T00:00:00'),pop=dd.precipitation_probability_max[i];
         var e=document.createElement('div');e.className='d';
-        e.innerHTML='<div class="dd">'+(dt.getMonth()+1)+'/'+dt.getDate()+' '+DOW[dt.getDay()]+'</div><div class="di">'+w[0]+'</div><div class="dt">'+Math.round(dd.temperature_2m_max[i])+'° <small>/'+Math.round(dd.temperature_2m_min[i])+'°</small></div><div class="dr'+(pop>=50?' hi':'')+'">비 '+pop+'%</div>';
+        e.innerHTML='<div class="dd">'+(dt.getMonth()+1)+'/'+dt.getDate()+' '+DOW[dt.getDay()]+'</div><div class="di">'+w[0]+'</div><div class="dt tnum">'+Math.round(dd.temperature_2m_max[i])+'° <small>/'+Math.round(dd.temperature_2m_min[i])+'°</small></div><div class="dr'+(pop>=50?' hi':'')+'">비 '+pop+'%</div>';
         box.appendChild(e);});
     }).catch(function(){document.getElementById('wt').textContent='날씨 로드 실패';document.getElementById('wi').textContent='⚠️';});
 
@@ -523,14 +641,14 @@
     }
     setTimeout(function(){ov.invalidateSize();ov.fitBounds(ov._m,{padding:[20,20]});},60);
   }
-  var fmap,fg={};
+  var fmap,fg={},fmk={};
   function ensureFood(){
     if(!fmap){
       fmap=L.map('food-map',{scrollWheelZoom:false});
       L.tileLayer(TILE,{maxZoom:19,attribution:'© OSM'}).addTo(fmap);
       var city=[],dogo=[],all=[];
-      FOODS.forEach(function(f){var mk=L.circleMarker([f.lat,f.lng],{radius:8,color:'#fff',weight:2,fillColor:FC[f.cat],fillOpacity:1}).addTo(fmap);
-        mk.bindPopup(popHtml(f.n,f.j,f.q,f.o));all.push(mk);(f.a==='dogo'?dogo:city).push(mk);});
+      FOODS.forEach(function(f,i){var mk=L.circleMarker([f.lat,f.lng],{radius:8,color:'#fff',weight:2,fillColor:FC[f.cat],fillOpacity:1}).addTo(fmap);
+        mk.bindPopup(popHtml(f.n,f.j,f.q,f.o));fmk[i]=mk;all.push(mk);(f.a==='dogo'?dogo:city).push(mk);});
       fg={city:L.featureGroup(city).getBounds(),dogo:L.featureGroup(dogo).getBounds(),all:L.featureGroup(all).getBounds()};
       document.querySelectorAll('[data-fm]').forEach(function(b){b.addEventListener('click',function(){
         document.querySelectorAll('[data-fm]').forEach(function(x){x.classList.remove('on');});b.classList.add('on');
@@ -549,68 +667,111 @@
     var d=DAYS[curDay],col=d.col,coords=(d.line||d.pts).map(function(p){return [p[0],p[1]];});
     L.polyline(coords,{color:col,weight:3,dashArray:'5,8',opacity:.85}).addTo(player);
     d.pts.forEach(function(p,i){L.marker([p[0],p[1]],{icon:L.divIcon({className:'',html:'<div class="np" style="background:'+col+'">'+(i+1)+'</div>',iconSize:[22,22],iconAnchor:[11,11]})}).addTo(player).bindPopup('<b>'+(i+1)+'. '+p[2]+'</b>');});
-    pmap.fitBounds(player.getBounds(),{padding:[24,24]});
+    pmap.fitBounds(player.getBounds(),{padding:[26,26]});
   }
+
+  /* ---------- plan render ---------- */
   function renderDay(i){
     curDay=i;
     document.querySelectorAll('.dt').forEach(function(t,x){t.classList.toggle('on',x===i);});
     var d=DAYS[i];
     var h='<div class="day-title">Day '+d.n+' · '+d.t+'</div><div class="day-date">'+d.date+'</div>';
     h+='<div class="dchips">'+d.chips.map(function(c){return '<span class="pill">'+c+'</span>';}).join('')+'</div>';
-    h+='<div class="tl">'+d.slots.map(function(s){return '<div class="ti"><div class="tt">'+s[0]+'</div><div class="tx">'+s[1]+'</div></div>';}).join('')+'</div>';
+    h+='<div class="tl2">'+d.slots.map(function(s){return '<div class="ti"><div class="tt">'+s[0]+'</div><div class="tx">'+s[1]+'</div></div>';}).join('')+'</div>';
     document.getElementById('day-body').innerHTML=h;
-    // eats
     var eb=document.getElementById('day-eats');
     if(d.eats.length){
-      var rows=d.eats.map(function(name){var f=FOODS.filter(function(x){return x.n===name;})[0];if(!f)return '';
-        return '<a class="food pk" href="'+gm(f.q)+'" target="_blank" rel="noopener"><span class="fd" style="background:'+FC[f.cat]+'"></span><span><span class="fn">'+f.n+'<span class="j">'+f.j+'</span></span><span class="fno">'+f.o+'</span></span><span class="fg">↗</span></a>';}).join('');
-      eb.innerHTML='<div class="lbl2">그날 추천 맛집</div>'+rows;
+      eb.innerHTML='<div class="lbl">그날 추천 맛집</div>'+d.eats.map(function(name){var f=byName(name);if(!f)return '';return foodCard(f);}).join('');
     } else eb.innerHTML='';
     drawDay();
   }
-  // day tabs
   (function(){var dt=document.getElementById('daytabs');
     DAYS.forEach(function(d,i){var b=document.createElement('button');b.className='dt'+(i===0?' on':'');
       b.innerHTML='Day '+d.n+'<small>'+d.date+'</small>';b.addEventListener('click',function(){renderDay(i);});dt.appendChild(b);});
     renderDay(0);
   })();
 
-  /* ---------- eat list + filters ---------- */
-  var curFilter='all';
-  function renderFood(){
-    var list=document.getElementById('food-list'),cats=['all','pick','local','izakaya','eel','cafe'];
-    document.getElementById('food-filters').innerHTML=cats.map(function(c){return '<button class="mbtn'+(c===curFilter?' on':'')+'" data-f="'+c+'">'+(c==='all'?'전체':FCN[c])+'</button>';}).join('');
-    document.querySelectorAll('[data-f]').forEach(function(b){b.addEventListener('click',function(){curFilter=b.dataset.f;renderFood();});});
-    var arr=FOODS.filter(function(f){return curFilter==='all'||f.cat===curFilter;});
-    // picks first
-    arr.sort(function(a,b){return (a.cat==='pick'?0:1)-(b.cat==='pick'?0:1);});
-    list.innerHTML=arr.map(function(f){return '<a class="food'+(f.cat==='pick'?' pk':'')+'" href="'+gm(f.q)+'" target="_blank" rel="noopener"><span class="fd" style="background:'+FC[f.cat]+'"></span><span><span class="fn">'+f.n+'<span class="j">'+f.j+'</span></span><span class="fno">'+f.o+'</span></span><span class="fg">↗</span></a>';}).join('');
+  /* ---------- food ---------- */
+  function byName(n){for(var i=0;i<FOODS.length;i++)if(FOODS[i].n===n)return FOODS[i];return null;}
+  var myPos=null, curFilter='all';
+  function hav(a,b,c,d){var R=6371,x=Math.PI/180,dl=(c-a)*x,dg=(d-b)*x,q=Math.sin(dl/2)*Math.sin(dl/2)+Math.cos(a*x)*Math.cos(c*x)*Math.sin(dg/2)*Math.sin(dg/2);return R*2*Math.atan2(Math.sqrt(q),Math.sqrt(1-q));}
+  function distStr(f){if(!myPos)return '';var km=hav(myPos[0],myPos[1],f.lat,f.lng);var min=Math.max(1,Math.round(km/4.5*60));return '<span class="fdist">🚶 '+(min<2?'바로 근처':min+'분')+' · '+km.toFixed(km<10?1:0)+'km</span>';}
+  function foodCard(f){
+    var menus=f.m.map(function(x){return '<div class="fm1"><b>'+x[0]+'</b> <span>· '+x[1]+'</span></div>';}).join('');
+    return '<a class="food" href="'+gm(f.q)+'" target="_blank" rel="noopener"><span class="fd" style="background:'+FC[f.cat]+'"></span><div class="fmain">'
+      +'<div class="fn">'+f.n+'<span class="j">'+f.j+'</span></div>'
+      +'<div class="fmeta"><span class="frate">★ '+f.r.toFixed(1)+'</span><span class="fcat" style="background:'+FC[f.cat]+'">'+FCN[f.cat]+'</span>'+distStr(f)+'</div>'
+      +'<div class="fmenu">'+menus+'</div></div><span class="fg">↗</span></a>';
   }
-  renderFood();
+  function renderFood(){
+    var list=document.getElementById('food-list'),arr=FOODS.filter(function(f){return curFilter==='all'||f.cat===curFilter;});
+    arr.sort(function(a,b){if(myPos){return hav(myPos[0],myPos[1],a.lat,a.lng)-hav(myPos[0],myPos[1],b.lat,b.lng);}return b.r-a.r;});
+    list.innerHTML=arr.map(foodCard).join('');
+    document.getElementById('food-count').textContent='· '+arr.length+'곳'+(myPos?' · 가까운 순':' · 평점순');
+  }
+  (function(){var fl=document.getElementById('filters');
+    var cats=['all'].concat(FORD);
+    cats.forEach(function(c){var b=document.createElement('button');b.className='fchip'+(c==='all'?' on':'');
+      b.innerHTML=(c==='all'?'전체':'<span class="fd" style="background:'+FC[c]+'"></span>'+FCN[c]);
+      b.addEventListener('click',function(){curFilter=c;document.querySelectorAll('.fchip').forEach(function(x){x.classList.remove('on');});b.classList.add('on');renderFood();
+        if(fmap)FOODS.forEach(function(f,i){if(c==='all'||f.cat===c)fmk[i].addTo(fmap);else fmap.removeLayer(fmk[i]);});});
+      fl.appendChild(b);});
+    renderFood();
+  })();
+  document.getElementById('locbtn').addEventListener('click',function(){var btn=this;
+    if(!navigator.geolocation){btn.textContent='이 브라우저는 위치 미지원';return;}
+    btn.textContent='📍 위치 확인 중…';
+    navigator.geolocation.getCurrentPosition(function(p){myPos=[p.coords.latitude,p.coords.longitude];btn.textContent='📍 내 위치 기준 (가까운 순)';renderFood();
+      if(fmap){L.circleMarker(myPos,{radius:7,color:'#fff',weight:3,fillColor:'#4C8DF6',fillOpacity:1}).addTo(fmap).bindPopup('내 위치');}},
+      function(){btn.textContent='위치 권한 거부됨 — 다시 시도';},{enableHighAccuracy:true,timeout:9000,maximumAge:60000});
+  });
+  // must-eat
+  (function(){var m=document.getElementById('must');
+    MUST.forEach(function(name,i){var b=document.createElement('button');b.textContent=name;var k='must_'+i;
+      try{if(localStorage.getItem(k)==='1')b.classList.add('done');}catch(e){}
+      b.addEventListener('click',function(){b.classList.toggle('done');try{localStorage.setItem(k,b.classList.contains('done')?'1':'0');}catch(e){}});
+      m.appendChild(b);});
+  })();
 
-  /* ---------- phrases ---------- */
-  (function(){var p=document.getElementById('phrases'),h='';
-    PHR.forEach(function(r){if(r[0]==='g'){h+='<div class="lbl2" style="margin-top:14px">'+r[1]+'</div>';}
-      else h+='<div class="ph"><div class="pk">'+r[0]+'</div><div class="pj">'+r[1]+'</div><div class="pr">'+r[2]+'</div></div>';});
-    p.innerHTML=h;})();
+  /* ---------- phrases (TTS) ---------- */
+  function phraseRow(p){return '<div class="ph" data-ja="'+p[1]+'"><div class="spk">🔊</div><div style="min-width:0"><div class="pk">'+p[0]+'</div><div class="pj jp">'+p[1]+'</div><div class="pr">'+p[2]+'</div></div></div>';}
+  (function(){
+    var full=document.getElementById('phrases'),h='';
+    PHR.forEach(function(p){if(p[0]==='g')h+='<div class="phg">'+p[1]+'</div>';else h+=phraseRow(p);});
+    full.innerHTML=h;
+    var homeP=PHR.filter(function(p){return p[0]!=='g';});
+    var pick=[homeP[5],homeP[6],homeP[13]]; // 안녕/감사/생맥주
+    document.getElementById('home-phrases').innerHTML=pick.map(phraseRow).join('');
+    document.body.addEventListener('click',function(e){var el=e.target.closest('.ph');if(el)speak(el.dataset.ja);});
+  })();
 
   /* ---------- checklist ---------- */
-  (function(){var c=document.getElementById('chk'),h='';
-    CHK.forEach(function(g){h+='<h4>'+g[0]+'</h4>';g[1].forEach(function(it){h+='<label><input type="checkbox"><span>'+it+'</span></label>';});});
-    c.innerHTML=h;
-    var boxes=c.querySelectorAll('input'),fill=document.getElementById('cfill'),cnt=document.getElementById('ccount');
-    function up(){var done=0;boxes.forEach(function(b){if(b.checked)done++;});fill.style.width=Math.round(done/boxes.length*100)+'%';cnt.textContent=done+'/'+boxes.length;}
-    boxes.forEach(function(b,i){var k='mtsk_'+i;try{if(localStorage.getItem(k)==='1')b.checked=true;}catch(e){}
-      b.addEventListener('change',function(){try{localStorage.setItem(k,b.checked?'1':'0');}catch(e){}up();});});
-    document.getElementById('creset').addEventListener('click',function(){boxes.forEach(function(b,i){b.checked=false;try{localStorage.removeItem('mtsk_'+i);}catch(e){}});up();});
-    up();})();
+  (function(){var box=document.getElementById('chk'),h='',n=0;
+    CHK.forEach(function(g,gi){h+='<div class="cgrp">'+g[0]+'</div>';
+      g[1].forEach(function(it,ii){h+='<label><input type="checkbox" data-k="c_'+gi+'_'+ii+'"><span>'+it+'</span></label>';n++;});});
+    box.innerHTML=h;
+    var boxes=box.querySelectorAll('input'),fill=document.getElementById('cfill'),cnt=document.getElementById('ccount');
+    function upd(){var d=0;boxes.forEach(function(b){if(b.checked)d++;});fill.style.width=Math.round(d/boxes.length*100)+'%';cnt.textContent=d+'/'+boxes.length;}
+    boxes.forEach(function(b){var k=b.dataset.k;try{if(localStorage.getItem(k)==='1')b.checked=true;}catch(e){}
+      b.addEventListener('change',function(){try{localStorage.setItem(k,b.checked?'1':'0');}catch(e){}upd();});});
+    document.getElementById('creset').addEventListener('click',function(){boxes.forEach(function(b){b.checked=false;try{localStorage.removeItem(b.dataset.k);}catch(e){}});upd();});
+    upd();
+  })();
 
   /* ---------- music ---------- */
-  (function(){var s=document.getElementById('songs');
-    function ytm(a,t){return 'https://music.youtube.com/search?q='+encodeURIComponent(a+' '+t);}
-    s.innerHTML=SONGS.map(function(x){return '<a class="song" href="'+ytm(x[0],x[1])+'" target="_blank" rel="noopener"><span class="sj">♪</span><span><span class="st">'+x[1]+'</span><br><span class="sa">'+x[2]+'</span></span><span class="sg">↗</span></a>';}).join('');
-    var last=-1;document.getElementById('mroll').addEventListener('click',function(){var i;do{i=Math.floor(Math.random()*SONGS.length);}while(i===last&&SONGS.length>1);last=i;var x=SONGS[i];
-      document.getElementById('mt').textContent=x[1];document.getElementById('ma').textContent=x[2];document.getElementById('mplay').href=ytm(x[0],x[1]);});})();
+  function rnd(arr,not){var i;do{i=Math.floor(Math.random()*arr.length);}while(arr.length>1&&arr[i]===not);return arr[i];}
+  // home today song
+  var s1=rnd(POOL);
+  function setHome(s){document.getElementById('s1t').textContent=s[1];document.getElementById('s1a').textContent=s[2];document.getElementById('s1play').href=ytm(s[0],s[1]);}
+  setHome(s1);
+  document.getElementById('s1roll').addEventListener('click',function(){s1=rnd(POOL,s1);setHome(s1);});
+  // info full
+  var songsBox=document.getElementById('songs');
+  SONGS.forEach(function(s){var a=document.createElement('a');a.className='song';a.href=ytm(s[0],s[1]);a.target='_blank';a.rel='noopener';
+    a.innerHTML='<span class="sj">♪</span><span><span class="st">'+s[1]+'</span><br><span class="sa">'+s[2]+'</span></span><span class="sg">↗</span>';songsBox.appendChild(a);});
+  var mrs=rnd(POOL);
+  function setMus(s){document.getElementById('mt').textContent=s[1];document.getElementById('ma').textContent=s[2];document.getElementById('mplay').href=ytm(s[0],s[1]);}
+  document.getElementById('mroll').addEventListener('click',function(){mrs=rnd(POOL,mrs);setMus(mrs);});
 })();
 </script>
 </body>
