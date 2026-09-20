@@ -10,6 +10,13 @@
 <meta property="og:url" content="https://yongchann.github.io/matsuyama-trip/">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#F3F1EC" media="(prefers-color-scheme:light)">
+<meta name="theme-color" content="#141412" media="(prefers-color-scheme:dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="마쓰야마">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -148,6 +155,15 @@
   .todo button.done{background:var(--accent);color:#fff;border-color:var(--accent)}
   .todo button.done .tem{filter:none}
   .todo .tem{opacity:.95}
+
+  /* install tip */
+  #install-tip:empty{display:none}
+  #install-tip{margin-top:22px}
+  .itip{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px 15px;box-shadow:var(--sh)}
+  .itip .itxt{flex:1;min-width:0;font-size:.83rem;line-height:1.4}
+  .itip .itxt span{color:var(--muted);font-size:.76rem}
+  .itip .ibtn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:8px 14px;font-weight:800;font-size:.82rem;flex:none}
+  .itip .ix{background:none;border:none;color:var(--muted);font-size:1.05rem;padding:4px;flex:none}
 
   /* mission / ticket */
   .miss{background:var(--accent-weak);border:1px solid transparent;border-radius:18px;padding:15px 16px}
@@ -324,6 +340,8 @@
       <h4>🇰🇷 공항서 한국인 무료 혜택 챙기기</h4>
       <p>마쓰야마공항 <b>1층 인포메이션</b>에 <b>여권 제시</b> → ① 명소 8곳 <b>쿠폰북</b>(성·온천·리프트) ② <b>공항↔시내↔도고 무료 셔틀</b>. 도착 즉시 필수!</p>
     </div>
+
+    <div id="install-tip"></div>
 
     <div class="lbl">항공편</div>
     <div class="card ticket">
@@ -605,6 +623,23 @@
     TODO.forEach(function(x,i){var b=document.createElement('button');b.innerHTML='<span class="tem">'+x[0]+'</span>'+x[1];var k='todo_'+i;
       try{if(localStorage.getItem(k)==='1')b.classList.add('done');}catch(e){}
       b.addEventListener('click',function(){b.classList.toggle('done');try{localStorage.setItem(k,b.classList.contains('done')?'1':'0');}catch(e){}});t.appendChild(b);});
+  })();
+
+  /* ---------- install tip (PWA) ---------- */
+  (function(){
+    var tip=document.getElementById('install-tip');if(!tip)return;
+    if(window.matchMedia('(display-mode:standalone)').matches||navigator.standalone)return;
+    try{if(localStorage.getItem('installTipDismiss')==='1')return;}catch(e){}
+    var isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent), deferred=null;
+    function render(){
+      tip.innerHTML='<div class="itip"><div class="itxt"><b>📲 홈 화면에 앱으로 추가</b><br><span>'
+        +(isIOS?'Safari 공유 버튼 → “홈 화면에 추가”':'브라우저 메뉴 → “앱 설치 / 홈 화면에 추가”')
+        +'</span></div>'+(deferred?'<button class="ibtn" id="ibtn">설치</button>':'')+'<button class="ix" id="ix">✕</button></div>';
+      var ib=document.getElementById('ibtn');if(ib)ib.onclick=function(){deferred.prompt();deferred=null;};
+      document.getElementById('ix').onclick=function(){try{localStorage.setItem('installTipDismiss','1');}catch(e){}tip.innerHTML='';};
+    }
+    window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferred=e;render();});
+    render();
   })();
 
   /* ---------- D-day + weather ---------- */
