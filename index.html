@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>마쓰야마 3박4일 · 9/22–9/25</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+  :root {
+    --bg:#FBFAF6; --surface:#FFFFFF; --surface-2:#F6F3EB; --ink:#1B2A32;
+    --muted:#5E6B70; --line:#E7E1D5; --accent:#E0710C; --accent-soft:#FBEAD6;
+    --sea:#0E6E70; --sea-soft:#DDEFEE; --road:#7A4FBF; --transit:#6B7785;
+    --shadow:0 1px 2px rgba(27,42,50,.04),0 8px 24px rgba(27,42,50,.06);
+    --radius:14px; --maxw:840px;
+  }
+  @media (prefers-color-scheme: dark){:root{
+    --bg:#12171A; --surface:#1B2226; --surface-2:#212A2E; --ink:#ECEAE2;
+    --muted:#9BA6AB; --line:#2C363B; --accent:#F6923C; --accent-soft:#3A2A17;
+    --sea:#46A9A5; --sea-soft:#16302F; --road:#A783E6; --transit:#8A96A0;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 28px rgba(0,0,0,.35);
+  }}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Apple SD Gothic Neo","Hiragino Kaku Gothic ProN","Segoe UI",sans-serif;
+    line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px 72px;}
+  .serif{font-family:"Hiragino Mincho ProN","Apple SD Gothic Neo",Georgia,"Times New Roman",serif;}
+  h1,h2,h3{text-wrap:balance;margin:0;}
+  .tnum{font-variant-numeric:tabular-nums;}
+
+  header.hero{border-top:4px solid var(--accent);padding:46px 0 30px;text-align:center;}
+  header.hero .kicker{font-size:.8rem;letter-spacing:.3em;text-transform:uppercase;color:var(--sea);font-weight:700;}
+  header.hero h1{font-size:clamp(2.1rem,6vw,3.1rem);font-weight:700;line-height:1.12;margin:.5rem 0 .2rem;letter-spacing:-.01em;}
+  header.hero .jp{color:var(--muted);font-size:1rem;letter-spacing:.1em;}
+  .facts{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:20px;}
+  .chip{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--line);
+    border-radius:999px;padding:6px 13px;font-size:.85rem;box-shadow:var(--shadow);}
+  .chip b{color:var(--accent);font-weight:700;}
+
+  section{margin-top:40px;}
+  section>h2{font-size:1.5rem;font-weight:700;letter-spacing:-.01em;display:flex;align-items:baseline;gap:10px;}
+  section>h2 .num{font-size:.8rem;color:var(--accent);font-weight:700;letter-spacing:.05em;font-variant-numeric:tabular-nums;}
+  section>h2+.sub{color:var(--muted);font-size:.9rem;margin:6px 0 0;}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 22px;}
+  .grid{display:grid;gap:14px;margin-top:16px;}
+  .note{margin-top:14px;font-size:.85rem;color:var(--muted);background:var(--surface-2);
+    border-radius:10px;padding:11px 14px;border-left:3px solid var(--accent);}
+
+  /* weather */
+  .weather{grid-template-columns:repeat(4,1fr);}
+  @media(max-width:620px){.weather{grid-template-columns:repeat(2,1fr);}}
+  .wx{text-align:center;padding:16px 12px;}
+  .wx .day{font-size:.82rem;color:var(--muted);font-weight:600;}
+  .wx .date{font-size:1.05rem;font-weight:700;margin-top:2px;}
+  .wx .icon{font-size:1.9rem;margin:8px 0 4px;}
+  .wx .temp{font-weight:700;font-size:1.15rem;}
+  .wx .temp .lo{color:var(--muted);font-weight:500;}
+  .wx .rain{display:inline-block;margin-top:8px;font-size:.74rem;color:var(--sea);background:var(--sea-soft);border-radius:999px;padding:2px 9px;font-weight:600;}
+  .wx .rain.hi{color:#fff;background:var(--accent);}
+  @media(prefers-color-scheme:dark){.wx .rain.hi{color:#12171A;}}
+  .wxnow{display:flex;align-items:center;gap:16px;padding:16px 20px;margin-top:16px;}
+  .wxnow .big{font-size:2.6rem;line-height:1;}
+  .wxnow .t{font-size:1.7rem;font-weight:700;}
+  .wxnow .meta{color:var(--muted);font-size:.85rem;}
+  .wxnow .live{margin-left:auto;font-size:.72rem;font-weight:700;letter-spacing:.08em;color:var(--sea);
+    background:var(--sea-soft);border-radius:999px;padding:3px 10px;display:inline-flex;align-items:center;gap:6px;}
+  .wxnow .live::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--sea);animation:pulse 1.8s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+  @media(prefers-reduced-motion:reduce){.wxnow .live::before{animation:none;}}
+  #wx-loading{color:var(--muted);font-size:.9rem;padding:8px 2px;}
+
+  /* map */
+  #map{height:440px;width:100%;border-radius:var(--radius);border:1px solid var(--line);
+    box-shadow:var(--shadow);margin-top:16px;z-index:0;}
+  #food-map{height:380px;width:100%;border-radius:var(--radius);border:1px solid var(--line);
+    box-shadow:var(--shadow);margin-top:16px;z-index:0;}
+  @media(max-width:640px){#map{height:320px;} #food-map{height:300px;}}
+  .maptools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px;}
+  .mbtn{font-size:.85rem;font-weight:600;background:var(--surface);border:1px solid var(--line);
+    color:var(--ink);border-radius:999px;padding:7px 15px;cursor:pointer;box-shadow:var(--shadow);}
+  .mbtn:hover{border-color:var(--accent);}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;font-size:.82rem;color:var(--muted);}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .dot{width:11px;height:11px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.15);}
+  .leaflet-popup-content{font-family:inherit;font-size:.9rem;margin:12px 14px;}
+  .leaflet-popup-content b{font-size:.98rem;}
+  .leaflet-popup-content .jp{color:#777;font-size:.8rem;}
+  .leaflet-popup-content a{color:var(--accent);font-weight:700;text-decoration:none;display:inline-block;margin-top:6px;}
+  .bigpin{background:none;border:none;}
+  .bigpin .bp{font-size:24px;line-height:1;text-align:center;filter:drop-shadow(0 1px 2px rgba(0,0,0,.55));}
+  .leaflet-tooltip.lbl{background:var(--surface);color:var(--ink);border:1px solid var(--line);
+    border-radius:6px;font-size:11px;font-weight:700;padding:1px 7px;box-shadow:var(--shadow);white-space:nowrap;}
+  .leaflet-tooltip.lbl::before{border-top-color:var(--line);}
+
+  /* info */
+  .info{grid-template-columns:1fr 1fr;}
+  @media(max-width:620px){.info{grid-template-columns:1fr;}}
+  .info .card h3{font-size:1rem;margin-bottom:6px;}
+  .info .card h3 .ic{color:var(--sea);margin-right:6px;}
+  .info .card p{margin:0;font-size:.9rem;color:var(--muted);}
+  .info .card p b{color:var(--ink);font-weight:600;}
+
+  /* eats */
+  .eats{display:grid;gap:10px;margin-top:16px;}
+  .eat{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;padding:14px 18px;
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);}
+  .eat .em{font-size:1.5rem;}
+  .eat .body .name{font-weight:700;}
+  .eat .body .name .jp{color:var(--muted);font-weight:500;font-size:.85rem;margin-left:6px;}
+  .eat .body .desc{font-size:.85rem;color:var(--muted);margin-top:1px;}
+  .eat .tag{font-size:.72rem;font-weight:700;letter-spacing:.04em;color:var(--sea);background:var(--sea-soft);
+    border-radius:999px;padding:4px 11px;white-space:nowrap;}
+  .eat .tag.must{color:#fff;background:var(--accent);}
+  @media(prefers-color-scheme:dark){.eat .tag.must{color:#12171A;}}
+  @media(max-width:560px){.eat{grid-template-columns:auto 1fr;}.eat .tag{grid-column:2;justify-self:start;margin-top:2px;}}
+
+  /* stays */
+  .stays{grid-template-columns:1fr 1fr;}
+  @media(max-width:620px){.stays{grid-template-columns:1fr;}}
+  .stay{padding:0;overflow:hidden;}
+  .stay .band{padding:8px 18px;font-size:.74rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#fff;}
+  .stay.a .band{background:var(--sea);}
+  .stay.b .band{background:var(--accent);}
+  @media(prefers-color-scheme:dark){.stay.b .band{color:#12171A;}}
+  .stay .inner{padding:16px 18px 20px;}
+  .stay h3{font-size:1.15rem;}
+  .stay .jp{color:var(--muted);font-size:.85rem;}
+  .stay .meta{margin-top:10px;font-size:.88rem;color:var(--muted);display:grid;gap:4px;}
+  .stay .meta b{color:var(--ink);font-weight:600;}
+
+  /* itinerary */
+  .days{display:grid;gap:14px;margin-top:16px;}
+  .day{padding:0;overflow:hidden;}
+  .day .head{display:flex;align-items:center;gap:12px;padding:13px 18px;background:var(--surface-2);border-bottom:1px solid var(--line);}
+  .day .dno{font-weight:700;font-size:.78rem;letter-spacing:.08em;color:var(--accent);text-transform:uppercase;}
+  .day .dtitle{font-weight:700;}
+  .day .ddate{margin-left:auto;font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums;}
+  .day .fixed{display:flex;flex-wrap:wrap;gap:6px;padding:12px 18px 4px;}
+  .fchip{font-size:.78rem;background:var(--sea-soft);color:var(--sea);border-radius:8px;padding:3px 10px;font-weight:600;}
+  .day-body{display:flex;gap:16px;align-items:stretch;}
+  .day-info{flex:1;min-width:0;}
+  .minimap{width:290px;flex:none;min-height:240px;border-radius:12px;overflow:hidden;border:1px solid var(--line);z-index:0;margin:0 18px 18px 0;}
+  @media(max-width:760px){.day-body{flex-direction:column;} .minimap{width:auto;min-height:0;height:220px;margin:0 18px 18px;}}
+  .npwrap{background:none;border:none;}
+  .np{width:22px;height:22px;border-radius:50%;color:#fff;font-size:12px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.5);}
+  .day .slots{padding:8px 18px 18px;display:grid;gap:8px;}
+  .slot{display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:center;min-height:34px;}
+  .slot .t{font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums;}
+  .slot .blank{border-bottom:1px dashed var(--line);height:1px;align-self:end;margin-bottom:6px;}
+
+  /* checklist */
+  .chk-track{height:10px;background:var(--surface-2);border-radius:99px;overflow:hidden;flex:1;min-width:160px;}
+  .chk-fill{height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .3s;}
+  .chk-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;}
+  @media(max-width:640px){.chk-grid{grid-template-columns:1fr;}}
+  .chk-card h3{font-size:1rem;margin:0 0 6px;}
+  .chk-card ul{list-style:none;margin:0;padding:0;}
+  .chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 6px;border-radius:8px;cursor:pointer;font-size:.9rem;line-height:1.45;}
+  .chk label:hover{background:var(--surface-2);}
+  .chk input[type=checkbox]{margin:2px 0 0;width:17px;height:17px;accent-color:var(--accent);flex:none;cursor:pointer;}
+  .chk input:checked + span{color:var(--muted);text-decoration:line-through;}
+
+  /* phrases */
+  .phlabel{font-weight:700;font-size:.82rem;letter-spacing:.04em;margin:18px 0 8px;color:var(--sea);}
+  .phrases{display:grid;gap:8px;}
+  .phrase{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:11px 15px;box-shadow:var(--shadow);}
+  .phrase .ko{font-weight:700;font-size:.9rem;}
+  .phrase .ja{color:var(--sea);font-size:1.04rem;margin-top:3px;}
+  .phrase .ro{color:var(--muted);font-size:.82rem;margin-top:1px;}
+
+  footer{margin-top:48px;text-align:center;color:var(--muted);font-size:.8rem;padding-top:20px;border-top:1px solid var(--line);}
+  a{color:var(--accent);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="kicker">Ehime · Shikoku</div>
+    <h1 class="serif">마쓰야마 3박 4일</h1>
+    <div class="jp">松山 · まつやま &nbsp;|&nbsp; 2026.09.22 (화) — 09.25 (금)</div>
+    <div class="facts">
+      <span class="chip">✈️ 제주항공 <b>7C</b> 직항</span>
+      <span class="chip">👥 <b>2</b>명</span>
+      <span class="chip">🏨 히요리 <b>2박</b> · 도고칸 <b>1박</b></span>
+      <span class="chip">💴 환전 <b>50만원</b></span>
+      <span class="chip">🕐 시차 <b>없음</b></span>
+    </div>
+  </header>
+
+  <!-- 항공편 -->
+  <section>
+    <h2>✈️ 항공편 <span class="num" style="letter-spacing:0">제주항공 7C · 직항</span></h2>
+    <div class="grid" style="grid-template-columns:1fr 1fr;gap:14px;margin-top:16px;">
+      <div class="card"><h3 style="font-size:1rem;margin-bottom:8px;"><span style="color:var(--sea);">🛫</span> 가는 편 · 9/22 (화)</h3>
+        <div style="font-size:1.3rem;font-weight:700;" class="tnum">08:40 <span style="color:var(--muted);font-weight:500;">→</span> ~10:30</div>
+        <div style="color:var(--muted);font-size:.88rem;margin-top:4px;">인천 <b>제1터미널</b> (ICN·T1) → 마쓰야마 (MYJ)<br>비행 약 1시간 50분 · 시차 없음</div>
+      </div>
+      <div class="card"><h3 style="font-size:1rem;margin-bottom:8px;"><span style="color:var(--accent);">🛬</span> 오는 편 · 9/25 (금)</h3>
+        <div style="font-size:1.3rem;font-weight:700;" class="tnum">11:15 <span style="color:var(--muted);font-weight:500;">→</span> ~13:05</div>
+        <div style="color:var(--muted);font-size:.88rem;margin-top:4px;">마쓰야마 (MYJ) → 인천 <b>제1터미널</b> (ICN)<br>공항 <b>9:00까지</b> 도착 권장</div>
+      </div>
+    </div>
+    <p class="note">제주항공(7C) · <b>2명</b> · 일반석 · 왕복 직항 · 발권완료 · (예약번호는 항공사 앱 확인)</p>
+  </section>
+
+  <!-- 날씨 -->
+  <section>
+    <h2><span class="num">01</span> 날씨 <span class="num" style="letter-spacing:0">실시간</span></h2>
+    <p class="sub">Open-Meteo 실시간 연동 · 여행일 예보는 출발 약 2주 전부터 표시돼요</p>
+    <div class="card wxnow" id="wxnow">
+      <div class="big" id="wxnow-icon">⏳</div>
+      <div>
+        <div class="t" id="wxnow-temp">불러오는 중…</div>
+        <div class="meta" id="wxnow-meta">마쓰야마 현재 날씨</div>
+      </div>
+      <span class="live">LIVE</span>
+    </div>
+    <div class="grid weather" id="wx-forecast">
+      <div id="wx-loading">📡 여행일 예보 불러오는 중…</div>
+    </div>
+    <p class="note" id="wx-note"><b>참고 —</b> 늦여름 잔서라 낮엔 반팔, 저녁·비 대비 얇은 겉옷. 9/23 전후 비 예보 잦으니 시모나다 일몰 날은 맑은 날로 맞추면 좋아요.</p>
+  </section>
+
+  <!-- 지도 -->
+  <section>
+    <h2><span class="num">02</span> 지도</h2>
+    <p class="sub">핀을 클릭하면 장소명·구글맵 링크가 떠요 · 드래그/휠로 이동·확대</p>
+    <div id="map"></div>
+    <div class="maptools">
+      <button class="mbtn" id="btn-city">🏨 공항·숙소·시내</button>
+      <button class="mbtn" id="btn-all">🗺️ 전체 (로드트립 포함)</button>
+      <button class="mbtn" id="btn-road">🚆 2일차 (우치코·시모나다)</button>
+    </div>
+    <div class="legend">
+      <span>🏨 숙소 · ✈️ 공항 (라벨 표시)</span>
+      <span><span class="dot" style="background:#0E6E70"></span>시내 명소</span>
+      <span><span class="dot" style="background:#D14D41"></span>추천 맛집</span>
+      <span><span class="dot" style="background:#7A4FBF"></span>우치코·시모나다</span>
+      <span><span style="display:inline-block;width:18px;border-top:2px dashed #7A4FBF;vertical-align:middle"></span> 2일차 동선</span>
+    </div>
+    <p class="note"><b>팁 —</b> 핀 팝업의 구글맵 링크를 눌러 미리 <b>별표 저장</b>해두면 현지에서 편해요. 렌터카 길찾기도 구글맵 그대로 사용.</p>
+  </section>
+
+  <!-- 기본 정보 -->
+  <section>
+    <h2><span class="num">03</span> 기본 정보 &amp; 상식</h2>
+    <div class="grid info">
+      <div class="card"><h3><span class="ic">📍</span>어디에 있나</h3><p>일본 <b>시코쿠</b> 북서부, <b>에히메현</b> 현청 소재지이자 시코쿠 최대 도시. 세토내해를 낀 온천·성곽 도시.</p></div>
+      <div class="card"><h3><span class="ic">♨️</span>도고온천</h3><p>일본에서 <b>가장 오래된 온천</b> 중 하나. 목조 본관은 중요문화재, <b>2024년 전면 재개관</b>. 「센과 치히로」 영감지로 유명.</p></div>
+      <div class="card"><h3><span class="ic">🏯</span>마쓰야마성</h3><p>현존 <b>12천수</b> 중 하나. 카츠야마 산 정상, <b>로프웨이·리프트</b>로 올라 시내 전망. 막차 대략 17시.</p></div>
+      <div class="card"><h3><span class="ic">🚋</span>시내 교통</h3><p>이요테츠 <b>노면전차</b>가 핵심. <b>1일권 ¥800</b> 가성비 굿. 레트로 <b>봇짱 열차</b>는 별도 요금. IC카드 대체로 사용 가능.</p></div>
+      <div class="card"><h3><span class="ic">✈️</span>공항 이동</h3><p>마쓰야마공항(MYJ)→시내 리무진 <b>약 15분</b>, <b>도고온천 약 40분</b>.</p></div>
+      <div class="card"><h3><span class="ic">🍊</span>미칸의 고장</h3><p>에히메는 일본 대표 <b>귤(미칸) 산지</b>. <b>미칸주스 수도꼭지</b>·폰주스가 명물. 기념품 1순위.</p></div>
+      <div class="card"><h3><span class="ic">💴</span>돈 · 결제</h3><p>통화 <b>엔(¥)</b>. 소도시라 <b>현금 비중 높음</b> — 잔돈 유용. 체인·대형점은 카드/페이 OK.</p></div>
+      <div class="card"><h3><span class="ic">🔌</span>전기 · 기타</h3><p>전압 <b>100V</b>, 플러그 <b>A타입</b> → 어댑터 필요. 시차 없음. 소설 「봇짱」·나쓰메 소세키 연고지.</p></div>
+    </div>
+  </section>
+
+  <!-- 교통편 -->
+  <section>
+    <h2><span class="num">04</span> 교통편</h2>
+    <p class="sub">시내는 노면전차, 근교(2일차)는 JR. 한국인 무료 셔틀 적극 활용</p>
+    <div class="grid info">
+      <div class="card"><h3><span class="ic">🚌</span>한국인 무료 셔틀 ⭐</h3><p>공항↔시내↔<b>도고온천</b> · <b>한국 여권 제시하면 무료</b> · 7개 지정 정류장. Day1 입국·Day4 출국 이동에 활용.</p></div>
+      <div class="card"><h3><span class="ic">🚋</span>노면전차 (이요테츠)</h3><p>1회 <b>¥180</b>(거리 무관). <b>1일권</b>도 있어 하루 4번+ 타면 이득. 도고·시내·성 다 연결.</p></div>
+      <div class="card"><h3><span class="ic">🚂</span>봇짱열차</h3><p>메이지 증기기관차 복원 관광열차. 마쓰야마시역↔도고온천역. ⚠️ <b>주말·공휴일만 운행</b>(여행 중 9/23 추분의 날 가능성). 승차 후 구매.</p></div>
+      <div class="card"><h3><span class="ic">🚆</span>JR (2일차)</h3><p>우치코·시모나다행. 이요나다선 <b>배차 1~2시간</b>이라 시각표 미리 확정 필수.</p></div>
+      <div class="card"><h3><span class="ic">🚶</span>도보 · 택시</h3><p>오카이도·도고 지구는 도보권. 심야엔 택시. 교통카드는 확인 필요, <b>현금·1일권</b>이 안전.</p></div>
+    </div>
+  </section>
+
+  <!-- 한국인 무료 혜택 -->
+  <section>
+    <h2><span class="num">05</span> 한국인 무료 혜택 🇰🇷</h2>
+    <p class="sub">도착하자마자 챙기면 교통·입장료가 확 줄어요 (Day1 첫 미션)</p>
+    <div class="grid info">
+      <div class="card"><h3><span class="ic">📍</span>어디서 받나</h3><p>공항 <b>1층 인포메이션</b>(국내선 C게이트 근처)에서 <b>한국 여권 제시</b> → 무료 쿠폰북 수령.</p></div>
+      <div class="card"><h3><span class="ic">🎟️</span>쿠폰북 (명소 8곳)</h3><p><b>마쓰야마성 천수각 입장권</b> · <b>로프웨이·리프트 왕복권</b> · <b>도고온천 입욕권</b> 등.</p></div>
+      <div class="card"><h3><span class="ic">🚌</span>무료 셔틀버스</h3><p>공항↔시내↔<b>도고온천</b> 한국인 전용 무료. 여권 제시 탑승, 7개 정류장. <b>Day1·Day4 이동 해결</b>.</p></div>
+      <div class="card"><h3><span class="ic">⏰</span>팁</h3><p>셔틀·쿠폰 모두 <b>여권 필수</b>. 셔틀 시간표는 인포메이션 확인. 마지막날은 출발 시각 역산.</p></div>
+    </div>
+    <p class="note"><b>핵심 —</b> 공항 도착 → 인포메이션서 여권 제시 → 쿠폰북 + 무료 셔틀. 이거 하나로 <b>성·온천 입장료 + 공항 이동비</b>를 다 아껴요.</p>
+  </section>
+
+  <!-- 맛집 -->
+  <section>
+    <h2><span class="num">06</span> 맛집 · 이자카야 · 카페 <span class="num" style="letter-spacing:0">엄선</span></h2>
+    <p class="sub">타베로그 평점·현지 로컬·인스타 후기 교차검증. 관광객만 몰리는 곳 말고 <b>진짜 괜찮은 곳</b> 위주</p>
+
+    <div class="maplabel" style="color:var(--accent)">🗺️ 맛집 지도 (구글맵 리뷰·네이버 랭킹 기반)</div>
+    <div id="food-map"></div>
+    <div class="maptools">
+      <button class="mbtn" id="fm-city">🏙️ 시내</button>
+      <button class="mbtn" id="fm-dogo">♨️ 도고</button>
+      <button class="mbtn" id="fm-all">🗺️ 전체</button>
+    </div>
+    <div class="legend">
+      <span><span class="dot" style="background:#E5397F"></span><b>혁누 추천</b></span>
+      <span><span class="dot" style="background:#D14D41"></span>타이메시·우동·향토</span>
+      <span><span class="dot" style="background:#E0710C"></span>이자카야·고기</span>
+      <span><span class="dot" style="background:#8A5A2B"></span>장어</span>
+      <span><span class="dot" style="background:#0E6E70"></span>카페·디저트</span>
+    </div>
+    <p class="note">핀 팝업의 <b>구글맵 링크</b>로 실시간 리뷰·영업시간 확인하세요. 핀 위치는 근사치예요.</p>
+
+    <div class="maplabel">🏆 구글·네이버 랭킹에서 추가로 뜬 곳</div>
+    <div class="eats">
+      <div class="eat"><div class="em">🍛</div><div class="body"><div class="name">불독 <span class="jp">ブルドッグ</span></div><div class="desc">규카츠 카레 레트로 노포. 현지인 꾸준 사랑. <a href="https://www.google.com/maps/search/?api=1&amp;query=ブルドッグ 松山 カレー" target="_blank" rel="noopener">지도↗</a></div></div><div class="tag">랭킹</div></div>
+      <div class="eat"><div class="em">🍱</div><div class="body"><div class="name">우나이치 <span class="jp">うな一</span></div><div class="desc">긴텐가이 옆 장어 명가. <a href="https://www.google.com/maps/search/?api=1&amp;query=うな一 松山 銀天街" target="_blank" rel="noopener">지도↗</a></div></div><div class="tag">랭킹</div></div>
+      <div class="eat"><div class="em">🥩</div><div class="body"><div class="name">오니쿠토 365 <span class="jp">お肉と365</span></div><div class="desc">야키니쿠. '오늘의 와규 세트' 가성비. <a href="https://www.google.com/maps/search/?api=1&amp;query=お肉と365 松山" target="_blank" rel="noopener">지도↗</a></div></div><div class="tag">랭킹</div></div>
+      <div class="eat"><div class="em">🍳</div><div class="body"><div class="name">미쓰하마야키 <span class="jp">三津浜焼き</span></div><div class="desc">마쓰야마식 오코노미야키(철판). 맥주와 궁합. <a href="https://www.google.com/maps/search/?api=1&amp;query=三津浜焼き 松山" target="_blank" rel="noopener">지도↗</a></div></div><div class="tag">랭킹</div></div>
+      <div class="eat"><div class="em">🍡</div><div class="body"><div class="name">키리노모리 다이후쿠 <span class="jp">霧の森大福</span></div><div class="desc">통판 일본 1위 화과자. 마쓰야마점(오카이도). <a href="https://www.google.com/maps/search/?api=1&amp;query=霧の森菓子工房 松山店" target="_blank" rel="noopener">지도↗</a></div></div><div class="tag">기념품</div></div>
+    </div>
+
+    <div class="maplabel" style="color:var(--accent)">⭐ 추천받은 3곳 (지도에 빨간 핀)</div>
+    <div class="eats">
+      <div class="eat"><div class="em">🐟</div><div class="body"><div class="name">아미모토 별저 <span class="jp">網元 別邸</span></div><div class="desc">해산물 이자카야. 이치반초(오카이도 옆). <a href="https://www.google.com/maps/search/?api=1&amp;query=網元 別邸 松山 一番町" target="_blank" rel="noopener">지도↗</a></div></div><div class="tag must">추천</div></div>
+      <div class="eat"><div class="em">🍗</div><div class="body"><div class="name">아즈마야 <span class="jp">炭火焼鳥 東屋</span></div><div class="desc">숯불 야키토리. 니반초. <a href="https://www.google.com/maps/search/?api=1&amp;query=炭火焼鳥 東屋 松山 二番町" target="_blank" rel="noopener">지도↗</a></div></div><div class="tag must">추천</div></div>
+      <div class="eat"><div class="em">🍱</div><div class="body"><div class="name">우나기 오구라 <span class="jp">うなぎ おぐら</span></div><div class="desc">장어(우나기) 전문. 도고 유노마치 — <b>도고칸 근처, 3일차 저녁 딱</b>. <a href="https://www.google.com/maps/search/?api=1&amp;query=うなぎ おぐら 道後" target="_blank" rel="noopener">지도↗</a></div></div><div class="tag must">추천</div></div>
+    </div>
+
+    <div class="maplabel">🍽️ 마쓰야마 대표 음식</div>
+    <div class="eats">
+      <div class="eat"><div class="em">🐟</div><div class="body"><div class="name">타이메시 <span class="jp">鯛めし</span></div><div class="desc">후기 명가 <b>고시키(五志喜·380년 노포)</b> · <b>카도야</b> · 우오야. 오카이도 근처.</div></div><div class="tag must">필수</div></div>
+      <div class="eat"><div class="em">🍲</div><div class="body"><div class="name">나베야키 우동 <span class="jp">鍋焼きうどん</span></div><div class="desc">달큰한 냄비우동. 노포 <b>아사히</b>·<b>코토리</b> 양대산맥. 오후 2~3시 조기 마감 주의.</div></div><div class="tag must">필수</div></div>
+      <div class="eat"><div class="em">🍢</div><div class="body"><div class="name">지야코텐 <span class="jp">じゃこ天</span></div><div class="desc">잡어 갈아 튀긴 어묵. 이자카야 안주·간식.</div></div><div class="tag">향토</div></div>
+      <div class="eat"><div class="em">🍗</div><div class="body"><div class="name">이마바리 야키토리 <span class="jp">今治焼き鳥</span></div><div class="desc">철판에 눌러 굽는 에히메식 닭꼬치.</div></div><div class="tag">향토</div></div>
+      <div class="eat"><div class="em">🍜</div><div class="body"><div class="name">라멘 <span class="jp">一風堂 등</span></div><div class="desc">잇푸도(오카이도 근처) 외 지역 라멘집 다수.</div></div><div class="tag">식사</div></div>
+      <div class="eat"><div class="em">☕</div><div class="body"><div class="name">코메다 커피 <span class="jp">コメダ珈琲</span></div><div class="desc">모닝 세트 명물. 도착 첫날 브런치로 딱.</div></div><div class="tag">카페</div></div>
+      <div class="eat"><div class="em">🍡</div><div class="body"><div class="name">봇짱 당고 <span class="jp">坊っちゃん団子</span></div><div class="desc">세 색 경단. 도고 상점가 간식·기념품.</div></div><div class="tag">간식</div></div>
+      <div class="eat"><div class="em">🍊</div><div class="body"><div class="name">미칸 주스 <span class="jp">みかんジュース</span></div><div class="desc">수도꼭지 생귤주스 &amp; 폰주스. 공항·도고에서.</div></div><div class="tag">명물</div></div>
+      <div class="eat"><div class="em">🥮</div><div class="body"><div class="name">이치로쿠 타르트 <span class="jp">一六タルト</span></div><div class="desc">유자향 롤 화과자. 대표 기념품 과자.</div></div><div class="tag">기념품</div></div>
+    </div>
+
+    <div class="maplabel" style="color:var(--accent)">🏮 이자카야 (엄선)</div>
+    <div class="eats">
+      <div class="eat"><div class="em">🏮</div><div class="body"><div class="name">로벤토 본점 <span class="jp">炉辺人</span></div><div class="desc">원목 인테리어 로바타야키. 카운터+호리고타츠, 오카이도 도보. 타베로그 인기. <a href="https://www.google.com/maps/search/?api=1&amp;query=炉辺人+松山" target="_blank" rel="noopener">지도↗</a></div></div><div class="tag must">이자카야</div></div>
+      <div class="eat"><div class="em">🐟</div><div class="body"><div class="name">오이덴야 <span class="jp">おいでん家</span></div><div class="desc">도고온천 본관 바로 옆. 옛 생선가게→산지직송 제철회, 가성비. <b>3일차 저녁 최적</b>. <a href="https://www.google.com/maps/search/?api=1&amp;query=おいでん家+道後" target="_blank" rel="noopener">지도↗</a></div></div><div class="tag must">이자카야</div></div>
+      <div class="eat"><div class="em">🍶</div><div class="body"><div class="name">대관정 나가사카 <span class="jp">代官町なが坂</span></div><div class="desc">오카이도 3분, 차분한 와공간. 에히메 향토요리+지자케, 개실 완비. <a href="https://www.google.com/maps/search/?api=1&amp;query=代官町なが坂+松山" target="_blank" rel="noopener">지도↗</a></div></div><div class="tag">이자카야</div></div>
+      <div class="eat"><div class="em">🔥</div><div class="body"><div class="name">유메노야 혼텐 <span class="jp">夢乃屋</span></div><div class="desc">눈앞 토치 불쇼 + 고등어 와라야키. 분위기 좋은 저녁. <a href="https://www.google.com/maps/search/?api=1&amp;query=夢乃屋+松山" target="_blank" rel="noopener">지도↗</a></div></div><div class="tag">이자카야</div></div>
+    </div>
+
+    <div class="maplabel" style="color:var(--accent)">☕ 감성 카페 (엄선)</div>
+    <div class="eats">
+      <div class="eat"><div class="em">☕</div><div class="body"><div class="name">도고 유케무리 카페 <span class="jp">湯けむりカフェ</span></div><div class="desc">120년 고민가 리노베, 도고온천역 1분. 당고+젤라또, 2층 좌식 공원뷰. <a href="https://www.google.com/maps/search/?api=1&amp;query=道後+湯けむりカフェ" target="_blank" rel="noopener">지도↗</a></div></div><div class="tag">카페</div></div>
+      <div class="eat"><div class="em">🏠</div><div class="body"><div class="name">마치야 <span class="jp">町屋</span></div><div class="desc">도고 하이카라도리 고민가 개조. 자가로스팅 커피+감귤주스, 점심 수제버거, 정원 다다미방. <a href="https://www.google.com/maps/search/?api=1&amp;query=道後+町屋+カフェ" target="_blank" rel="noopener">지도↗</a></div></div><div class="tag">카페</div></div>
+      <div class="eat"><div class="em">🎞️</div><div class="body"><div class="name">코히칸 아카렌가야 <span class="jp">赤煉瓦屋</span></div><div class="desc">레트로 킷사텐. 빈티지 소품·따뜻한 조명, 영화 속 같은 분위기 (인스타 극찬). <a href="https://www.google.com/maps/search/?api=1&amp;query=松山+赤煉瓦+珈琲" target="_blank" rel="noopener">지도↗</a></div></div><div class="tag">카페</div></div>
+    </div>
+  </section>
+
+  <!-- 숙소 -->
+  <section>
+    <h2><span class="num">07</span> 숙소</h2>
+    <p class="sub">2박 · 1박으로 도심과 온천 둘 다 경험</p>
+    <div class="grid stays">
+      <div class="card stay a"><div class="band">1–2박 · 9/22–9/24</div><div class="inner">
+        <h3 class="serif">히요리 호텔 마쓰야마 <span class="jp">HIYORI</span></h3>
+        <div class="meta">
+          <div><b>위치</b> · 오카이도(大街道) 중심 · <b>노면전차 정류장 바로 앞</b> · 도고온천 차 3분 <a href="https://www.google.com/maps/search/?api=1&amp;query=HIYORI HOTEL 松山" target="_blank" rel="noopener">지도↗</a></div>
+          <div><b>특징</b> · 2026.4 신축 오픈, 245실, 24h 프런트, 해피아워·웰컴드링크 (한국 후기: 위치 최고)</div>
+          <div><b>⚠️ 청소</b> · 3박까지 객실청소 없음 (타월교환·쓰레기수거는 매일)</div>
+          <div><b>주변</b> · 마쓰야마성 · 오카이도/긴텐가이 쇼핑 · 아미모토·아즈마야 이자카야 · <b>빌트모어(프렌치토스트)</b> · 고시키 타이메시</div>
+          <div><b>메모</b> · 2일차 여친 미용실 이 근처로 예약</div>
+        </div>
+      </div></div>
+      <div class="card stay b"><div class="band">3박 · 9/24–9/25</div><div class="inner">
+        <h3 class="serif">도고칸 <span class="jp">道後館</span></h3>
+        <div class="meta">
+          <div><b>위치</b> · 도고 다코마치 · <b>도고온천역 도보 7분</b> · 공항 무료셔틀/버스 40분 <a href="https://www.google.com/maps/search/?api=1&amp;query=道後館 松山" target="_blank" rel="noopener">지도↗</a></div>
+          <div><b>특징</b> · 구로카와 기쇼 설계 온천 료칸 · <b>가이세키 정식 극찬</b> (한국 후기)</div>
+          <div><b>주변</b> · 도고온천 본관 · 상점가·봇짱당고 · 이사니와 신사 · <b>우나기 오구라</b> · 오이덴야 · 유케무리/마치야 카페</div>
+          <div><b>메모</b> · 마지막날 공항 무료셔틀 시각 확인 (9시까지 도착)</div>
+        </div>
+      </div></div>
+    </div>
+    <p class="note"><b>짐 이동 —</b> 히요리→도고칸은 노면전차 약 20분. 들고 이동하거나 호텔 짐배송 문의 가능.</p>
+  </section>
+
+  <!-- 일정 -->
+  <section>
+    <h2><span class="num">08</span> 일정 <span class="num" style="letter-spacing:0">(초안 · 채워가는 중)</span></h2>
+    <p class="sub">고정 시간만 표시. 세부는 대화하며 채우기</p>
+    <div class="days">
+      <div class="card day"><div class="head"><span class="dno">Day 0</span><span class="dtitle">전날 · 인천공항 이동</span><span class="ddate">9/21 (월)</span></div>
+        <div class="fixed"><span class="fchip">🏨 디케이에어포트 호텔 (운서동)</span><span class="fchip">🚇 저녁 이동</span></div>
+        <div class="slots"><div class="slot"><span class="t">저녁</span><span class="blank"></span></div><div class="slot"><span class="t">밤</span><span class="blank"></span></div></div></div>
+      <div class="card day"><div class="head"><span class="dno">Day 1</span><span class="dtitle">도착 · 마쓰야마 시내</span><span class="ddate">9/22 (화)</span></div>
+        <div class="day-body"><div class="day-info">
+        <div class="fixed"><span class="fchip">✈️ ICN 08:40 → MYJ ~10:30</span><span class="fchip">🎟️ 공항서 한국인 쿠폰북</span><span class="fchip">🏨 히요리</span></div>
+        <div class="slots">
+          <div class="slot"><span class="t">오전</span><span>MYJ 도착 → 안내데스크서 쿠폰북 수령(여권) → 리무진 시내 → 짐 맡기기 · <b>코메다 커피</b> 브런치</span></div>
+          <div class="slot"><span class="t">점심</span><span>오카이도 <b>잇푸도 라멘</b> (또는 타이메시 고시키)</span></div>
+          <div class="slot"><span class="t">오후</span><span><b>마쓰야마성</b>(체어리프트 강추) → 소세키/사카노우에 뮤지엄 → 반스이소</span></div>
+          <div class="slot"><span class="t">저녁</span><span>오카이도 쇼핑(돈키호테) · 추천 이자카야 <b>아미모토 별저</b>(해산물) 또는 <b>아즈마야</b>(야키토리)</span></div>
+        </div></div><div class="minimap" id="mm-d1"></div></div></div>
+      <div class="card day"><div class="head"><span class="dno">Day 2</span><span class="dtitle">러닝 · 우치코 · 시모나다</span><span class="ddate">9/23 (수)</span></div>
+        <div class="day-body"><div class="day-info">
+        <div class="fixed"><span class="fchip">🏨 히요리</span><span class="fchip">💇 09:00 미용실 (~1h)</span><span class="fchip">🚆 열차 이동</span><span class="fchip">🌅 시모나다 일몰</span></div>
+        <div class="slots">
+          <div class="slot"><span class="t">04:00</span><span>러닝 42km → 복귀·샤워</span></div>
+          <div class="slot"><span class="t">09:00</span><span>여친 미용실(~1h) · 그동안 회복/아침 → JR로 이동</span></div>
+          <div class="slot"><span class="t">낮</span><span><b>우치코 옛거리</b> 산책(우치코자) + 점심 (오즈성 제외, 여유롭게)</span></div>
+          <div class="slot"><span class="t">오후</span><span>이요나다선 열차로 <b>시모나다 방면</b> ⚠️ 배차 1~2h — 시각표 미리 확정 필요</span></div>
+          <div class="slot"><span class="t">~18:00</span><span><b>시모나다역</b> 또는 <b>후타미 해변</b>(双海, 마쓰야마 최고 석양지)에서 일몰 → 상행선으로 마쓰야마 복귀·저녁</span></div>
+        </div></div><div class="minimap" id="mm-d2"></div></div></div>
+      <div class="card day"><div class="head"><span class="dno">Day 3</span><span class="dtitle">도고온천 · 회복데이</span><span class="ddate">9/24 (목)</span></div>
+        <div class="day-body"><div class="day-info">
+        <div class="fixed"><span class="fchip">🏨 도고칸 (체크인)</span><span class="fchip">♨️ 도고온천 본관 2층 개인실</span></div>
+        <div class="slots">
+          <div class="slot"><span class="t">오전</span><span>느긋한 아침 · <b>이사니와 신사</b>(계단 위 주황 신사, 인스타) 산책 · 감성카페 <b>유케무리/마치야</b> → 도고칸 체크인</span></div>
+          <div class="slot"><span class="t">오후</span><span><b>도고온천 본관 2층 개인실</b> · 상점가 · 대관람차 '구루린' 야경 · 미칸주스 수도꼭지</span></div>
+          <div class="slot"><span class="t">저녁</span><span>도고 <b>우나기 오구라</b>(장어) 또는 오이덴야(회) · 유카타 입고 야간 산책</span></div>
+        </div></div><div class="minimap" id="mm-d3"></div></div></div>
+      <div class="card day"><div class="head"><span class="dno">Day 4</span><span class="dtitle">출국</span><span class="ddate">9/25 (금)</span></div>
+        <div class="day-body"><div class="day-info">
+        <div class="fixed"><span class="fchip">🚌 ~8:20 공항버스</span><span class="fchip">✈️ MYJ 11:15 → ICN ~13:00</span></div>
+        <div class="slots"><div class="slot"><span class="t">아침</span><span class="blank"></span></div><div class="slot"><span class="t">이동</span><span class="blank"></span></div></div>
+        </div><div class="minimap" id="mm-d4"></div></div></div>
+    </div>
+  </section>
+
+  <!-- 준비물 -->
+  <section>
+    <h2><span class="num">09</span> 준비물 체크리스트</h2>
+    <p class="sub">탭하면 체크되고 <b>자동 저장</b>돼요 (이 브라우저에 기억). 출발 전까지 하나씩 지워나가기</p>
+    <div class="card" style="margin-top:16px;">
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+        <div class="chk-track"><div class="chk-fill" id="chk-bar"></div></div>
+        <div id="chk-count" class="tnum" style="font-weight:700;white-space:nowrap;">0 / 0</div>
+        <button class="mbtn" id="chk-reset">초기화</button>
+      </div>
+    </div>
+    <div class="chk chk-grid">
+
+      <div class="card chk-card"><h3>📄 필수 서류·증빙</h3><ul>
+        <li><label><input type="checkbox"><span>여권 (유효기간 6개월 이상)</span></label></li>
+        <li><label><input type="checkbox"><span>제주항공 e-티켓 (7C 왕복)</span></label></li>
+        <li><label><input type="checkbox"><span>숙소 예약확인서 (히요리·도고칸)</span></label></li>
+        <li><label><input type="checkbox"><span>여행자보험 증서</span></label></li>
+        <li><label><input type="checkbox"><span>eSIM QR·설치 확인 (출발 전 테스트)</span></label></li>
+        <li><label><input type="checkbox"><span>Visit Japan Web 등록 (입국·세관 QR)</span></label></li>
+        <li><label><input type="checkbox"><span>여권 사본·여분 증명사진 (분실 대비)</span></label></li>
+      </ul></div>
+
+      <div class="card chk-card"><h3>💴 돈·결제</h3><ul>
+        <li><label><input type="checkbox"><span>엔화 현금 (환전 50만원분)</span></label></li>
+        <li><label><input type="checkbox"><span>해외결제 카드 (신용/트래블)</span></label></li>
+        <li><label><input type="checkbox"><span>동전 지갑 (소도시 현금 多)</span></label></li>
+        <li><label><input type="checkbox"><span>국내 신분증</span></label></li>
+      </ul></div>
+
+      <div class="card chk-card"><h3>📱 전자기기</h3><ul>
+        <li><label><input type="checkbox"><span>휴대폰 + 충전기</span></label></li>
+        <li><label><input type="checkbox"><span>보조배터리 (기내 휴대필수, 위탁 X)</span></label></li>
+        <li><label><input type="checkbox"><span>110V A타입 어댑터(돼지코) 2개</span></label></li>
+        <li><label><input type="checkbox"><span>멀티탭·멀티충전기</span></label></li>
+        <li><label><input type="checkbox"><span>러닝워치·애플워치 + 충전기</span></label></li>
+        <li><label><input type="checkbox"><span>이어폰</span></label></li>
+        <li><label><input type="checkbox"><span>카메라 + 충전기·메모리 (선택)</span></label></li>
+      </ul></div>
+
+      <div class="card chk-card"><h3>👕 의류 (낮 28° / 밤 20°)</h3><ul>
+        <li><label><input type="checkbox"><span>반팔 티셔츠 3~4장</span></label></li>
+        <li><label><input type="checkbox"><span>얇은 가디건·바람막이 (냉방·온도차)</span></label></li>
+        <li><label><input type="checkbox"><span>편한 긴바지 / 반바지</span></label></li>
+        <li><label><input type="checkbox"><span>속옷·양말 (일수+여유분)</span></label></li>
+        <li><label><input type="checkbox"><span>잠옷</span></label></li>
+        <li><label><input type="checkbox"><span>편한 운동화·워킹화</span></label></li>
+        <li><label><input type="checkbox"><span>슬리퍼/샌들 · 모자 · 선글라스</span></label></li>
+      </ul></div>
+
+      <div class="card chk-card"><h3>🏃 러닝 (42km)</h3><ul>
+        <li><label><input type="checkbox"><span>러닝화</span></label></li>
+        <li><label><input type="checkbox"><span>러닝복 상·하의 · 러닝 양말</span></label></li>
+        <li><label><input type="checkbox"><span>러닝워치·암밴드</span></label></li>
+        <li><label><input type="checkbox"><span>에너지젤·보급식</span></label></li>
+        <li><label><input type="checkbox"><span>물집 방지 (밴드·바세린)</span></label></li>
+      </ul></div>
+
+      <div class="card chk-card"><h3>🧴 세면·위생</h3><ul>
+        <li><label><input type="checkbox"><span>칫솔·치약</span></label></li>
+        <li><label><input type="checkbox"><span>스킨케어·클렌징</span></label></li>
+        <li><label><input type="checkbox"><span>선크림</span></label></li>
+        <li><label><input type="checkbox"><span>면도기</span></label></li>
+        <li><label><input type="checkbox"><span>렌즈·안경·렌즈용액</span></label></li>
+        <li><label><input type="checkbox"><span>여성용품</span></label></li>
+      </ul></div>
+
+      <div class="card chk-card"><h3>💊 상비약</h3><ul>
+        <li><label><input type="checkbox"><span>소화제·지사제</span></label></li>
+        <li><label><input type="checkbox"><span>두통·진통제</span></label></li>
+        <li><label><input type="checkbox"><span>감기약</span></label></li>
+        <li><label><input type="checkbox"><span>밴드·연고</span></label></li>
+        <li><label><input type="checkbox"><span>멀미약 (열차 이동)</span></label></li>
+        <li><label><input type="checkbox"><span>파스 (마라톤 후) · 개인 처방약</span></label></li>
+      </ul></div>
+
+      <div class="card chk-card"><h3>♨️ 온천·여행 특화</h3><ul>
+        <li><label><input type="checkbox"><span>수건 (도고온천 대여 유료 → 챙기면 절약)</span></label></li>
+        <li><label><input type="checkbox"><span>우산·우비 (9/25 비 예보)</span></label></li>
+        <li><label><input type="checkbox"><span>에코백·장바구니 (기념품)</span></label></li>
+        <li><label><input type="checkbox"><span>목베개·안대·귀마개</span></label></li>
+        <li><label><input type="checkbox"><span>지퍼백·빨래주머니</span></label></li>
+        <li><label><input type="checkbox"><span>접이식 보조가방</span></label></li>
+      </ul></div>
+
+      <div class="card chk-card"><h3>🎒 기타·앱</h3><ul>
+        <li><label><input type="checkbox"><span>물티슈·손소독제 · 마스크</span></label></li>
+        <li><label><input type="checkbox"><span>상비 간식 · 볼펜</span></label></li>
+        <li><label><input type="checkbox"><span>구글맵 · 파파고 앱</span></label></li>
+        <li><label><input type="checkbox"><span>이 여행 계획 파일 (오프라인 저장/북마크)</span></label></li>
+      </ul></div>
+
+    </div>
+  </section>
+
+  <!-- 기초 회화 -->
+  <section>
+    <h2><span class="num">10</span> 기초 회화 🗣️</h2>
+    <p class="sub">일본어 밑에 <b>한글 발음</b> 그대로 읽으면 돼요. 스몰톡·자기소개용</p>
+
+    <div class="phlabel">🙋 우리 소개</div>
+    <div class="phrases">
+      <div class="phrase"><div class="ko">한국에서 (여행) 왔어요</div><div class="ja">韓国から旅行に来ました</div><div class="ro">칸코쿠카라 료코-니 키마시타</div></div>
+      <div class="phrase"><div class="ko">둘이 사귄 지 3년 됐어요</div><div class="ja">付き合って3年です</div><div class="ro">츠키앗테 산넨데스</div></div>
+      <div class="phrase"><div class="ko">이름은 ○○예요 <span style="opacity:.6">(각자 이름 넣기)</span></div><div class="ja">名前は◯◯です</div><div class="ro">나마에와 ◯◯데스</div></div>
+      <div class="phrase"><div class="ko">1995년생, 1997년생이에요</div><div class="ja">1995年と1997年生まれです</div><div class="ro">센큐-햐쿠큐-쥬-고넨토 센큐-햐쿠큐-쥬-나나넨 우마레데스</div></div>
+      <div class="phrase"><div class="ko">제가 두 살 연하예요</div><div class="ja">僕が2歳年下です</div><div class="ro">보쿠가 니사이 토시시타데스</div></div>
+      <div class="phrase"><div class="ko">같이 살고 있어요</div><div class="ja">一緒に住んでいます</div><div class="ro">잇쇼니 슨데이마스</div></div>
+      <div class="phrase"><div class="ko">화요일에 와서 금요일에 돌아가요</div><div class="ja">火曜日に来て金曜日に帰ります</div><div class="ro">카요-비니 키테 킨요-비니 카에리마스</div></div>
+      <div class="phrase"><div class="ko">저는 서버(백엔드) 개발자예요</div><div class="ja">僕はサーバーエンジニアです</div><div class="ro">보쿠와 사-바- 엔지니아데스</div></div>
+      <div class="phrase"><div class="ko">여자친구는 디자이너예요</div><div class="ja">彼女はデザイナーです</div><div class="ro">카노죠와 데자이나-데스</div></div>
+    </div>
+
+    <div class="phlabel">💬 스몰톡·인사</div>
+    <div class="phrases">
+      <div class="phrase"><div class="ko">안녕하세요</div><div class="ja">こんにちは</div><div class="ro">콘니치와</div></div>
+      <div class="phrase"><div class="ko">감사합니다</div><div class="ja">ありがとうございます</div><div class="ro">아리가토- 고자이마스</div></div>
+      <div class="phrase"><div class="ko">저기요 / 실례합니다</div><div class="ja">すみません</div><div class="ro">스미마셍</div></div>
+      <div class="phrase"><div class="ko">맛있어요!</div><div class="ja">おいしいです！</div><div class="ro">오이시-데스</div></div>
+      <div class="phrase"><div class="ko">영어(사진) 괜찮으세요?</div><div class="ja">英語わかりますか</div><div class="ro">에이고 와카리마스카</div></div>
+      <div class="phrase"><div class="ko">사진 찍어주실 수 있어요?</div><div class="ja">写真を撮ってもらえますか</div><div class="ro">샤신오 톳테 모라에마스카</div></div>
+    </div>
+
+    <div class="phlabel">🍽️ 주문·실전</div>
+    <div class="phrases">
+      <div class="phrase"><div class="ko">이거 주세요</div><div class="ja">これください</div><div class="ro">코레 쿠다사이</div></div>
+      <div class="phrase"><div class="ko">추천이 뭐예요?</div><div class="ja">おすすめは何ですか</div><div class="ro">오스스메와 난데스카</div></div>
+      <div class="phrase"><div class="ko">두 명이에요</div><div class="ja">二人です</div><div class="ro">후타리데스</div></div>
+      <div class="phrase"><div class="ko">예약했어요</div><div class="ja">予約しました</div><div class="ro">요야쿠 시마시타</div></div>
+      <div class="phrase"><div class="ko">얼마예요?</div><div class="ja">いくらですか</div><div class="ro">이쿠라데스카</div></div>
+      <div class="phrase"><div class="ko">카드 되나요?</div><div class="ja">カードは使えますか</div><div class="ro">카-도와 츠카에마스카</div></div>
+      <div class="phrase"><div class="ko">계산해 주세요</div><div class="ja">お会計お願いします</div><div class="ro">오카이케- 오네가이시마스</div></div>
+      <div class="phrase"><div class="ko">한 잔 더 주세요</div><div class="ja">もう一杯ください</div><div class="ro">모- 잇파이 쿠다사이</div></div>
+      <div class="phrase"><div class="ko">화장실 어디예요?</div><div class="ja">トイレはどこですか</div><div class="ro">토이레와 도코데스카</div></div>
+      <div class="phrase"><div class="ko">잘 먹겠습니다 / 잘 먹었습니다</div><div class="ja">いただきます / ごちそうさま</div><div class="ro">이타다키마스 / 고치소-사마</div></div>
+    </div>
+  </section>
+
+  <footer>마쓰야마 여행 계획 · 라이브 v4 · 함께 채워가는 중 🍊<br>지도 © OpenStreetMap · 날씨 © Open-Meteo</footer>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+(function(){
+  // ---------- 지도 ----------
+  var PLACES = [
+    {n:"마쓰야마공항", jp:"松山空港 MYJ", lat:33.8272, lng:132.6997, c:"transit", q:"松山空港", big:"✈️"},
+    {n:"히요리 (1·2박)", jp:"HOTEL Hiyori 松山", lat:33.8399, lng:132.7686, c:"stay", q:"HOTEL Hiyori 松山", big:"🏨"},
+    {n:"도고칸 (3박)", jp:"道後館", lat:33.8536, lng:132.7855, c:"stay", q:"道後館 愛媛", big:"🏨"},
+    {n:"마쓰야마성", jp:"松山城", lat:33.8457, lng:132.7657, c:"sight", q:"松山城"},
+    {n:"도고온천 본관", jp:"道後温泉本館", lat:33.8519, lng:132.7863, c:"sight", q:"道後温泉本館"},
+    {n:"오카이도 상점가", jp:"大街道", lat:33.8420, lng:132.7686, c:"sight", q:"大街道 松山"},
+    {n:"이시테지", jp:"石手寺", lat:33.8497, lng:132.8010, c:"sight", q:"石手寺"},
+    {n:"반스이소", jp:"萬翠荘", lat:33.8433, lng:132.7648, c:"sight", q:"萬翠荘"},
+    {n:"사카노우에 뮤지엄", jp:"坂の上の雲ミュージアム", lat:33.8440, lng:132.7662, c:"sight", q:"坂の上の雲ミュージアム"},
+    {n:"⭐ 아미모토 별저 (이자카야)", jp:"居酒屋 網元 別邸", lat:33.8412, lng:132.7693, c:"food", q:"網元 別邸 松山 一番町"},
+    {n:"⭐ 아즈마야 (야키토리)", jp:"炭火焼鳥 東屋", lat:33.8391, lng:132.7690, c:"food", q:"炭火焼鳥 東屋 松山 二番町"},
+    {n:"⭐ 우나기 오구라 (장어)", jp:"うなぎ おぐら", lat:33.8506, lng:132.7846, c:"food", q:"うなぎ おぐら 道後"},
+    {n:"우치코 옛거리", jp:"内子座", lat:33.5389, lng:132.6538, c:"road", q:"内子座"},
+    {n:"시모나다역 (일몰)", jp:"下灘駅", lat:33.6816, lng:132.6300, c:"road", q:"下灘駅"},
+    {n:"마쓰야마시역", jp:"松山市駅", lat:33.8395, lng:132.7663, c:"transit", q:"松山市駅"}
+  ];
+  var COLORS = {stay:"#E0710C", sight:"#0E6E70", road:"#7A4FBF", transit:"#6B7785", food:"#D14D41"};
+
+  var map = L.map('map', {scrollWheelZoom:true}).setView([33.72,132.72], 11);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom:19, attribution:'© OpenStreetMap'
+  }).addTo(map);
+
+  // 2일차 로드트립 동선: 시내 → 우치코 → 시모나다 → 시내
+  L.polyline([[33.8399,132.7686],[33.5389,132.6538],[33.6816,132.6300],[33.8399,132.7686]],
+    {color:"#7A4FBF", weight:3, dashArray:"6,9", opacity:.75}).addTo(map);
+  // 공항 ↔ 시내 이동
+  L.polyline([[33.8272,132.6997],[33.8399,132.7686]],
+    {color:"#6B7785", weight:2, dashArray:"2,7", opacity:.6}).addTo(map);
+
+  var all = [], roadGrp = [], mainGrp = [];
+  PLACES.forEach(function(p){
+    var m;
+    if(p.big){
+      var icon = L.divIcon({className:"bigpin", html:'<div class="bp">'+p.big+'</div>', iconSize:[30,30], iconAnchor:[15,15]});
+      m = L.marker([p.lat,p.lng], {icon:icon, zIndexOffset:1000}).addTo(map);
+      m.bindTooltip(p.n, {permanent:true, direction:"top", className:"lbl", offset:[0,-12]});
+    } else {
+      m = L.circleMarker([p.lat,p.lng], {radius:8, color:"#fff", weight:2, fillColor:COLORS[p.c], fillOpacity:1}).addTo(map);
+    }
+    var g = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(p.q);
+    m.bindPopup('<b>'+p.n+'</b> <span class="jp">'+p.jp+'</span><br><a href="'+g+'" target="_blank" rel="noopener">구글맵에서 열기 ↗</a>');
+    all.push(m);
+    if(p.c==="road") roadGrp.push(m); else mainGrp.push(m);
+  });
+
+  // 기본: 공항 + 숙소2 + 시내가 읽히는 뷰 (로드트립 제외)
+  var homeView = function(){ map.fitBounds(L.featureGroup(mainGrp).getBounds().pad(0.15)); };
+  var cityView = function(){ map.setView([33.847,132.780], 14); };
+  var allView  = function(){ map.fitBounds(L.featureGroup(all).getBounds().pad(0.12)); };
+  var roadView = function(){ map.fitBounds(L.featureGroup(roadGrp).getBounds().pad(0.3)); };
+  document.getElementById('btn-city').onclick = homeView;
+  document.getElementById('btn-all').onclick  = allView;
+  document.getElementById('btn-road').onclick = roadView;
+  homeView();
+
+  // ---------- 실시간 날씨 ----------
+  var WMO = {
+    0:["☀️","맑음"],1:["🌤️","대체로 맑음"],2:["⛅","구름 조금"],3:["☁️","흐림"],
+    45:["🌫️","안개"],48:["🌫️","안개"],
+    51:["🌦️","약한 이슬비"],53:["🌦️","이슬비"],55:["🌦️","짙은 이슬비"],
+    61:["🌧️","약한 비"],63:["🌧️","비"],65:["🌧️","강한 비"],
+    66:["🌧️","진눈깨비"],67:["🌧️","진눈깨비"],
+    71:["❄️","약한 눈"],73:["❄️","눈"],75:["❄️","강한 눈"],77:["❄️","싸락눈"],
+    80:["🌦️","소나기"],81:["🌦️","소나기"],82:["🌦️","강한 소나기"],
+    85:["🌨️","눈소나기"],86:["🌨️","눈소나기"],
+    95:["⛈️","뇌우"],96:["⛈️","우박 뇌우"],99:["⛈️","우박 뇌우"]
+  };
+  function wmo(c){ return WMO[c] || ["🌡️","-"]; }
+  var DOW = ["일","월","화","수","목","금","토"];
+  var TRIP = {"2026-09-22":1,"2026-09-23":1,"2026-09-24":1,"2026-09-25":1};
+
+  var url = "https://api.open-meteo.com/v1/forecast?latitude=33.8416&longitude=132.7686"
+    + "&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m"
+    + "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max"
+    + "&timezone=Asia%2FTokyo&forecast_days=16";
+
+  fetch(url).then(function(r){ return r.json(); }).then(function(d){
+    // 현재
+    if(d.current){
+      var w = wmo(d.current.weather_code);
+      document.getElementById('wxnow-icon').textContent = w[0];
+      document.getElementById('wxnow-temp').textContent = Math.round(d.current.temperature_2m) + "° · " + w[1];
+      document.getElementById('wxnow-meta').textContent =
+        "마쓰야마 현재 · 습도 " + d.current.relative_humidity_2m + "% · 바람 " + Math.round(d.current.wind_speed_10m) + "km/h";
+    }
+    // 예보
+    var dd = d.daily, box = document.getElementById('wx-forecast'), note = document.getElementById('wx-note');
+    box.innerHTML = "";
+    var idx = [];
+    dd.time.forEach(function(t,i){ if(TRIP[t]) idx.push(i); });
+    var usingTrip = idx.length > 0;
+    if(!usingTrip){ idx = dd.time.map(function(_,i){return i;}).slice(0,4); }
+    idx.forEach(function(i){
+      var t = dd.time[i], w = wmo(dd.weather_code[i]);
+      var dt = new Date(t+"T00:00:00");
+      var pop = dd.precipitation_probability_max[i];
+      var el = document.createElement('div');
+      el.className = "card wx";
+      el.innerHTML = '<div class="day">'+DOW[dt.getDay()]+'요일</div>'
+        + '<div class="date tnum">'+(dt.getMonth()+1)+'/'+dt.getDate()+'</div>'
+        + '<div class="icon">'+w[0]+'</div>'
+        + '<div class="temp tnum">'+Math.round(dd.temperature_2m_max[i])+'° <span class="lo">/ '+Math.round(dd.temperature_2m_min[i])+'°</span></div>'
+        + '<div class="rain'+(pop>=50?' hi':'')+'">비 '+pop+'%</div>';
+      box.appendChild(el);
+    });
+    if(!usingTrip){
+      note.innerHTML = "<b>참고 —</b> 여행일(9/22~25) 예보는 <b>출발 약 2주 전부터</b> 표시돼요. 지금은 가장 가까운 4일 예보를 보여주는 중. 위 'LIVE'는 현재 실시간 값입니다.";
+    }
+  }).catch(function(e){
+    document.getElementById('wxnow-temp').textContent = "날씨를 불러오지 못했어요";
+    document.getElementById('wxnow-icon').textContent = "⚠️";
+    document.getElementById('wxnow-meta').textContent = "인터넷 연결을 확인하고 새로고침 해주세요";
+    document.getElementById('wx-forecast').innerHTML =
+      '<div id="wx-loading">오프라인 참고값 — 9/22 24°/20° · 9/23 26°/19°(비↑) · 9/24 27°/21°(맑음) · 9/25 28°/22°</div>';
+  });
+})();
+
+// ---------- 일자별 미니 지도 (동선) ----------
+(function(){
+  function miniMap(id, color, pts, line){
+    if(!document.getElementById(id)) return;
+    var m = L.map(id, {scrollWheelZoom:false, zoomControl:false, attributionControl:false});
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19}).addTo(m);
+    var lineCoords = (line || pts).map(function(p){ return [p[0], p[1]]; });
+    L.polyline(lineCoords, {color:color, weight:3, dashArray:"5,8", opacity:.85}).addTo(m);
+    pts.forEach(function(p, i){
+      var icon = L.divIcon({className:"npwrap", html:'<div class="np" style="background:'+color+'">'+(i+1)+'</div>', iconSize:[22,22], iconAnchor:[11,11]});
+      L.marker([p[0],p[1]], {icon:icon}).addTo(m).bindPopup('<b>'+(i+1)+'. '+p[2]+'</b>');
+    });
+    var fit = function(){ m.invalidateSize(); m.fitBounds(L.latLngBounds(lineCoords).pad(0.28)); };
+    fit();
+    setTimeout(fit, 250);
+  }
+  // Day 1 — 시내 (공항→히요리→성→반스이소→오카이도)
+  miniMap('mm-d1', '#0E6E70', [
+    [33.8272,132.6997,'마쓰야마공항'],[33.8399,132.7686,'히요리'],
+    [33.8457,132.7657,'마쓰야마성'],[33.8433,132.7648,'반스이소'],[33.8412,132.7690,'오카이도·이자카야']
+  ]);
+  // Day 2 — 우치코·시모나다 (히요리↔우치코↔시모나다, 왕복)
+  miniMap('mm-d2', '#7A4FBF', [
+    [33.8399,132.7686,'히요리(출발)'],[33.5389,132.6538,'우치코'],[33.6816,132.6300,'시모나다역(일몰)'],[33.6470,132.6160,'후타미 해변(노을)']
+  ], [[33.8399,132.7686],[33.5389,132.6538],[33.6816,132.6300],[33.6470,132.6160],[33.8399,132.7686]]);
+  // Day 3 — 도고 (이사니와→도고칸→본관→우나기)
+  miniMap('mm-d3', '#E0710C', [
+    [33.8515,132.7869,'이사니와 신사'],[33.8536,132.7855,'도고칸'],
+    [33.8519,132.7863,'도고온천 본관'],[33.8506,132.7846,'우나기 오구라']
+  ]);
+  // Day 4 — 출국 (도고칸→공항)
+  miniMap('mm-d4', '#6B7785', [
+    [33.8536,132.7855,'도고칸'],[33.8272,132.6997,'마쓰야마공항']
+  ]);
+})();
+
+// ---------- 맛집 지도 ----------
+(function(){
+  if(!document.getElementById('food-map')) return;
+  var FC = {local:'#D14D41', izakaya:'#E0710C', eel:'#8A5A2B', cafe:'#0E6E70', pick:'#E5397F', sunset:'#F2A65A'};
+  var FOODS = [
+    // 시내 (오카이도·긴텐가이·반초)
+    {n:'고시키 (타이메시·오색소면)', jp:'五志喜', lat:33.8410, lng:132.7670, cat:'local', a:'city', q:'五志喜 松山', note:'380년 노포 · 우와지마식 타이메시'},
+    {n:'카도야 (타이메시)', jp:'かどや', lat:33.8420, lng:132.7689, cat:'local', a:'city', q:'かどや 松山 大街道', note:'현지인도 줄 서는 도미밥 명가'},
+    {n:'아사히 (나베야키우동)', jp:'アサヒ', lat:33.8405, lng:132.7666, cat:'local', a:'city', q:'アサヒ 鍋焼きうどん 松山', note:'나베야키우동 노포 · 낮에만'},
+    {n:'코토리 (나베야키우동)', jp:'ことり', lat:33.8388, lng:132.7670, cat:'local', a:'city', q:'ことり 鍋焼きうどん 松山', note:'진한 국물의 냄비우동'},
+    {n:'미쓰하마야키', jp:'三津浜焼き', lat:33.8412, lng:132.7682, cat:'local', a:'city', q:'三津浜焼き 松山', note:'마쓰야마식 오코노미야키(철판)'},
+    {n:'⭐ 아미모토 별저', jp:'網元 別邸', lat:33.8412, lng:132.7693, cat:'pick', a:'city', q:'網元 別邸 松山 一番町', note:'혁누 추천 · 해산물 이자카야'},
+    {n:'⭐ 아즈마야 (야키토리)', jp:'炭火焼鳥 東屋', lat:33.8391, lng:132.7690, cat:'pick', a:'city', q:'炭火焼鳥 東屋 松山 二番町', note:'혁누 추천 · 숯불 야키토리'},
+    {n:'로벤토 본점', jp:'炉辺人', lat:33.8425, lng:132.7681, cat:'izakaya', a:'city', q:'炉辺人 松山', note:'원목 로바타야키 · 타베로그 상위'},
+    {n:'불독 (규카츠 카레)', jp:'ブルドッグ', lat:33.8398, lng:132.7687, cat:'izakaya', a:'city', q:'ブルドッグ 松山 カレー', note:'규카츠 카레 레트로 노포'},
+    {n:'오니쿠토 365 (야키니쿠)', jp:'お肉と365', lat:33.8422, lng:132.7700, cat:'izakaya', a:'city', q:'お肉と365 松山', note:'오늘의 와규 세트 가성비'},
+    {n:'우나이치 (장어)', jp:'うな一', lat:33.8400, lng:132.7662, cat:'eel', a:'city', q:'うな一 松山 銀天街', note:'긴텐가이 옆 장어 명가'},
+    {n:'아카렌가야 (레트로 킷사)', jp:'赤煉瓦屋', lat:33.8415, lng:132.7695, cat:'cafe', a:'city', q:'松山 赤煉瓦 珈琲', note:'빈티지·영화 같은 분위기'},
+    {n:'키리노모리 다이후쿠', jp:'霧の森', lat:33.8420, lng:132.7690, cat:'cafe', a:'city', q:'霧の森菓子工房 松山店', note:'통판 일본1위 화과자'},
+    // 도고
+    {n:'⭐ 우나기 오구라 (장어)', jp:'うなぎ おぐら', lat:33.8506, lng:132.7846, cat:'pick', a:'dogo', q:'うなぎ おぐら 道後', note:'혁누 추천 · 도고칸 근처'},
+    {n:'오이덴야 (산지직송 회)', jp:'おいでん家', lat:33.8516, lng:132.7857, cat:'izakaya', a:'dogo', q:'おいでん家 道後', note:'도고온천 본관 옆 · 가성비'},
+    {n:'봇짱 (도고 명물)', jp:'坊っちゃん', lat:33.8512, lng:132.7852, cat:'local', a:'dogo', q:'坊っちゃん 道後 商店街', note:'도고 아케이드 끝 유명집'},
+    {n:'유케무리 카페', jp:'湯けむりカフェ', lat:33.8525, lng:132.7852, cat:'cafe', a:'dogo', q:'道後 湯けむりカフェ', note:'120년 고민가 · 당고+젤라또'},
+    {n:'마치야 (고민가 카페)', jp:'町屋', lat:33.8515, lng:132.7860, cat:'cafe', a:'dogo', q:'道後 町屋 カフェ', note:'자가로스팅·정원 다다미방'},
+    {n:'⭐ 빌트모어 커피 (프렌치토스트!)', jp:'Biltmore Coffee', lat:33.8388, lng:132.7648, cat:'pick', a:'city', q:'Biltmore Coffee 松山 港町', note:'혁누 추천 · 프렌치토스트 꼭 추가'}
+  ];
+  var fmap = L.map('food-map', {scrollWheelZoom:false});
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19, attribution:'© OpenStreetMap'}).addTo(fmap);
+  var fcity=[], fdogo=[], fall=[];
+  FOODS.forEach(function(f){
+    var m = L.circleMarker([f.lat,f.lng], {radius:8, color:'#fff', weight:2, fillColor:FC[f.cat], fillOpacity:1}).addTo(fmap);
+    var g = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(f.q);
+    m.bindPopup('<b>'+f.n+'</b> <span class="jp">'+f.jp+'</span><br>'+f.note+'<br><a href="'+g+'" target="_blank" rel="noopener">구글맵 리뷰·위치 ↗</a>');
+    fall.push(m); (f.a==='dogo'?fdogo:fcity).push(m);
+  });
+  var fFit = function(grp){ fmap.invalidateSize(); fmap.fitBounds(L.featureGroup(grp).getBounds().pad(0.2)); };
+  document.getElementById('fm-city').onclick = function(){ fFit(fcity); };
+  document.getElementById('fm-dogo').onclick = function(){ fFit(fdogo); };
+  document.getElementById('fm-all').onclick  = function(){ fFit(fall); };
+  fFit(fcity);
+  setTimeout(function(){ fFit(fcity); }, 250);
+})();
+
+// ---------- 준비물 체크리스트 (localStorage 저장) ----------
+(function(){
+  var boxes = document.querySelectorAll('.chk input[type=checkbox]');
+  var bar = document.getElementById('chk-bar'), cnt = document.getElementById('chk-count');
+  if(!boxes.length) return;
+  function update(){
+    var done = 0;
+    boxes.forEach(function(b){ if(b.checked) done++; });
+    var pct = Math.round(done / boxes.length * 100);
+    if(bar) bar.style.width = pct + '%';
+    if(cnt) cnt.textContent = done + ' / ' + boxes.length + ' (' + pct + '%)';
+  }
+  boxes.forEach(function(b, i){
+    var k = 'mpk_chk_' + i;
+    try { if(localStorage.getItem(k) === '1') b.checked = true; } catch(e){}
+    b.addEventListener('change', function(){
+      try { localStorage.setItem(k, b.checked ? '1' : '0'); } catch(e){}
+      update();
+    });
+  });
+  var rst = document.getElementById('chk-reset');
+  if(rst) rst.addEventListener('click', function(){
+    boxes.forEach(function(b, i){
+      b.checked = false;
+      try { localStorage.removeItem('mpk_chk_' + i); } catch(e){}
+    });
+    update();
+  });
+  update();
+})();
+</script>
+</body>
+</html>
