@@ -2,942 +2,615 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>마쓰야마 3박4일 · 9/22–9/25</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>마쓰야마 여행</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Dela+Gothic+One&family=Gothic+A1:wght@400;500;700;800;900&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@400;500;600;700;800;900&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg:#F1E7D3; --surface:#FCF7EC; --surface-2:#EADEC6; --ink:#241D14;
-    --muted:#7C6D57; --line:#D8C9AC; --accent:#DA3A20; --accent-soft:#F6DED0;
-    --sea:#2B4A7B; --sea-soft:#DCE2F0; --road:#7A4FBF; --transit:#6B7785;
-    --shadow:0 1px 0 rgba(36,29,20,.06),0 10px 26px rgba(36,29,20,.10);
-    --radius:13px; --maxw:860px;
-    --f-disp:'Black Han Sans','Zen Kaku Gothic New',sans-serif;
-    --f-jp:'Dela Gothic One','Zen Kaku Gothic New',sans-serif;
-    --f-jptext:'Zen Kaku Gothic New',system-ui,sans-serif;
-    --f-kr:'Gothic A1',system-ui,-apple-system,sans-serif;
+  :root{
+    --bg:#EEE9E0; --card:#FBF9F3; --card2:#F1ECE1; --ink:#28231C; --muted:#8A8073;
+    --line:#E4DED0; --accent:#BF5E44; --accent-weak:#F0E2DB; --teal:#4A7A71; --amber:#C4964F;
+    --purple:#8A6BC4; --grey:#8A9089;
+    --sh:0 1px 2px rgba(40,32,24,.05),0 8px 22px rgba(40,32,24,.08);
+    --sh2:0 14px 40px rgba(40,32,24,.18);
+    --f:'Gothic A1',system-ui,-apple-system,sans-serif; --jp:'Zen Kaku Gothic New',var(--f);
+    --w:560px;
   }
-  @media (prefers-color-scheme: dark){:root{
-    --bg:#15141C; --surface:#1E1C26; --surface-2:#282531; --ink:#F1E9DA;
-    --muted:#A99C88; --line:#332F3C; --accent:#F0563B; --accent-soft:#3A211A;
-    --sea:#8EA6D9; --sea-soft:#1C2436; --road:#A783E6; --transit:#8A96A0;
-    --shadow:0 1px 0 rgba(0,0,0,.3),0 12px 30px rgba(0,0,0,.45);
+  @media (prefers-color-scheme:dark){:root{
+    --bg:#14120E; --card:#1E1B15; --card2:#26221B; --ink:#F0EBE0; --muted:#9E9486;
+    --line:#2C271F; --accent:#D97B5F; --accent-weak:#2E1F18; --teal:#5FA192; --amber:#D2A863;
+    --purple:#A98FE6; --grey:#8A9089;
+    --sh:0 1px 2px rgba(0,0,0,.35),0 8px 22px rgba(0,0,0,.45); --sh2:0 14px 40px rgba(0,0,0,.6);
   }}
-  *{box-sizing:border-box;}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-kr);
-    line-height:1.62;-webkit-font-smoothing:antialiased;
-    background-image:radial-gradient(rgba(124,109,87,.11) .6px,transparent .7px);background-size:13px 13px;}
-  @media (prefers-color-scheme: dark){body{background-image:radial-gradient(rgba(255,255,255,.035) .6px,transparent .7px);}}
-  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 18px 116px;}
-  .serif{font-family:var(--f-disp);}
-  h1,h2,h3{text-wrap:balance;margin:0;}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--f);line-height:1.55;-webkit-font-smoothing:antialiased;position:relative;}
+  body::before{content:"";position:fixed;inset:0;z-index:-1;background:url(bg.jpg) center/cover;opacity:.085;filter:blur(2px) saturate(.9);}
+  @media (prefers-color-scheme:dark){body::before{opacity:.06;}}
+  .app{max-width:var(--w);margin:0 auto;position:relative;}
+  a{color:inherit;text-decoration:none;}
+  h1,h2,h3,h4{margin:0;font-weight:800;letter-spacing:-.02em;text-wrap:balance;}
   .tnum{font-variant-numeric:tabular-nums;}
+  .jp{font-family:var(--jp);}
 
-  header.hero{position:relative;padding:30px 0 24px;text-align:left;}
-  header.hero .kicker{font-family:var(--f-jptext);font-size:.72rem;letter-spacing:.2em;color:var(--accent);font-weight:700;}
-  header.hero h1{font-family:var(--f-disp);font-weight:400;font-size:clamp(2.9rem,13vw,4.7rem);line-height:.96;margin:.12em 0 .12em;letter-spacing:-.01em;}
-  header.hero .jp{font-family:var(--f-jp);color:var(--ink);font-size:.98rem;letter-spacing:.04em;}
-  .facts{display:flex;flex-wrap:wrap;gap:7px;margin-top:18px;}
-  .chip{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--line);
-    border-radius:7px;padding:6px 11px;font-size:.82rem;box-shadow:var(--shadow);}
-  .chip b{color:var(--accent);font-weight:800;}
+  /* view routing */
+  .view{display:none;padding:0 16px calc(96px + env(safe-area-inset-bottom));min-height:100vh;}
+  .view.on{display:block;animation:vin .28s cubic-bezier(.22,.61,.36,1);}
+  @keyframes vin{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+  @media (prefers-reduced-motion:reduce){.view.on{animation:none;}}
 
-  section{margin-top:38px;scroll-margin-top:12px;}
-  section>h2{font-family:var(--f-disp);font-weight:400;font-size:clamp(1.5rem,5.2vw,2rem);display:flex;align-items:center;gap:11px;flex-wrap:wrap;letter-spacing:-.01em;}
-  section>h2 .num{font-family:var(--f-kr);font-weight:800;font-size:.58rem;letter-spacing:.02em;color:var(--accent);
-    background:var(--accent-soft);border-radius:6px;padding:4px 8px;display:inline-flex;align-items:center;}
-  section>h2 .num:first-child{font-family:var(--f-jp);color:#fff;background:var(--accent);min-width:2em;height:2em;
-    justify-content:center;padding:0 .3em;font-size:.72rem;border-radius:9px;transform:rotate(-4deg);
-    box-shadow:2px 2px 0 rgba(36,29,20,.2);}
-  section>h2+.sub{color:var(--muted);font-size:.88rem;margin:8px 0 0;}
-  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 20px;}
-  .grid{display:grid;gap:13px;margin-top:15px;}
-  .note{margin-top:14px;font-size:.85rem;color:var(--muted);background:var(--surface-2);
-    border-radius:10px;padding:11px 14px;border-left:3px solid var(--accent);}
+  .vhead{padding:26px 2px 12px;position:sticky;top:0;z-index:20;background:linear-gradient(var(--bg) 70%,transparent);}
+  .vhead .k{font-size:.72rem;font-weight:800;letter-spacing:.12em;color:var(--accent);text-transform:uppercase;}
+  .vhead h1{font-size:1.85rem;margin-top:2px;}
+  .sub{color:var(--muted);font-size:.87rem;}
 
-  /* weather */
-  .weather{grid-template-columns:repeat(4,1fr);}
-  @media(max-width:620px){.weather{grid-template-columns:repeat(2,1fr);}}
-  .wx{text-align:center;padding:16px 12px;}
-  .wx .day{font-size:.82rem;color:var(--muted);font-weight:600;}
-  .wx .date{font-size:1.05rem;font-weight:700;margin-top:2px;}
-  .wx .icon{font-size:1.9rem;margin:8px 0 4px;}
-  .wx .temp{font-weight:700;font-size:1.15rem;}
-  .wx .temp .lo{color:var(--muted);font-weight:500;}
-  .wx .rain{display:inline-block;margin-top:8px;font-size:.74rem;color:var(--sea);background:var(--sea-soft);border-radius:999px;padding:2px 9px;font-weight:600;}
-  .wx .rain.hi{color:#fff;background:var(--accent);}
-  @media(prefers-color-scheme:dark){.wx .rain.hi{color:#12171A;}}
-  .wxnow{display:flex;align-items:center;gap:16px;padding:16px 20px;margin-top:16px;}
-  .wxnow .big{font-size:2.6rem;line-height:1;}
-  .wxnow .t{font-size:1.7rem;font-weight:700;}
-  .wxnow .meta{color:var(--muted);font-size:.85rem;}
-  .wxnow .live{margin-left:auto;font-size:.72rem;font-weight:700;letter-spacing:.08em;color:var(--sea);
-    background:var(--sea-soft);border-radius:999px;padding:3px 10px;display:inline-flex;align-items:center;gap:6px;}
-  .wxnow .live::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--sea);animation:pulse 1.8s infinite;}
-  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
-  @media(prefers-reduced-motion:reduce){.wxnow .live::before{animation:none;}}
-  #wx-loading{color:var(--muted);font-size:.9rem;padding:8px 2px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--sh);padding:16px 17px;}
+  .row{display:flex;gap:11px;}
+  .stack{display:grid;gap:11px;}
+  .pill{display:inline-flex;align-items:center;gap:5px;background:var(--card2);border:1px solid var(--line);
+    border-radius:999px;padding:5px 11px;font-size:.78rem;font-weight:600;color:var(--muted);}
+  .b-accent{color:var(--accent);} .fw8{font-weight:800;}
 
-  /* map */
-  #map{height:440px;width:100%;border-radius:var(--radius);border:1px solid var(--line);
-    box-shadow:var(--shadow);margin-top:16px;z-index:0;}
-  #food-map{height:380px;width:100%;border-radius:var(--radius);border:1px solid var(--line);
-    box-shadow:var(--shadow);margin-top:16px;z-index:0;}
-  @media(max-width:640px){#map{height:320px;} #food-map{height:300px;}}
-  .maptools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px;}
-  .mbtn{font-size:.85rem;font-weight:600;background:var(--surface);border:1px solid var(--line);
-    color:var(--ink);border-radius:999px;padding:7px 15px;cursor:pointer;box-shadow:var(--shadow);}
-  .mbtn:hover{border-color:var(--accent);}
-  .legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;font-size:.82rem;color:var(--muted);}
-  .legend span{display:inline-flex;align-items:center;gap:6px;}
-  .dot{width:11px;height:11px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.15);}
-  .leaflet-popup-content{font-family:inherit;font-size:.9rem;margin:12px 14px;}
-  .leaflet-popup-content b{font-size:.98rem;}
-  .leaflet-popup-content .jp{color:#777;font-size:.8rem;}
-  .leaflet-popup-content a{color:var(--accent);font-weight:700;text-decoration:none;display:inline-block;margin-top:6px;}
-  .bigpin{background:none;border:none;}
-  .bigpin .bp{font-size:24px;line-height:1;text-align:center;filter:drop-shadow(0 1px 2px rgba(0,0,0,.55));}
-  .leaflet-tooltip.lbl{background:var(--surface);color:var(--ink);border:1px solid var(--line);
-    border-radius:6px;font-size:11px;font-weight:700;padding:1px 7px;box-shadow:var(--shadow);white-space:nowrap;}
+  /* HOME hero */
+  .hero{position:relative;border-radius:22px;overflow:hidden;padding:110px 20px 20px;color:#fff;box-shadow:var(--sh2);
+    background:linear-gradient(180deg,rgba(24,16,10,.03) 0%,rgba(24,16,10,.28) 50%,rgba(24,16,10,.76) 100%),url(bg.jpg) center 24%/cover;}
+  .hero .hk,.hero h1,.hero .hd{text-shadow:0 1px 12px rgba(0,0,0,.4);}
+  .hero .hk{font-family:var(--jp);font-size:.75rem;letter-spacing:.16em;opacity:.92;}
+  .hero h1{font-size:2.5rem;line-height:1;margin:8px 0 6px;letter-spacing:-.03em;}
+  .hero .hd{font-size:.92rem;opacity:.95;font-weight:600;}
+  .hero .dday{position:absolute;top:18px;right:18px;background:rgba(255,255,255,.22);backdrop-filter:blur(4px);
+    border-radius:12px;padding:7px 12px;font-weight:800;font-size:.9rem;}
+  .hero .wnow{display:flex;align-items:center;gap:9px;margin-top:16px;background:rgba(255,255,255,.15);
+    border-radius:14px;padding:10px 13px;}
+  .hero .wnow .t{font-size:1.5rem;line-height:1;}
+  .hero .wnow .wt{font-weight:800;font-size:1.15rem;}
+  .hero .wnow .wm{font-size:.76rem;opacity:.9;}
+  .hero .wnow .live{margin-left:auto;font-size:.62rem;font-weight:800;letter-spacing:.1em;
+    background:rgba(255,255,255,.25);border-radius:999px;padding:3px 8px;display:flex;align-items:center;gap:5px;}
+  .hero .wnow .live::before{content:"";width:6px;height:6px;border-radius:50%;background:#fff;animation:blink 1.7s infinite;}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+  /* forecast strip */
+  .fc{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+  .fc .d{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 6px;text-align:center;box-shadow:var(--sh);}
+  .fc .dd{font-size:.72rem;color:var(--muted);font-weight:700;}
+  .fc .di{font-size:1.5rem;margin:5px 0 3px;}
+  .fc .dt{font-weight:800;font-size:.92rem;}
+  .fc .dt small{color:var(--muted);font-weight:600;}
+  .fc .dr{font-size:.66rem;color:var(--teal);font-weight:700;margin-top:3px;}
+  .fc .dr.hi{color:var(--accent);}
+
+  .lbl2{font-size:.7rem;font-weight:800;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;margin:22px 2px 9px;}
+
+  /* quick grid */
+  .quick{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+  .qbtn{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px 15px;box-shadow:var(--sh);
+    display:flex;flex-direction:column;gap:7px;cursor:pointer;text-align:left;}
+  .qbtn .qi{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.05rem;}
+  .qbtn .qt{font-weight:800;font-size:.98rem;}
+  .qbtn .qs{font-size:.76rem;color:var(--muted);}
+
+  .info-hi{background:var(--accent-weak);border:1px solid transparent;border-radius:16px;padding:14px 16px;}
+  .info-hi h4{color:var(--accent);font-size:.95rem;}
+  .info-hi p{margin:5px 0 0;font-size:.83rem;color:var(--ink);}
+
+  /* flight ticket */
+  .ticket{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);overflow:hidden;}
+  .ticket .tr{display:flex;align-items:center;padding:14px 16px;gap:12px;}
+  .ticket .tr+.tr{border-top:1px dashed var(--line);}
+  .ticket .tcode{font-weight:800;font-size:1.35rem;}
+  .ticket .tarr{color:var(--muted);}
+  .ticket .tmeta{font-size:.76rem;color:var(--muted);margin-top:2px;}
+  .ticket .tlead{font-size:.7rem;font-weight:800;color:var(--accent);letter-spacing:.05em;}
+
+  /* day tabs (plan) */
+  .daytabs{display:flex;gap:7px;overflow-x:auto;padding:4px 2px 10px;position:sticky;top:74px;z-index:19;
+    background:linear-gradient(var(--bg) 75%,transparent);-ms-overflow-style:none;scrollbar-width:none;}
+  .daytabs::-webkit-scrollbar{display:none;}
+  .dt{flex:none;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:8px 13px;
+    font-weight:800;font-size:.82rem;color:var(--muted);cursor:pointer;box-shadow:var(--sh);white-space:nowrap;}
+  .dt small{display:block;font-size:.64rem;font-weight:700;opacity:.8;}
+  .dt.on{background:var(--ink);color:var(--bg);border-color:var(--ink);}
+
+  .day-title{font-size:1.25rem;margin:4px 2px 2px;}
+  .day-date{color:var(--muted);font-size:.82rem;font-weight:700;margin:0 2px 12px;}
+  .dchips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 13px;}
+
+  .tl{position:relative;padding-left:20px;}
+  .tl::before{content:"";position:absolute;left:5px;top:6px;bottom:6px;width:2px;background:var(--line);}
+  .tl .ti{position:relative;padding:0 0 15px;}
+  .tl .ti::before{content:"";position:absolute;left:-18px;top:5px;width:9px;height:9px;border-radius:50%;
+    background:var(--accent);border:2px solid var(--card);}
+  .tl .tt{font-weight:800;font-size:.82rem;color:var(--accent);}
+  .tl .tx{font-size:.9rem;margin-top:2px;}
+
+  /* maps */
+  .map{width:100%;height:340px;border-radius:16px;border:1px solid var(--line);box-shadow:var(--sh);z-index:0;}
+  #plan-map{height:220px;}
+  .mtools{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap;}
+  .mbtn{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:8px 13px;font-weight:700;
+    font-size:.82rem;color:var(--ink);cursor:pointer;box-shadow:var(--sh);}
+  .mbtn.on,.mbtn:active{background:var(--ink);color:var(--bg);border-color:var(--ink);}
+  .legend{display:flex;flex-wrap:wrap;gap:11px;margin-top:11px;font-size:.76rem;color:var(--muted);}
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .dot{width:10px;height:10px;border-radius:50%;border:2px solid var(--card);box-shadow:0 0 0 1px rgba(0,0,0,.12);}
+  .leaflet-popup-content{font-family:var(--f);font-size:.86rem;margin:11px 13px;}
+  .leaflet-popup-content b{font-size:.95rem;} .leaflet-popup-content .j{color:var(--muted);font-size:.78rem;}
+  .leaflet-popup-content a{color:var(--accent);font-weight:800;display:inline-block;margin-top:6px;}
+  .bigpin{background:none;border:none;} .bigpin .bp{font-size:21px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5));text-align:center;}
+  .leaflet-tooltip.lbl{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:6px;
+    font-size:11px;font-weight:800;padding:1px 6px;box-shadow:var(--sh);white-space:nowrap;}
   .leaflet-tooltip.lbl::before{border-top-color:var(--line);}
+  .np{width:22px;height:22px;border-radius:50%;color:#fff;font-size:12px;font-weight:800;display:flex;
+    align-items:center;justify-content:center;border:2px solid var(--card);box-shadow:0 1px 3px rgba(0,0,0,.5);}
 
-  /* info */
-  .info{grid-template-columns:1fr 1fr;}
-  @media(max-width:620px){.info{grid-template-columns:1fr;}}
-  .info .card h3{font-size:1rem;margin-bottom:6px;}
-  .info .card h3 .ic{color:var(--sea);margin-right:6px;}
-  .info .card p{margin:0;font-size:.9rem;color:var(--muted);}
-  .info .card p b{color:var(--ink);font-weight:600;}
+  /* eat list */
+  .filters{display:flex;gap:7px;overflow-x:auto;padding:2px 2px 12px;scrollbar-width:none;}
+  .filters::-webkit-scrollbar{display:none;}
+  .food{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);
+    border-radius:15px;padding:12px 14px;box-shadow:var(--sh);margin-bottom:9px;}
+  .food .fd{width:11px;height:11px;border-radius:50%;flex:none;}
+  .food .fn{font-weight:800;font-size:.94rem;}
+  .food .fn .j{font-family:var(--jp);color:var(--muted);font-weight:500;font-size:.8rem;margin-left:5px;}
+  .food .fno{font-size:.78rem;color:var(--muted);margin-top:1px;}
+  .food .fg{margin-left:auto;flex:none;color:var(--accent);font-weight:800;font-size:1.05rem;padding:4px 6px;}
+  .food.pk{border-color:var(--accent);background:linear-gradient(0deg,var(--accent-weak),var(--card));}
 
-  /* eats */
-  .eats{display:grid;gap:10px;margin-top:16px;}
-  .eat{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;padding:14px 18px;
-    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);}
-  .eat .em{font-size:1.5rem;}
-  .eat .body .name{font-weight:700;}
-  .eat .body .name .jp{color:var(--muted);font-weight:500;font-size:.85rem;margin-left:6px;}
-  .eat .body .desc{font-size:.85rem;color:var(--muted);margin-top:1px;}
-  .eat .tag{font-size:.72rem;font-weight:700;letter-spacing:.04em;color:var(--sea);background:var(--sea-soft);
-    border-radius:999px;padding:4px 11px;white-space:nowrap;}
-  .eat .tag.must{color:#fff;background:var(--accent);}
-  @media(prefers-color-scheme:dark){.eat .tag.must{color:#12171A;}}
-  @media(max-width:560px){.eat{grid-template-columns:auto 1fr;}.eat .tag{grid-column:2;justify-self:start;margin-top:2px;}}
-
-  /* stays */
-  .stays{grid-template-columns:1fr 1fr;}
-  @media(max-width:620px){.stays{grid-template-columns:1fr;}}
-  .stay{padding:0;overflow:hidden;}
-  .stay .band{padding:8px 18px;font-size:.74rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#fff;}
-  .stay.a .band{background:var(--sea);}
-  .stay.b .band{background:var(--accent);}
-  @media(prefers-color-scheme:dark){.stay.b .band{color:#12171A;}}
-  .stay .inner{padding:16px 18px 20px;}
-  .stay h3{font-size:1.15rem;}
-  .stay .jp{color:var(--muted);font-size:.85rem;}
-  .stay .meta{margin-top:10px;font-size:.88rem;color:var(--muted);display:grid;gap:4px;}
-  .stay .meta b{color:var(--ink);font-weight:600;}
-
-  /* itinerary */
-  .days{display:grid;gap:14px;margin-top:16px;}
-  .day{padding:0;overflow:hidden;}
-  .day .head{display:flex;align-items:center;gap:12px;padding:13px 18px;background:var(--surface-2);border-bottom:1px solid var(--line);}
-  .day .dno{font-weight:700;font-size:.78rem;letter-spacing:.08em;color:var(--accent);text-transform:uppercase;}
-  .day .dtitle{font-weight:700;}
-  .day .ddate{margin-left:auto;font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums;}
-  .day .fixed{display:flex;flex-wrap:wrap;gap:6px;padding:12px 18px 4px;}
-  .fchip{font-size:.78rem;background:var(--sea-soft);color:var(--sea);border-radius:8px;padding:3px 10px;font-weight:600;}
-  .day-body{display:flex;gap:16px;align-items:stretch;}
-  .day-info{flex:1;min-width:0;}
-  .minimap{width:290px;flex:none;min-height:240px;border-radius:12px;overflow:hidden;border:1px solid var(--line);z-index:0;margin:0 18px 18px 0;}
-  @media(max-width:760px){.day-body{flex-direction:column;} .minimap{width:auto;min-height:0;height:220px;margin:0 18px 18px;}}
-  .npwrap{background:none;border:none;}
-  .np{width:22px;height:22px;border-radius:50%;color:#fff;font-size:12px;font-weight:700;
-    display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.5);}
-  .day .slots{padding:8px 18px 18px;display:grid;gap:8px;}
-  .slot{display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:center;min-height:34px;}
-  .slot .t{font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums;}
-  .slot .blank{border-bottom:1px dashed var(--line);height:1px;align-self:end;margin-bottom:6px;}
+  /* accordion (info) */
+  .acc{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);margin-bottom:11px;overflow:hidden;}
+  .acc>summary{list-style:none;cursor:pointer;padding:15px 16px;font-weight:800;font-size:1rem;display:flex;align-items:center;gap:10px;}
+  .acc>summary::-webkit-details-marker{display:none;}
+  .acc>summary .ci{font-size:1.1rem;}
+  .acc>summary .ar{margin-left:auto;color:var(--muted);transition:transform .2s;font-weight:700;}
+  .acc[open]>summary .ar{transform:rotate(90deg);}
+  .acc .body{padding:0 16px 16px;}
+  .kv{font-size:.87rem;display:grid;gap:7px;}
+  .kv b{color:var(--ink);}
+  .kv .k{color:var(--muted);font-weight:800;font-size:.75rem;text-transform:uppercase;letter-spacing:.04em;}
 
   /* checklist */
-  .chk-track{height:10px;background:var(--surface-2);border-radius:99px;overflow:hidden;flex:1;min-width:160px;}
-  .chk-fill{height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .3s;}
-  .chk-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;}
-  @media(max-width:640px){.chk-grid{grid-template-columns:1fr;}}
-  .chk-card h3{font-size:1rem;margin:0 0 6px;}
-  .chk-card ul{list-style:none;margin:0;padding:0;}
-  .chk label{display:flex;gap:10px;align-items:flex-start;padding:6px 6px;border-radius:8px;cursor:pointer;font-size:.9rem;line-height:1.45;}
-  .chk label:hover{background:var(--surface-2);}
-  .chk input[type=checkbox]{margin:2px 0 0;width:17px;height:17px;accent-color:var(--accent);flex:none;cursor:pointer;}
-  .chk input:checked + span{color:var(--muted);text-decoration:line-through;}
+  .cprog{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+  .ctrack{flex:1;height:9px;background:var(--card2);border-radius:99px;overflow:hidden;border:1px solid var(--line);}
+  .cfill{height:100%;width:0;background:var(--accent);transition:width .3s;}
+  .chk h4{font-size:.9rem;margin:14px 0 4px;}
+  .chk label{display:flex;gap:10px;align-items:flex-start;padding:7px 4px;border-radius:9px;font-size:.88rem;cursor:pointer;}
+  .chk label:active{background:var(--card2);}
+  .chk input{width:19px;height:19px;margin:1px 0 0;accent-color:var(--accent);flex:none;}
+  .chk input:checked+span{color:var(--muted);text-decoration:line-through;}
 
   /* phrases */
-  .phlabel{font-weight:700;font-size:.82rem;letter-spacing:.04em;margin:18px 0 8px;color:var(--sea);}
-  .phrases{display:grid;gap:8px;}
-  .phrase{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:11px 15px;box-shadow:var(--shadow);}
-  .phrase .ko{font-weight:700;font-size:.9rem;}
-  .phrase .ja{color:var(--sea);font-size:1.04rem;margin-top:3px;}
-  .phrase .ro{color:var(--muted);font-size:.82rem;margin-top:1px;}
-
-  /* bottom tab bar */
-  .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:1000;display:flex;
-    background:color-mix(in srgb, var(--surface) 92%, transparent);backdrop-filter:blur(10px);
-    border-top:1.5px solid var(--line);box-shadow:0 -6px 20px rgba(36,29,20,.12);padding-bottom:env(safe-area-inset-bottom);}
-  .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 0 8px;
-    cursor:pointer;text-decoration:none;color:var(--muted);background:none;border:none;-webkit-tap-highlight-color:transparent;}
-  .tab .ti{font-size:1.28rem;line-height:1;filter:grayscale(.35) opacity(.8);transition:transform .16s;}
-  .tab .tl{font-size:.66rem;font-weight:800;letter-spacing:.02em;}
-  .tab.is-active{color:var(--accent);}
-  .tab.is-active .ti{filter:none;transform:translateY(-3px) scale(1.12);}
-  .tab.is-active .tl{color:var(--accent);}
+  .ph{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:11px 14px;box-shadow:var(--sh);margin-bottom:8px;}
+  .ph .pk{font-weight:800;font-size:.88rem;}
+  .ph .pj{font-family:var(--jp);color:var(--teal);font-size:1.02rem;margin-top:2px;}
+  .ph .pr{color:var(--muted);font-size:.8rem;}
 
   /* music */
-  .music-card{background:var(--sea);color:#fff;border-color:transparent;}
-  @media(prefers-color-scheme:dark){.music-card{background:#243049;}}
-  .music-card .mn-label{font-family:var(--f-jptext);font-size:.66rem;letter-spacing:.14em;opacity:.75;}
-  .music-card .mn-title{font-family:var(--f-jp);font-size:1.4rem;margin-top:5px;line-height:1.2;word-break:keep-all;}
-  .music-card .mn-artist{opacity:.9;font-size:.9rem;margin-top:5px;}
-  .music-actions{display:flex;gap:9px;margin-top:16px;}
-  .music-roll,.music-play{flex:1;font-family:var(--f-kr);font-weight:800;font-size:.94rem;padding:12px 0;
-    border-radius:11px;text-align:center;text-decoration:none;cursor:pointer;border:none;}
-  .music-roll{background:rgba(255,255,255,.18);color:#fff;}
-  .music-roll:active{transform:scale(.97);}
-  .music-play{background:var(--accent);color:#fff;}
-  .songs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px;}
-  @media(max-width:520px){.songs{grid-template-columns:1fr;}}
-  .song{display:flex;align-items:center;gap:11px;background:var(--surface);border:1px solid var(--line);
-    border-radius:11px;padding:10px 13px;text-decoration:none;color:var(--ink);box-shadow:var(--shadow);}
-  .song:hover,.song:focus-visible{border-color:var(--accent);outline:none;}
-  .song .sj{font-family:var(--f-jptext);font-size:.72rem;color:#fff;background:var(--accent);border-radius:7px;padding:5px 8px;flex:none;}
-  .song .st{font-family:var(--f-jptext);font-weight:700;font-size:.9rem;}
+  .mus{border-radius:18px;padding:18px 18px 16px;color:#fff;box-shadow:var(--sh2);
+    background:linear-gradient(135deg,#7A5AD1,#E0533A 96%);}
+  .mus .ml{font-family:var(--jp);font-size:.68rem;letter-spacing:.14em;opacity:.85;}
+  .mus .mt{font-family:var(--jp);font-size:1.45rem;margin-top:5px;line-height:1.2;}
+  .mus .ma{opacity:.9;font-size:.9rem;margin-top:4px;}
+  .mus .mact{display:flex;gap:9px;margin-top:16px;}
+  .mus .mact>*{flex:1;text-align:center;font-weight:800;padding:12px 0;border-radius:12px;font-size:.92rem;border:none;cursor:pointer;}
+  .mus .mroll{background:rgba(255,255,255,.2);color:#fff;}
+  .mus .mplay{background:#fff;color:#7A2FD1;}
+  .song{display:flex;align-items:center;gap:11px;background:var(--card);border:1px solid var(--line);border-radius:13px;
+    padding:10px 13px;box-shadow:var(--sh);margin-bottom:8px;}
+  .song .sj{font-family:var(--jp);font-size:.72rem;color:#fff;background:var(--purple);border-radius:7px;padding:5px 8px;flex:none;}
+  .song .st{font-family:var(--jp);font-weight:700;font-size:.9rem;}
   .song .sa{color:var(--muted);font-size:.77rem;}
+  .song .sg{margin-left:auto;color:var(--accent);font-weight:800;}
 
-  footer{margin-top:48px;text-align:center;color:var(--muted);font-size:.8rem;padding-top:20px;border-top:1px solid var(--line);}
-  a{color:var(--accent);}
+  /* tab bar (real nav) */
+  .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:100;display:flex;justify-content:center;
+    background:color-mix(in srgb,var(--card) 90%,transparent);backdrop-filter:blur(14px);
+    border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);}
+  .tabbar .in{max-width:var(--w);width:100%;display:flex;}
+  .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 0 8px;color:var(--muted);
+    cursor:pointer;background:none;border:none;position:relative;}
+  .tab svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s;}
+  .tab .tl{font-size:.66rem;font-weight:800;}
+  .tab.on{color:var(--accent);}
+  .tab.on svg{transform:translateY(-1px) scale(1.06);}
+  .tab.on::before{content:"";position:absolute;top:0;width:26px;height:3px;border-radius:0 0 4px 4px;background:var(--accent);}
+
+  footer{text-align:center;color:var(--muted);font-size:.72rem;margin-top:26px;}
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="app">
 
-  <header class="hero" id="top">
-    <div class="kicker">旅のしおり · EHIME TRAVEL HANDBOOK</div>
-    <h1>마쓰야마</h1>
-    <div class="jp">松山 · MATSUYAMA &nbsp;/&nbsp; 3泊4日</div>
-    <div class="facts">
-      <span class="chip">📅 <b>9.22</b> — <b>9.25</b></span>
-      <span class="chip">✈️ 제주항공 <b>7C</b></span>
-      <span class="chip">👥 <b>둘이서</b></span>
-      <span class="chip">🏨 히요리 · 도고칸</span>
-      <span class="chip">💴 <b>50만원</b> 환전</span>
-    </div>
-  </header>
-
-  <!-- 항공편 -->
-  <section>
-    <h2>✈️ 항공편 <span class="num" style="letter-spacing:0">제주항공 7C · 직항</span></h2>
-    <div class="grid" style="grid-template-columns:1fr 1fr;gap:14px;margin-top:16px;">
-      <div class="card"><h3 style="font-size:1rem;margin-bottom:8px;"><span style="color:var(--sea);">🛫</span> 가는 편 · 9/22 (화)</h3>
-        <div style="font-size:1.3rem;font-weight:700;" class="tnum">08:40 <span style="color:var(--muted);font-weight:500;">→</span> ~10:30</div>
-        <div style="color:var(--muted);font-size:.88rem;margin-top:4px;">인천 <b>제1터미널</b> (ICN·T1) → 마쓰야마 (MYJ)<br>비행 약 1시간 50분 · 시차 없음</div>
-      </div>
-      <div class="card"><h3 style="font-size:1rem;margin-bottom:8px;"><span style="color:var(--accent);">🛬</span> 오는 편 · 9/25 (금)</h3>
-        <div style="font-size:1.3rem;font-weight:700;" class="tnum">11:15 <span style="color:var(--muted);font-weight:500;">→</span> ~13:05</div>
-        <div style="color:var(--muted);font-size:.88rem;margin-top:4px;">마쓰야마 (MYJ) → 인천 <b>제1터미널</b> (ICN)<br>공항 <b>9:00까지</b> 도착 권장</div>
+  <!-- ========== HOME ========== -->
+  <section class="view on" id="v-home">
+    <div style="height:20px"></div>
+    <div class="hero">
+      <div class="hk">松山 · EHIME</div>
+      <h1>마쓰야마</h1>
+      <div class="hd">3박 4일 · 9.22(화) — 9.25(금)</div>
+      <div class="dday" id="dday">D-?</div>
+      <div class="wnow">
+        <div class="t" id="wi">⏳</div>
+        <div><div class="wt" id="wt">불러오는 중</div><div class="wm" id="wm">마쓰야마 현재 날씨</div></div>
+        <div class="live">LIVE</div>
       </div>
     </div>
-    <p class="note">제주항공(7C) · <b>2명</b> · 일반석 · 왕복 직항 · 발권완료 · (예약번호는 항공사 앱 확인)</p>
+
+    <div class="lbl2">여행 기간 날씨</div>
+    <div class="fc" id="fc"><div class="d"><div class="dd">…</div></div></div>
+
+    <div class="lbl2">바로가기</div>
+    <div class="quick">
+      <button class="qbtn" data-go="v-plan"><div class="qi" style="background:var(--accent-weak);color:var(--accent)">📅</div><div class="qt">오늘 일정</div><div class="qs">Day별 동선·지도</div></button>
+      <button class="qbtn" data-go="v-map"><div class="qi" style="background:#E4EFEC;color:var(--teal)">🗺️</div><div class="qt">지도</div><div class="qs">전체 스팟 한눈에</div></button>
+      <button class="qbtn" data-go="v-eat"><div class="qi" style="background:var(--accent-weak);color:var(--accent)">🍜</div><div class="qt">맛집</div><div class="qs">혁누추천·현지 맛집</div></button>
+      <button class="qbtn" data-go="v-info"><div class="qi" style="background:var(--card2);color:var(--ink)">🧳</div><div class="qt">여행 정보</div><div class="qs">항공·숙소·준비물</div></button>
+    </div>
+
+    <div class="lbl2">도착하면 제일 먼저</div>
+    <div class="info-hi">
+      <h4>🇰🇷 공항서 한국인 무료 혜택 챙기기</h4>
+      <p>마쓰야마공항 <b>1층 인포메이션</b>에 <b>여권 제시</b> → ① 명소 8곳 <b>쿠폰북</b>(성·온천·리프트) ② <b>공항↔시내↔도고 무료 셔틀</b>. 도착 즉시 필수!</p>
+    </div>
+
+    <div class="lbl2">항공편</div>
+    <div class="ticket">
+      <div class="tr"><div><div class="tlead">가는 편 · 9.22 화</div><div><span class="tcode">08:40</span> <span class="tarr">→ ~10:30</span></div><div class="tmeta">인천 T1 → 마쓰야마 (MYJ) · 직항 1h50m</div></div><div style="margin-left:auto;font-size:1.5rem">🛫</div></div>
+      <div class="tr"><div><div class="tlead">오는 편 · 9.25 금</div><div><span class="tcode">11:15</span> <span class="tarr">→ ~13:05</span></div><div class="tmeta">마쓰야마 → 인천 T1 · 공항 9시까지</div></div><div style="margin-left:auto;font-size:1.5rem">🛬</div></div>
+    </div>
+    <footer>제주항공 7C · 2명 · 왕복 직항</footer>
   </section>
 
-  <!-- 날씨 -->
-  <section>
-    <h2><span class="num">01</span> 날씨 <span class="num" style="letter-spacing:0">실시간</span></h2>
-    <p class="sub">Open-Meteo 실시간 연동 · 여행일 예보는 출발 약 2주 전부터 표시돼요</p>
-    <div class="card wxnow" id="wxnow">
-      <div class="big" id="wxnow-icon">⏳</div>
-      <div>
-        <div class="t" id="wxnow-temp">불러오는 중…</div>
-        <div class="meta" id="wxnow-meta">마쓰야마 현재 날씨</div>
-      </div>
-      <span class="live">LIVE</span>
-    </div>
-    <div class="grid weather" id="wx-forecast">
-      <div id="wx-loading">📡 여행일 예보 불러오는 중…</div>
-    </div>
-    <p class="note" id="wx-note"><b>참고 —</b> 늦여름 잔서라 낮엔 반팔, 저녁·비 대비 얇은 겉옷. 9/23 전후 비 예보 잦으니 시모나다 일몰 날은 맑은 날로 맞추면 좋아요.</p>
+  <!-- ========== PLAN ========== -->
+  <section class="view" id="v-plan">
+    <div class="vhead"><div class="k">Itinerary</div><h1>일정</h1></div>
+    <div class="daytabs" id="daytabs"></div>
+    <div id="day-body"></div>
+    <div class="lbl2">그날 동선</div>
+    <div id="plan-map" class="map"></div>
+    <div id="day-eats"></div>
   </section>
 
-  <!-- 지도 -->
-  <section id="sec-map">
-    <h2><span class="num">02</span> 지도</h2>
-    <p class="sub">핀을 클릭하면 장소명·구글맵 링크가 떠요 · 드래그/휠로 이동·확대</p>
-    <div id="map"></div>
-    <div class="maptools">
-      <button class="mbtn" id="btn-city">🏨 공항·숙소·시내</button>
-      <button class="mbtn" id="btn-all">🗺️ 전체 (로드트립 포함)</button>
-      <button class="mbtn" id="btn-road">🚆 2일차 (우치코·시모나다)</button>
+  <!-- ========== MAP ========== -->
+  <section class="view" id="v-map">
+    <div class="vhead"><div class="k">Map</div><h1>지도</h1><div class="sub">핀 탭 → 구글맵 리뷰·길찾기</div></div>
+    <div id="ov-map" class="map"></div>
+    <div class="mtools">
+      <button class="mbtn" data-ov="main">공항·숙소·시내</button>
+      <button class="mbtn" data-ov="all">전체(로드트립)</button>
     </div>
     <div class="legend">
-      <span>🏨 숙소 · ✈️ 공항 (라벨 표시)</span>
-      <span><span class="dot" style="background:#0E6E70"></span>시내 명소</span>
-      <span><span class="dot" style="background:#D14D41"></span>추천 맛집</span>
-      <span><span class="dot" style="background:#7A4FBF"></span>우치코·시모나다</span>
-      <span><span style="display:inline-block;width:18px;border-top:2px dashed #7A4FBF;vertical-align:middle"></span> 2일차 동선</span>
-    </div>
-    <p class="note"><b>팁 —</b> 핀 팝업의 구글맵 링크를 눌러 미리 <b>별표 저장</b>해두면 현지에서 편해요. 렌터카 길찾기도 구글맵 그대로 사용.</p>
-  </section>
-
-  <!-- 기본 정보 -->
-  <section>
-    <h2><span class="num">03</span> 기본 정보 &amp; 상식</h2>
-    <div class="grid info">
-      <div class="card"><h3><span class="ic">📍</span>어디에 있나</h3><p>일본 <b>시코쿠</b> 북서부, <b>에히메현</b> 현청 소재지이자 시코쿠 최대 도시. 세토내해를 낀 온천·성곽 도시.</p></div>
-      <div class="card"><h3><span class="ic">♨️</span>도고온천</h3><p>일본에서 <b>가장 오래된 온천</b> 중 하나. 목조 본관은 중요문화재, <b>2024년 전면 재개관</b>. 「센과 치히로」 영감지로 유명.</p></div>
-      <div class="card"><h3><span class="ic">🏯</span>마쓰야마성</h3><p>현존 <b>12천수</b> 중 하나. 카츠야마 산 정상, <b>로프웨이·리프트</b>로 올라 시내 전망. 막차 대략 17시.</p></div>
-      <div class="card"><h3><span class="ic">🚋</span>시내 교통</h3><p>이요테츠 <b>노면전차</b>가 핵심. <b>1일권 ¥800</b> 가성비 굿. 레트로 <b>봇짱 열차</b>는 별도 요금. IC카드 대체로 사용 가능.</p></div>
-      <div class="card"><h3><span class="ic">✈️</span>공항 이동</h3><p>마쓰야마공항(MYJ)→시내 리무진 <b>약 15분</b>, <b>도고온천 약 40분</b>.</p></div>
-      <div class="card"><h3><span class="ic">🍊</span>미칸의 고장</h3><p>에히메는 일본 대표 <b>귤(미칸) 산지</b>. <b>미칸주스 수도꼭지</b>·폰주스가 명물. 기념품 1순위.</p></div>
-      <div class="card"><h3><span class="ic">💴</span>돈 · 결제</h3><p>통화 <b>엔(¥)</b>. 소도시라 <b>현금 비중 높음</b> — 잔돈 유용. 체인·대형점은 카드/페이 OK.</p></div>
-      <div class="card"><h3><span class="ic">🔌</span>전기 · 기타</h3><p>전압 <b>100V</b>, 플러그 <b>A타입</b> → 어댑터 필요. 시차 없음. 소설 「봇짱」·나쓰메 소세키 연고지.</p></div>
+      <span>🏨숙소 · ✈️공항</span>
+      <span><span class="dot" style="background:#2E7D74"></span>명소</span>
+      <span><span class="dot" style="background:#E0533A"></span>추천 맛집</span>
+      <span><span class="dot" style="background:#7A5AD1"></span>우치코·시모나다</span>
     </div>
   </section>
 
-  <!-- 교통편 -->
-  <section>
-    <h2><span class="num">04</span> 교통편</h2>
-    <p class="sub">시내는 노면전차, 근교(2일차)는 JR. 한국인 무료 셔틀 적극 활용</p>
-    <div class="grid info">
-      <div class="card"><h3><span class="ic">🚌</span>한국인 무료 셔틀 ⭐</h3><p>공항↔시내↔<b>도고온천</b> · <b>한국 여권 제시하면 무료</b> · 7개 지정 정류장. Day1 입국·Day4 출국 이동에 활용.</p></div>
-      <div class="card"><h3><span class="ic">🚋</span>노면전차 (이요테츠)</h3><p>1회 <b>¥180</b>(거리 무관). <b>1일권</b>도 있어 하루 4번+ 타면 이득. 도고·시내·성 다 연결.</p></div>
-      <div class="card"><h3><span class="ic">🚂</span>봇짱열차</h3><p>메이지 증기기관차 복원 관광열차. 마쓰야마시역↔도고온천역. ⚠️ <b>주말·공휴일만 운행</b>(여행 중 9/23 추분의 날 가능성). 승차 후 구매.</p></div>
-      <div class="card"><h3><span class="ic">🚆</span>JR (2일차)</h3><p>우치코·시모나다행. 이요나다선 <b>배차 1~2시간</b>이라 시각표 미리 확정 필수.</p></div>
-      <div class="card"><h3><span class="ic">🚶</span>도보 · 택시</h3><p>오카이도·도고 지구는 도보권. 심야엔 택시. 교통카드는 확인 필요, <b>현금·1일권</b>이 안전.</p></div>
+  <!-- ========== EAT ========== -->
+  <section class="view" id="v-eat">
+    <div class="vhead"><div class="k">Eat &amp; Drink</div><h1>맛집</h1><div class="sub">구글맵 리뷰·네이버 랭킹·혁누추천</div></div>
+    <div id="food-map" class="map"></div>
+    <div class="mtools">
+      <button class="mbtn" data-fm="city">🏙️ 시내</button>
+      <button class="mbtn" data-fm="dogo">♨️ 도고</button>
+      <button class="mbtn" data-fm="all">전체</button>
     </div>
+    <div class="filters" id="food-filters"></div>
+    <div id="food-list"></div>
   </section>
 
-  <!-- 한국인 무료 혜택 -->
-  <section>
-    <h2><span class="num">05</span> 한국인 무료 혜택 🇰🇷</h2>
-    <p class="sub">도착하자마자 챙기면 교통·입장료가 확 줄어요 (Day1 첫 미션)</p>
-    <div class="grid info">
-      <div class="card"><h3><span class="ic">📍</span>어디서 받나</h3><p>공항 <b>1층 인포메이션</b>(국내선 C게이트 근처)에서 <b>한국 여권 제시</b> → 무료 쿠폰북 수령.</p></div>
-      <div class="card"><h3><span class="ic">🎟️</span>쿠폰북 (명소 8곳)</h3><p><b>마쓰야마성 천수각 입장권</b> · <b>로프웨이·리프트 왕복권</b> · <b>도고온천 입욕권</b> 등.</p></div>
-      <div class="card"><h3><span class="ic">🚌</span>무료 셔틀버스</h3><p>공항↔시내↔<b>도고온천</b> 한국인 전용 무료. 여권 제시 탑승, 7개 정류장. <b>Day1·Day4 이동 해결</b>.</p></div>
-      <div class="card"><h3><span class="ic">⏰</span>팁</h3><p>셔틀·쿠폰 모두 <b>여권 필수</b>. 셔틀 시간표는 인포메이션 확인. 마지막날은 출발 시각 역산.</p></div>
-    </div>
-    <p class="note"><b>핵심 —</b> 공항 도착 → 인포메이션서 여권 제시 → 쿠폰북 + 무료 셔틀. 이거 하나로 <b>성·온천 입장료 + 공항 이동비</b>를 다 아껴요.</p>
-  </section>
+  <!-- ========== INFO ========== -->
+  <section class="view" id="v-info">
+    <div class="vhead"><div class="k">Guide</div><h1>여행 정보</h1></div>
 
-  <!-- 맛집 -->
-  <section id="sec-food">
-    <h2><span class="num">06</span> 맛집 · 이자카야 · 카페 <span class="num" style="letter-spacing:0">엄선</span></h2>
-    <p class="sub">타베로그 평점·현지 로컬·인스타 후기 교차검증. 관광객만 몰리는 곳 말고 <b>진짜 괜찮은 곳</b> 위주</p>
+    <details class="acc" open><summary><span class="ci">🏨</span>숙소<span class="ar">›</span></summary><div class="body kv">
+      <div><span class="k">히요리 (1·2박)</span> 오카이도 중심 · <b>노면전차 정류장 앞</b> · 도고 차 3분. 2026.4 신축, 해피아워. ⚠️3박까지 객실청소 없음. <a class="b-accent fw8" href="https://www.google.com/maps/search/?api=1&amp;query=HIYORI HOTEL 松山" target="_blank" rel="noopener">지도↗</a></div>
+      <div><span class="k">도고칸 (3박)</span> 도고온천역 도보 7분 · 구로카와 기쇼 설계 료칸 · <b>가이세키 극찬</b>. <a class="b-accent fw8" href="https://www.google.com/maps/search/?api=1&amp;query=道後館 松山" target="_blank" rel="noopener">지도↗</a></div>
+      <div><span class="k">짐</span> 히요리→도고칸 노면전차 20분. 짐배송 문의 가능.</div>
+    </div></details>
 
-    <div class="maplabel" style="color:var(--accent)">🗺️ 맛집 지도 (구글맵 리뷰·네이버 랭킹 기반)</div>
-    <div id="food-map"></div>
-    <div class="maptools">
-      <button class="mbtn" id="fm-city">🏙️ 시내</button>
-      <button class="mbtn" id="fm-dogo">♨️ 도고</button>
-      <button class="mbtn" id="fm-all">🗺️ 전체</button>
-    </div>
-    <div class="legend">
-      <span><span class="dot" style="background:#E5397F"></span><b>혁누 추천</b></span>
-      <span><span class="dot" style="background:#D14D41"></span>타이메시·우동·향토</span>
-      <span><span class="dot" style="background:#E0710C"></span>이자카야·고기</span>
-      <span><span class="dot" style="background:#8A5A2B"></span>장어</span>
-      <span><span class="dot" style="background:#0E6E70"></span>카페·디저트</span>
-    </div>
-    <p class="note">핀 팝업의 <b>구글맵 링크</b>로 실시간 리뷰·영업시간 확인하세요. 핀 위치는 근사치예요.</p>
+    <details class="acc"><summary><span class="ci">🚌</span>교통<span class="ar">›</span></summary><div class="body kv">
+      <div><span class="k">한국인 무료 셔틀 ⭐</span> 공항↔시내↔도고 · 여권 제시 무료 · 7정류장.</div>
+      <div><span class="k">노면전차</span> 1회 ¥180(거리무관) · 1일권 있음(4번+ 타면 이득).</div>
+      <div><span class="k">봇짱열차</span> ⚠️ 주말·공휴일만 운행(9/23 추분 가능성).</div>
+      <div><span class="k">JR (2일차)</span> 시모나다 이요나다선 배차 1~2h — 시각표 필수.</div>
+    </div></details>
 
-    <div class="maplabel">🏆 구글·네이버 랭킹에서 추가로 뜬 곳</div>
-    <div class="eats">
-      <div class="eat"><div class="em">🍛</div><div class="body"><div class="name">불독 <span class="jp">ブルドッグ</span></div><div class="desc">규카츠 카레 레트로 노포. 현지인 꾸준 사랑. <a href="https://www.google.com/maps/search/?api=1&amp;query=ブルドッグ 松山 カレー" target="_blank" rel="noopener">지도↗</a></div></div><div class="tag">랭킹</div></div>
-      <div class="eat"><div class="em">🍱</div><div class="body"><div class="name">우나이치 <span class="jp">うな一</span></div><div class="desc">긴텐가이 옆 장어 명가. <a href="https://www.google.com/maps/search/?api=1&amp;query=うな一 松山 銀天街" target="_blank" rel="noopener">지도↗</a></div></div><div class="tag">랭킹</div></div>
-      <div class="eat"><div class="em">🥩</div><div class="body"><div class="name">오니쿠토 365 <span class="jp">お肉と365</span></div><div class="desc">야키니쿠. '오늘의 와규 세트' 가성비. <a href="https://www.google.com/maps/search/?api=1&amp;query=お肉と365 松山" target="_blank" rel="noopener">지도↗</a></div></div><div class="tag">랭킹</div></div>
-      <div class="eat"><div class="em">🍳</div><div class="body"><div class="name">미쓰하마야키 <span class="jp">三津浜焼き</span></div><div class="desc">마쓰야마식 오코노미야키(철판). 맥주와 궁합. <a href="https://www.google.com/maps/search/?api=1&amp;query=三津浜焼き 松山" target="_blank" rel="noopener">지도↗</a></div></div><div class="tag">랭킹</div></div>
-      <div class="eat"><div class="em">🍡</div><div class="body"><div class="name">키리노모리 다이후쿠 <span class="jp">霧の森大福</span></div><div class="desc">통판 일본 1위 화과자. 마쓰야마점(오카이도). <a href="https://www.google.com/maps/search/?api=1&amp;query=霧の森菓子工房 松山店" target="_blank" rel="noopener">지도↗</a></div></div><div class="tag">기념품</div></div>
-    </div>
+    <details class="acc"><summary><span class="ci">💴</span>환전 · 결제<span class="ar">›</span></summary><div class="body kv">
+      <div><span class="k">환전</span> 토스뱅크 엔화는 보통 <b>국내(인천) 수령</b> — 앱에서 수령처 확인, 인천 T1서 받아가기 권장. 소도시라 현금 중요.</div>
+      <div><span class="k">카드</span> 비자/마스터 큰 차이 없음. 일본은 비자·JCB 커버리지 넓음. 소형점은 현금. <b>엔화(현지통화)로 결제</b> 선택.</div>
+    </div></details>
 
-    <div class="maplabel" style="color:var(--accent)">⭐ 추천받은 3곳 (지도에 빨간 핀)</div>
-    <div class="eats">
-      <div class="eat"><div class="em">🐟</div><div class="body"><div class="name">아미모토 별저 <span class="jp">網元 別邸</span></div><div class="desc">해산물 이자카야. 이치반초(오카이도 옆). <a href="https://www.google.com/maps/search/?api=1&amp;query=網元 別邸 松山 一番町" target="_blank" rel="noopener">지도↗</a></div></div><div class="tag must">추천</div></div>
-      <div class="eat"><div class="em">🍗</div><div class="body"><div class="name">아즈마야 <span class="jp">炭火焼鳥 東屋</span></div><div class="desc">숯불 야키토리. 니반초. <a href="https://www.google.com/maps/search/?api=1&amp;query=炭火焼鳥 東屋 松山 二番町" target="_blank" rel="noopener">지도↗</a></div></div><div class="tag must">추천</div></div>
-      <div class="eat"><div class="em">🍱</div><div class="body"><div class="name">우나기 오구라 <span class="jp">うなぎ おぐら</span></div><div class="desc">장어(우나기) 전문. 도고 유노마치 — <b>도고칸 근처, 3일차 저녁 딱</b>. <a href="https://www.google.com/maps/search/?api=1&amp;query=うなぎ おぐら 道後" target="_blank" rel="noopener">지도↗</a></div></div><div class="tag must">추천</div></div>
-    </div>
+    <details class="acc"><summary><span class="ci">🗾</span>기본 상식<span class="ar">›</span></summary><div class="body kv">
+      <div><span class="k">도고온천</span> 일본 최고(最古) 온천 중 하나 · 2024 재개관 · 「센과 치히로」 영감지.</div>
+      <div><span class="k">마쓰야마성</span> 현존 12천수 · 체어리프트 강추 · 막차 ~17시.</div>
+      <div><span class="k">전기</span> 100V, A타입 어댑터 필요 · 시차 없음.</div>
+      <div><span class="k">미칸</span> 에히메 = 귤의 고장 · 미칸주스 수도꼭지 명물.</div>
+    </div></details>
 
-    <div class="maplabel">🍽️ 마쓰야마 대표 음식</div>
-    <div class="eats">
-      <div class="eat"><div class="em">🐟</div><div class="body"><div class="name">타이메시 <span class="jp">鯛めし</span></div><div class="desc">후기 명가 <b>고시키(五志喜·380년 노포)</b> · <b>카도야</b> · 우오야. 오카이도 근처.</div></div><div class="tag must">필수</div></div>
-      <div class="eat"><div class="em">🍲</div><div class="body"><div class="name">나베야키 우동 <span class="jp">鍋焼きうどん</span></div><div class="desc">달큰한 냄비우동. 노포 <b>아사히</b>·<b>코토리</b> 양대산맥. 오후 2~3시 조기 마감 주의.</div></div><div class="tag must">필수</div></div>
-      <div class="eat"><div class="em">🍢</div><div class="body"><div class="name">지야코텐 <span class="jp">じゃこ天</span></div><div class="desc">잡어 갈아 튀긴 어묵. 이자카야 안주·간식.</div></div><div class="tag">향토</div></div>
-      <div class="eat"><div class="em">🍗</div><div class="body"><div class="name">이마바리 야키토리 <span class="jp">今治焼き鳥</span></div><div class="desc">철판에 눌러 굽는 에히메식 닭꼬치.</div></div><div class="tag">향토</div></div>
-      <div class="eat"><div class="em">🍜</div><div class="body"><div class="name">라멘 <span class="jp">一風堂 등</span></div><div class="desc">잇푸도(오카이도 근처) 외 지역 라멘집 다수.</div></div><div class="tag">식사</div></div>
-      <div class="eat"><div class="em">☕</div><div class="body"><div class="name">코메다 커피 <span class="jp">コメダ珈琲</span></div><div class="desc">모닝 세트 명물. 도착 첫날 브런치로 딱.</div></div><div class="tag">카페</div></div>
-      <div class="eat"><div class="em">🍡</div><div class="body"><div class="name">봇짱 당고 <span class="jp">坊っちゃん団子</span></div><div class="desc">세 색 경단. 도고 상점가 간식·기념품.</div></div><div class="tag">간식</div></div>
-      <div class="eat"><div class="em">🍊</div><div class="body"><div class="name">미칸 주스 <span class="jp">みかんジュース</span></div><div class="desc">수도꼭지 생귤주스 &amp; 폰주스. 공항·도고에서.</div></div><div class="tag">명물</div></div>
-      <div class="eat"><div class="em">🥮</div><div class="body"><div class="name">이치로쿠 타르트 <span class="jp">一六タルト</span></div><div class="desc">유자향 롤 화과자. 대표 기념품 과자.</div></div><div class="tag">기념품</div></div>
-    </div>
+    <details class="acc"><summary><span class="ci">✅</span>준비물 체크리스트<span class="ar">›</span></summary><div class="body">
+      <div class="cprog"><div class="ctrack"><div class="cfill" id="cfill"></div></div><div id="ccount" class="fw8 tnum" style="font-size:.82rem">0/0</div><button class="mbtn" id="creset">초기화</button></div>
+      <div class="chk" id="chk"></div>
+    </div></details>
 
-    <div class="maplabel" style="color:var(--accent)">🏮 이자카야 (엄선)</div>
-    <div class="eats">
-      <div class="eat"><div class="em">🏮</div><div class="body"><div class="name">로벤토 본점 <span class="jp">炉辺人</span></div><div class="desc">원목 인테리어 로바타야키. 카운터+호리고타츠, 오카이도 도보. 타베로그 인기. <a href="https://www.google.com/maps/search/?api=1&amp;query=炉辺人+松山" target="_blank" rel="noopener">지도↗</a></div></div><div class="tag must">이자카야</div></div>
-      <div class="eat"><div class="em">🐟</div><div class="body"><div class="name">오이덴야 <span class="jp">おいでん家</span></div><div class="desc">도고온천 본관 바로 옆. 옛 생선가게→산지직송 제철회, 가성비. <b>3일차 저녁 최적</b>. <a href="https://www.google.com/maps/search/?api=1&amp;query=おいでん家+道後" target="_blank" rel="noopener">지도↗</a></div></div><div class="tag must">이자카야</div></div>
-      <div class="eat"><div class="em">🍶</div><div class="body"><div class="name">대관정 나가사카 <span class="jp">代官町なが坂</span></div><div class="desc">오카이도 3분, 차분한 와공간. 에히메 향토요리+지자케, 개실 완비. <a href="https://www.google.com/maps/search/?api=1&amp;query=代官町なが坂+松山" target="_blank" rel="noopener">지도↗</a></div></div><div class="tag">이자카야</div></div>
-      <div class="eat"><div class="em">🔥</div><div class="body"><div class="name">유메노야 혼텐 <span class="jp">夢乃屋</span></div><div class="desc">눈앞 토치 불쇼 + 고등어 와라야키. 분위기 좋은 저녁. <a href="https://www.google.com/maps/search/?api=1&amp;query=夢乃屋+松山" target="_blank" rel="noopener">지도↗</a></div></div><div class="tag">이자카야</div></div>
-    </div>
+    <details class="acc"><summary><span class="ci">🗣️</span>기초 회화<span class="ar">›</span></summary><div class="body" id="phrases"></div></details>
 
-    <div class="maplabel" style="color:var(--accent)">☕ 감성 카페 (엄선)</div>
-    <div class="eats">
-      <div class="eat"><div class="em">☕</div><div class="body"><div class="name">도고 유케무리 카페 <span class="jp">湯けむりカフェ</span></div><div class="desc">120년 고민가 리노베, 도고온천역 1분. 당고+젤라또, 2층 좌식 공원뷰. <a href="https://www.google.com/maps/search/?api=1&amp;query=道後+湯けむりカフェ" target="_blank" rel="noopener">지도↗</a></div></div><div class="tag">카페</div></div>
-      <div class="eat"><div class="em">🏠</div><div class="body"><div class="name">마치야 <span class="jp">町屋</span></div><div class="desc">도고 하이카라도리 고민가 개조. 자가로스팅 커피+감귤주스, 점심 수제버거, 정원 다다미방. <a href="https://www.google.com/maps/search/?api=1&amp;query=道後+町屋+カフェ" target="_blank" rel="noopener">지도↗</a></div></div><div class="tag">카페</div></div>
-      <div class="eat"><div class="em">🎞️</div><div class="body"><div class="name">코히칸 아카렌가야 <span class="jp">赤煉瓦屋</span></div><div class="desc">레트로 킷사텐. 빈티지 소품·따뜻한 조명, 영화 속 같은 분위기 (인스타 극찬). <a href="https://www.google.com/maps/search/?api=1&amp;query=松山+赤煉瓦+珈琲" target="_blank" rel="noopener">지도↗</a></div></div><div class="tag">카페</div></div>
-    </div>
-  </section>
-
-  <!-- 숙소 -->
-  <section>
-    <h2><span class="num">07</span> 숙소</h2>
-    <p class="sub">2박 · 1박으로 도심과 온천 둘 다 경험</p>
-    <div class="grid stays">
-      <div class="card stay a"><div class="band">1–2박 · 9/22–9/24</div><div class="inner">
-        <h3 class="serif">히요리 호텔 마쓰야마 <span class="jp">HIYORI</span></h3>
-        <div class="meta">
-          <div><b>위치</b> · 오카이도(大街道) 중심 · <b>노면전차 정류장 바로 앞</b> · 도고온천 차 3분 <a href="https://www.google.com/maps/search/?api=1&amp;query=HIYORI HOTEL 松山" target="_blank" rel="noopener">지도↗</a></div>
-          <div><b>특징</b> · 2026.4 신축 오픈, 245실, 24h 프런트, 해피아워·웰컴드링크 (한국 후기: 위치 최고)</div>
-          <div><b>⚠️ 청소</b> · 3박까지 객실청소 없음 (타월교환·쓰레기수거는 매일)</div>
-          <div><b>주변</b> · 마쓰야마성 · 오카이도/긴텐가이 쇼핑 · 아미모토·아즈마야 이자카야 · <b>빌트모어(프렌치토스트)</b> · 고시키 타이메시</div>
-          <div><b>메모</b> · 2일차 여친 미용실 이 근처로 예약</div>
-        </div>
-      </div></div>
-      <div class="card stay b"><div class="band">3박 · 9/24–9/25</div><div class="inner">
-        <h3 class="serif">도고칸 <span class="jp">道後館</span></h3>
-        <div class="meta">
-          <div><b>위치</b> · 도고 다코마치 · <b>도고온천역 도보 7분</b> · 공항 무료셔틀/버스 40분 <a href="https://www.google.com/maps/search/?api=1&amp;query=道後館 松山" target="_blank" rel="noopener">지도↗</a></div>
-          <div><b>특징</b> · 구로카와 기쇼 설계 온천 료칸 · <b>가이세키 정식 극찬</b> (한국 후기)</div>
-          <div><b>주변</b> · 도고온천 본관 · 상점가·봇짱당고 · 이사니와 신사 · <b>우나기 오구라</b> · 오이덴야 · 유케무리/마치야 카페</div>
-          <div><b>메모</b> · 마지막날 공항 무료셔틀 시각 확인 (9시까지 도착)</div>
-        </div>
-      </div></div>
-    </div>
-    <p class="note"><b>짐 이동 —</b> 히요리→도고칸은 노면전차 약 20분. 들고 이동하거나 호텔 짐배송 문의 가능.</p>
-  </section>
-
-  <!-- 일정 -->
-  <section id="sec-plan">
-    <h2><span class="num">08</span> 일정 <span class="num" style="letter-spacing:0">(초안 · 채워가는 중)</span></h2>
-    <p class="sub">고정 시간만 표시. 세부는 대화하며 채우기</p>
-    <div class="days">
-      <div class="card day"><div class="head"><span class="dno">Day 0</span><span class="dtitle">전날 · 인천공항 이동</span><span class="ddate">9/21 (월)</span></div>
-        <div class="fixed"><span class="fchip">🏨 디케이에어포트 호텔 (운서동)</span><span class="fchip">🚇 저녁 이동</span></div>
-        <div class="slots"><div class="slot"><span class="t">저녁</span><span class="blank"></span></div><div class="slot"><span class="t">밤</span><span class="blank"></span></div></div></div>
-      <div class="card day"><div class="head"><span class="dno">Day 1</span><span class="dtitle">도착 · 마쓰야마 시내</span><span class="ddate">9/22 (화)</span></div>
-        <div class="day-body"><div class="day-info">
-        <div class="fixed"><span class="fchip">✈️ ICN 08:40 → MYJ ~10:30</span><span class="fchip">🎟️ 공항서 한국인 쿠폰북</span><span class="fchip">🏨 히요리</span></div>
-        <div class="slots">
-          <div class="slot"><span class="t">오전</span><span>MYJ 도착 → 안내데스크서 쿠폰북 수령(여권) → 리무진 시내 → 짐 맡기기 · <b>코메다 커피</b> 브런치</span></div>
-          <div class="slot"><span class="t">점심</span><span>오카이도 <b>잇푸도 라멘</b> (또는 타이메시 고시키)</span></div>
-          <div class="slot"><span class="t">오후</span><span><b>마쓰야마성</b>(체어리프트 강추) → 소세키/사카노우에 뮤지엄 → 반스이소</span></div>
-          <div class="slot"><span class="t">저녁</span><span>오카이도 쇼핑(돈키호테) · 추천 이자카야 <b>아미모토 별저</b>(해산물) 또는 <b>아즈마야</b>(야키토리)</span></div>
-        </div></div><div class="minimap" id="mm-d1"></div></div></div>
-      <div class="card day"><div class="head"><span class="dno">Day 2</span><span class="dtitle">러닝 · 우치코 · 시모나다</span><span class="ddate">9/23 (수)</span></div>
-        <div class="day-body"><div class="day-info">
-        <div class="fixed"><span class="fchip">🏨 히요리</span><span class="fchip">💇 09:00 미용실 (~1h)</span><span class="fchip">🚆 열차 이동</span><span class="fchip">🌅 시모나다 일몰</span></div>
-        <div class="slots">
-          <div class="slot"><span class="t">04:00</span><span>러닝 42km → 복귀·샤워</span></div>
-          <div class="slot"><span class="t">09:00</span><span>여친 미용실(~1h) · 그동안 회복/아침 → JR로 이동</span></div>
-          <div class="slot"><span class="t">낮</span><span><b>우치코 옛거리</b> 산책(우치코자) + 점심 (오즈성 제외, 여유롭게)</span></div>
-          <div class="slot"><span class="t">오후</span><span>이요나다선 열차로 <b>시모나다 방면</b> ⚠️ 배차 1~2h — 시각표 미리 확정 필요</span></div>
-          <div class="slot"><span class="t">~18:00</span><span><b>시모나다역</b> 또는 <b>후타미 해변</b>(双海, 마쓰야마 최고 석양지)에서 일몰 → 상행선으로 마쓰야마 복귀·저녁</span></div>
-        </div></div><div class="minimap" id="mm-d2"></div></div></div>
-      <div class="card day"><div class="head"><span class="dno">Day 3</span><span class="dtitle">도고온천 · 회복데이</span><span class="ddate">9/24 (목)</span></div>
-        <div class="day-body"><div class="day-info">
-        <div class="fixed"><span class="fchip">🏨 도고칸 (체크인)</span><span class="fchip">♨️ 도고온천 본관 2층 개인실</span></div>
-        <div class="slots">
-          <div class="slot"><span class="t">오전</span><span>느긋한 아침 · <b>이사니와 신사</b>(계단 위 주황 신사, 인스타) 산책 · 감성카페 <b>유케무리/마치야</b> → 도고칸 체크인</span></div>
-          <div class="slot"><span class="t">오후</span><span><b>도고온천 본관 2층 개인실</b> · 상점가 · 대관람차 '구루린' 야경 · 미칸주스 수도꼭지</span></div>
-          <div class="slot"><span class="t">저녁</span><span>도고 <b>우나기 오구라</b>(장어) 또는 오이덴야(회) · 유카타 입고 야간 산책</span></div>
-        </div></div><div class="minimap" id="mm-d3"></div></div></div>
-      <div class="card day"><div class="head"><span class="dno">Day 4</span><span class="dtitle">출국</span><span class="ddate">9/25 (금)</span></div>
-        <div class="day-body"><div class="day-info">
-        <div class="fixed"><span class="fchip">🚌 ~8:20 공항버스</span><span class="fchip">✈️ MYJ 11:15 → ICN ~13:00</span></div>
-        <div class="slots"><div class="slot"><span class="t">아침</span><span class="blank"></span></div><div class="slot"><span class="t">이동</span><span class="blank"></span></div></div>
-        </div><div class="minimap" id="mm-d4"></div></div></div>
-    </div>
-  </section>
-
-  <!-- 준비물 -->
-  <section>
-    <h2><span class="num">09</span> 준비물 체크리스트</h2>
-    <p class="sub">탭하면 체크되고 <b>자동 저장</b>돼요 (이 브라우저에 기억). 출발 전까지 하나씩 지워나가기</p>
-    <div class="card" style="margin-top:16px;">
-      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
-        <div class="chk-track"><div class="chk-fill" id="chk-bar"></div></div>
-        <div id="chk-count" class="tnum" style="font-weight:700;white-space:nowrap;">0 / 0</div>
-        <button class="mbtn" id="chk-reset">초기화</button>
+    <details class="acc"><summary><span class="ci">🎵</span>여행 BGM<span class="ar">›</span></summary><div class="body">
+      <div class="mus">
+        <div class="ml">今日の一曲 · 지금 이 곡</div>
+        <div class="mt" id="mt">🎲 눌러봐</div>
+        <div class="ma" id="ma">아이묭·아라시·후지이 카제·요아소비…</div>
+        <div class="mact"><button class="mroll" id="mroll">🎲 랜덤</button><a class="mplay" id="mplay" href="https://music.youtube.com/" target="_blank" rel="noopener">▶ 유튜브뮤직</a></div>
       </div>
-    </div>
-    <div class="chk chk-grid">
+      <div style="height:12px"></div>
+      <div id="songs"></div>
+    </div></details>
 
-      <div class="card chk-card"><h3>📄 필수 서류·증빙</h3><ul>
-        <li><label><input type="checkbox"><span>여권 (유효기간 6개월 이상)</span></label></li>
-        <li><label><input type="checkbox"><span>제주항공 e-티켓 (7C 왕복)</span></label></li>
-        <li><label><input type="checkbox"><span>숙소 예약확인서 (히요리·도고칸)</span></label></li>
-        <li><label><input type="checkbox"><span>여행자보험 증서</span></label></li>
-        <li><label><input type="checkbox"><span>eSIM QR·설치 확인 (출발 전 테스트)</span></label></li>
-        <li><label><input type="checkbox"><span>Visit Japan Web 등록 (입국·세관 QR)</span></label></li>
-        <li><label><input type="checkbox"><span>여권 사본·여분 증명사진 (분실 대비)</span></label></li>
-      </ul></div>
-
-      <div class="card chk-card"><h3>💴 돈·결제</h3><ul>
-        <li><label><input type="checkbox"><span>엔화 현금 (환전 50만원분)</span></label></li>
-        <li><label><input type="checkbox"><span>해외결제 카드 (신용/트래블)</span></label></li>
-        <li><label><input type="checkbox"><span>동전 지갑 (소도시 현금 多)</span></label></li>
-        <li><label><input type="checkbox"><span>국내 신분증</span></label></li>
-      </ul></div>
-
-      <div class="card chk-card"><h3>📱 전자기기</h3><ul>
-        <li><label><input type="checkbox"><span>휴대폰 + 충전기</span></label></li>
-        <li><label><input type="checkbox"><span>보조배터리 (기내 휴대필수, 위탁 X)</span></label></li>
-        <li><label><input type="checkbox"><span>110V A타입 어댑터(돼지코) 2개</span></label></li>
-        <li><label><input type="checkbox"><span>멀티탭·멀티충전기</span></label></li>
-        <li><label><input type="checkbox"><span>러닝워치·애플워치 + 충전기</span></label></li>
-        <li><label><input type="checkbox"><span>이어폰</span></label></li>
-        <li><label><input type="checkbox"><span>카메라 + 충전기·메모리 (선택)</span></label></li>
-      </ul></div>
-
-      <div class="card chk-card"><h3>👕 의류 (낮 28° / 밤 20°)</h3><ul>
-        <li><label><input type="checkbox"><span>반팔 티셔츠 3~4장</span></label></li>
-        <li><label><input type="checkbox"><span>얇은 가디건·바람막이 (냉방·온도차)</span></label></li>
-        <li><label><input type="checkbox"><span>편한 긴바지 / 반바지</span></label></li>
-        <li><label><input type="checkbox"><span>속옷·양말 (일수+여유분)</span></label></li>
-        <li><label><input type="checkbox"><span>잠옷</span></label></li>
-        <li><label><input type="checkbox"><span>편한 운동화·워킹화</span></label></li>
-        <li><label><input type="checkbox"><span>슬리퍼/샌들 · 모자 · 선글라스</span></label></li>
-      </ul></div>
-
-      <div class="card chk-card"><h3>🏃 러닝 (42km)</h3><ul>
-        <li><label><input type="checkbox"><span>러닝화</span></label></li>
-        <li><label><input type="checkbox"><span>러닝복 상·하의 · 러닝 양말</span></label></li>
-        <li><label><input type="checkbox"><span>러닝워치·암밴드</span></label></li>
-        <li><label><input type="checkbox"><span>에너지젤·보급식</span></label></li>
-        <li><label><input type="checkbox"><span>물집 방지 (밴드·바세린)</span></label></li>
-      </ul></div>
-
-      <div class="card chk-card"><h3>🧴 세면·위생</h3><ul>
-        <li><label><input type="checkbox"><span>칫솔·치약</span></label></li>
-        <li><label><input type="checkbox"><span>스킨케어·클렌징</span></label></li>
-        <li><label><input type="checkbox"><span>선크림</span></label></li>
-        <li><label><input type="checkbox"><span>면도기</span></label></li>
-        <li><label><input type="checkbox"><span>렌즈·안경·렌즈용액</span></label></li>
-        <li><label><input type="checkbox"><span>여성용품</span></label></li>
-      </ul></div>
-
-      <div class="card chk-card"><h3>💊 상비약</h3><ul>
-        <li><label><input type="checkbox"><span>소화제·지사제</span></label></li>
-        <li><label><input type="checkbox"><span>두통·진통제</span></label></li>
-        <li><label><input type="checkbox"><span>감기약</span></label></li>
-        <li><label><input type="checkbox"><span>밴드·연고</span></label></li>
-        <li><label><input type="checkbox"><span>멀미약 (열차 이동)</span></label></li>
-        <li><label><input type="checkbox"><span>파스 (마라톤 후) · 개인 처방약</span></label></li>
-      </ul></div>
-
-      <div class="card chk-card"><h3>♨️ 온천·여행 특화</h3><ul>
-        <li><label><input type="checkbox"><span>수건 (도고온천 대여 유료 → 챙기면 절약)</span></label></li>
-        <li><label><input type="checkbox"><span>우산·우비 (9/25 비 예보)</span></label></li>
-        <li><label><input type="checkbox"><span>에코백·장바구니 (기념품)</span></label></li>
-        <li><label><input type="checkbox"><span>목베개·안대·귀마개</span></label></li>
-        <li><label><input type="checkbox"><span>지퍼백·빨래주머니</span></label></li>
-        <li><label><input type="checkbox"><span>접이식 보조가방</span></label></li>
-      </ul></div>
-
-      <div class="card chk-card"><h3>🎒 기타·앱</h3><ul>
-        <li><label><input type="checkbox"><span>물티슈·손소독제 · 마스크</span></label></li>
-        <li><label><input type="checkbox"><span>상비 간식 · 볼펜</span></label></li>
-        <li><label><input type="checkbox"><span>구글맵 · 파파고 앱</span></label></li>
-        <li><label><input type="checkbox"><span>이 여행 계획 파일 (오프라인 저장/북마크)</span></label></li>
-      </ul></div>
-
-    </div>
+    <footer>마쓰야마 여행 핸드북 · 旅のしおり<br>지도 © OpenStreetMap · 날씨 © Open-Meteo</footer>
   </section>
 
-  <!-- 기초 회화 -->
-  <section>
-    <h2><span class="num">10</span> 기초 회화 🗣️</h2>
-    <p class="sub">일본어 밑에 <b>한글 발음</b> 그대로 읽으면 돼요. 스몰톡·자기소개용</p>
-
-    <div class="phlabel">🙋 우리 소개</div>
-    <div class="phrases">
-      <div class="phrase"><div class="ko">한국에서 (여행) 왔어요</div><div class="ja">韓国から旅行に来ました</div><div class="ro">칸코쿠카라 료코-니 키마시타</div></div>
-      <div class="phrase"><div class="ko">둘이 사귄 지 3년 됐어요</div><div class="ja">付き合って3年です</div><div class="ro">츠키앗테 산넨데스</div></div>
-      <div class="phrase"><div class="ko">이름은 ○○예요 <span style="opacity:.6">(각자 이름 넣기)</span></div><div class="ja">名前は◯◯です</div><div class="ro">나마에와 ◯◯데스</div></div>
-      <div class="phrase"><div class="ko">1995년생, 1997년생이에요</div><div class="ja">1995年と1997年生まれです</div><div class="ro">센큐-햐쿠큐-쥬-고넨토 센큐-햐쿠큐-쥬-나나넨 우마레데스</div></div>
-      <div class="phrase"><div class="ko">제가 두 살 연하예요</div><div class="ja">僕が2歳年下です</div><div class="ro">보쿠가 니사이 토시시타데스</div></div>
-      <div class="phrase"><div class="ko">같이 살고 있어요</div><div class="ja">一緒に住んでいます</div><div class="ro">잇쇼니 슨데이마스</div></div>
-      <div class="phrase"><div class="ko">화요일에 와서 금요일에 돌아가요</div><div class="ja">火曜日に来て金曜日に帰ります</div><div class="ro">카요-비니 키테 킨요-비니 카에리마스</div></div>
-      <div class="phrase"><div class="ko">저는 서버(백엔드) 개발자예요</div><div class="ja">僕はサーバーエンジニアです</div><div class="ro">보쿠와 사-바- 엔지니아데스</div></div>
-      <div class="phrase"><div class="ko">여자친구는 디자이너예요</div><div class="ja">彼女はデザイナーです</div><div class="ro">카노죠와 데자이나-데스</div></div>
-    </div>
-
-    <div class="phlabel">💬 스몰톡·인사</div>
-    <div class="phrases">
-      <div class="phrase"><div class="ko">안녕하세요</div><div class="ja">こんにちは</div><div class="ro">콘니치와</div></div>
-      <div class="phrase"><div class="ko">감사합니다</div><div class="ja">ありがとうございます</div><div class="ro">아리가토- 고자이마스</div></div>
-      <div class="phrase"><div class="ko">저기요 / 실례합니다</div><div class="ja">すみません</div><div class="ro">스미마셍</div></div>
-      <div class="phrase"><div class="ko">맛있어요!</div><div class="ja">おいしいです！</div><div class="ro">오이시-데스</div></div>
-      <div class="phrase"><div class="ko">영어(사진) 괜찮으세요?</div><div class="ja">英語わかりますか</div><div class="ro">에이고 와카리마스카</div></div>
-      <div class="phrase"><div class="ko">사진 찍어주실 수 있어요?</div><div class="ja">写真を撮ってもらえますか</div><div class="ro">샤신오 톳테 모라에마스카</div></div>
-    </div>
-
-    <div class="phlabel">🍽️ 주문·실전</div>
-    <div class="phrases">
-      <div class="phrase"><div class="ko">이거 주세요</div><div class="ja">これください</div><div class="ro">코레 쿠다사이</div></div>
-      <div class="phrase"><div class="ko">추천이 뭐예요?</div><div class="ja">おすすめは何ですか</div><div class="ro">오스스메와 난데스카</div></div>
-      <div class="phrase"><div class="ko">두 명이에요</div><div class="ja">二人です</div><div class="ro">후타리데스</div></div>
-      <div class="phrase"><div class="ko">예약했어요</div><div class="ja">予約しました</div><div class="ro">요야쿠 시마시타</div></div>
-      <div class="phrase"><div class="ko">얼마예요?</div><div class="ja">いくらですか</div><div class="ro">이쿠라데스카</div></div>
-      <div class="phrase"><div class="ko">카드 되나요?</div><div class="ja">カードは使えますか</div><div class="ro">카-도와 츠카에마스카</div></div>
-      <div class="phrase"><div class="ko">계산해 주세요</div><div class="ja">お会計お願いします</div><div class="ro">오카이케- 오네가이시마스</div></div>
-      <div class="phrase"><div class="ko">한 잔 더 주세요</div><div class="ja">もう一杯ください</div><div class="ro">모- 잇파이 쿠다사이</div></div>
-      <div class="phrase"><div class="ko">화장실 어디예요?</div><div class="ja">トイレはどこですか</div><div class="ro">토이레와 도코데스카</div></div>
-      <div class="phrase"><div class="ko">잘 먹겠습니다 / 잘 먹었습니다</div><div class="ja">いただきます / ごちそうさま</div><div class="ro">이타다키마스 / 고치소-사마</div></div>
-    </div>
-  </section>
-
-  <!-- 음악 -->
-  <section id="sec-music">
-    <h2><span class="num">11</span> 여행 BGM 🎵</h2>
-    <p class="sub">일본 명곡 랜덤 추천 · 탭하면 유튜브 뮤직으로 이어져요</p>
-    <div class="card music-card">
-      <div class="mn-label">今日の一曲 · 지금 이 곡</div>
-      <div class="mn-title" id="mn-title">🎲 버튼을 눌러봐</div>
-      <div class="mn-artist" id="mn-artist">아이묭 · 아라시 · 후지이 카제 · 요아소비 …</div>
-      <div class="music-actions">
-        <button class="music-roll" id="music-roll">🎲 랜덤 추천</button>
-        <a class="music-play" id="music-play" href="https://music.youtube.com/" target="_blank" rel="noopener">▶ 유튜브뮤직</a>
-      </div>
-    </div>
-    <div class="phlabel">🎏 플레이리스트 (탭 → 재생)</div>
-    <div class="songs" id="song-list"></div>
-  </section>
-
-  <footer>마쓰야마 여행 핸드북 · 旅のしおり · v5 🍊<br>지도 © OpenStreetMap · 날씨 © Open-Meteo · 음악 → YouTube Music</footer>
 </div>
 
-<nav class="tabbar" id="tabbar">
-  <a data-t="top" class="tab is-active"><span class="ti">🏮</span><span class="tl">홈</span></a>
-  <a data-t="sec-map" class="tab"><span class="ti">🗺️</span><span class="tl">지도</span></a>
-  <a data-t="sec-plan" class="tab"><span class="ti">📅</span><span class="tl">일정</span></a>
-  <a data-t="sec-food" class="tab"><span class="ti">🍜</span><span class="tl">맛집</span></a>
-  <a data-t="sec-music" class="tab"><span class="ti">🎵</span><span class="tl">음악</span></a>
-</nav>
+<nav class="tabbar"><div class="in">
+  <button class="tab on" data-v="v-home"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg><span class="tl">오늘</span></button>
+  <button class="tab" data-v="v-plan"><svg viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9h18M8 2.5v4M16 2.5v4"/></svg><span class="tl">일정</span></button>
+  <button class="tab" data-v="v-map"><svg viewBox="0 0 24 24"><path d="M12 21s-6.5-5.5-6.5-10.5A6.5 6.5 0 0112 4a6.5 6.5 0 016.5 6.5C18.5 15.5 12 21 12 21z"/><circle cx="12" cy="10.5" r="2.3"/></svg><span class="tl">지도</span></button>
+  <button class="tab" data-v="v-eat"><svg viewBox="0 0 24 24"><path d="M6 3v8M9 3v8a3 3 0 01-6 0V3M7.5 11v10"/><path d="M17 3c-1.7 0-3 3-3 6.5S15.5 14 17 14v7"/></svg><span class="tl">맛집</span></button>
+  <button class="tab" data-v="v-info"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5h.01"/></svg><span class="tl">정보</span></button>
+</div></nav>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 (function(){
-  // ---------- 지도 ----------
-  var PLACES = [
-    {n:"마쓰야마공항", jp:"松山空港 MYJ", lat:33.8272, lng:132.6997, c:"transit", q:"松山空港", big:"✈️"},
-    {n:"히요리 (1·2박)", jp:"HOTEL Hiyori 松山", lat:33.8399, lng:132.7686, c:"stay", q:"HOTEL Hiyori 松山", big:"🏨"},
-    {n:"도고칸 (3박)", jp:"道後館", lat:33.8536, lng:132.7855, c:"stay", q:"道後館 愛媛", big:"🏨"},
-    {n:"마쓰야마성", jp:"松山城", lat:33.8457, lng:132.7657, c:"sight", q:"松山城"},
-    {n:"도고온천 본관", jp:"道後温泉本館", lat:33.8519, lng:132.7863, c:"sight", q:"道後温泉本館"},
-    {n:"오카이도 상점가", jp:"大街道", lat:33.8420, lng:132.7686, c:"sight", q:"大街道 松山"},
-    {n:"이시테지", jp:"石手寺", lat:33.8497, lng:132.8010, c:"sight", q:"石手寺"},
-    {n:"반스이소", jp:"萬翠荘", lat:33.8433, lng:132.7648, c:"sight", q:"萬翠荘"},
-    {n:"사카노우에 뮤지엄", jp:"坂の上の雲ミュージアム", lat:33.8440, lng:132.7662, c:"sight", q:"坂の上の雲ミュージアム"},
-    {n:"⭐ 아미모토 별저 (이자카야)", jp:"居酒屋 網元 別邸", lat:33.8412, lng:132.7693, c:"food", q:"網元 別邸 松山 一番町"},
-    {n:"⭐ 아즈마야 (야키토리)", jp:"炭火焼鳥 東屋", lat:33.8391, lng:132.7690, c:"food", q:"炭火焼鳥 東屋 松山 二番町"},
-    {n:"⭐ 우나기 오구라 (장어)", jp:"うなぎ おぐら", lat:33.8506, lng:132.7846, c:"food", q:"うなぎ おぐら 道後"},
-    {n:"우치코 옛거리", jp:"内子座", lat:33.5389, lng:132.6538, c:"road", q:"内子座"},
-    {n:"시모나다역 (일몰)", jp:"下灘駅", lat:33.6816, lng:132.6300, c:"road", q:"下灘駅"},
-    {n:"마쓰야마시역", jp:"松山市駅", lat:33.8395, lng:132.7663, c:"transit", q:"松山市駅"}
+  var TILE='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+  function gm(q){return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q);}
+
+  /* ---------- routing ---------- */
+  var tabs=document.querySelectorAll('.tab'), views=document.querySelectorAll('.view');
+  function show(v){
+    views.forEach(function(s){s.classList.toggle('on',s.id===v);});
+    tabs.forEach(function(t){t.classList.toggle('on',t.dataset.v===v);});
+    window.scrollTo(0,0);
+    if(v==='v-map') ensureOv();
+    if(v==='v-eat') ensureFood();
+    if(v==='v-plan') ensurePlan();
+  }
+  tabs.forEach(function(t){t.addEventListener('click',function(){show(t.dataset.v);});});
+  document.querySelectorAll('[data-go]').forEach(function(b){b.addEventListener('click',function(){show(b.dataset.go);});});
+
+  /* ---------- data ---------- */
+  var COL={stay:'#E1962F',sight:'#2E7D74',road:'#7A5AD1',transit:'#8A9089',food:'#E0533A'};
+  var PLACES=[
+    {n:'마쓰야마공항',j:'松山空港',lat:33.8272,lng:132.6997,c:'transit',q:'松山空港',big:'✈️'},
+    {n:'히요리',j:'HIYORI',lat:33.8399,lng:132.7686,c:'stay',q:'HIYORI HOTEL 松山',big:'🏨'},
+    {n:'도고칸',j:'道後館',lat:33.8536,lng:132.7855,c:'stay',q:'道後館 松山',big:'🏨'},
+    {n:'마쓰야마성',j:'松山城',lat:33.8457,lng:132.7657,c:'sight',q:'松山城'},
+    {n:'도고온천 본관',j:'道後温泉本館',lat:33.8519,lng:132.7863,c:'sight',q:'道後温泉本館'},
+    {n:'오카이도',j:'大街道',lat:33.8420,lng:132.7686,c:'sight',q:'大街道 松山'},
+    {n:'이시테지',j:'石手寺',lat:33.8497,lng:132.8010,c:'sight',q:'石手寺'},
+    {n:'반스이소',j:'萬翠荘',lat:33.8433,lng:132.7648,c:'sight',q:'萬翠荘'},
+    {n:'아미모토 별저',j:'網元別邸',lat:33.8412,lng:132.7693,c:'food',q:'網元 別邸 松山 一番町'},
+    {n:'아즈마야',j:'炭火焼鳥 東屋',lat:33.8391,lng:132.7690,c:'food',q:'炭火焼鳥 東屋 松山'},
+    {n:'우나기 오구라',j:'うなぎおぐら',lat:33.8506,lng:132.7846,c:'food',q:'うなぎ おぐら 道後'},
+    {n:'우치코 옛거리',j:'内子',lat:33.5389,lng:132.6538,c:'road',q:'内子座'},
+    {n:'시모나다역',j:'下灘駅',lat:33.6816,lng:132.6300,c:'road',q:'下灘駅'},
+    {n:'후타미 해변',j:'双海',lat:33.6470,lng:132.6160,c:'road',q:'ふたみシーサイド公園 双海 夕日'}
   ];
-  var COLORS = {stay:"#E0710C", sight:"#0E6E70", road:"#7A4FBF", transit:"#6B7785", food:"#D14D41"};
-
-  var map = L.map('map', {scrollWheelZoom:true}).setView([33.72,132.72], 11);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom:19, attribution:'© OpenStreetMap'
-  }).addTo(map);
-
-  // 2일차 로드트립 동선: 시내 → 우치코 → 시모나다 → 시내
-  L.polyline([[33.8399,132.7686],[33.5389,132.6538],[33.6816,132.6300],[33.8399,132.7686]],
-    {color:"#7A4FBF", weight:3, dashArray:"6,9", opacity:.75}).addTo(map);
-  // 공항 ↔ 시내 이동
-  L.polyline([[33.8272,132.6997],[33.8399,132.7686]],
-    {color:"#6B7785", weight:2, dashArray:"2,7", opacity:.6}).addTo(map);
-
-  var all = [], roadGrp = [], mainGrp = [];
-  PLACES.forEach(function(p){
-    var m;
-    if(p.big){
-      var icon = L.divIcon({className:"bigpin", html:'<div class="bp">'+p.big+'</div>', iconSize:[30,30], iconAnchor:[15,15]});
-      m = L.marker([p.lat,p.lng], {icon:icon, zIndexOffset:1000}).addTo(map);
-      m.bindTooltip(p.n, {permanent:true, direction:"top", className:"lbl", offset:[0,-12]});
-    } else {
-      m = L.circleMarker([p.lat,p.lng], {radius:8, color:"#fff", weight:2, fillColor:COLORS[p.c], fillOpacity:1}).addTo(map);
-    }
-    var g = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(p.q);
-    m.bindPopup('<b>'+p.n+'</b> <span class="jp">'+p.jp+'</span><br><a href="'+g+'" target="_blank" rel="noopener">구글맵에서 열기 ↗</a>');
-    all.push(m);
-    if(p.c==="road") roadGrp.push(m); else mainGrp.push(m);
-  });
-
-  // 기본: 공항 + 숙소2 + 시내가 읽히는 뷰 (로드트립 제외)
-  var homeView = function(){ map.fitBounds(L.featureGroup(mainGrp).getBounds().pad(0.15)); };
-  var cityView = function(){ map.setView([33.847,132.780], 14); };
-  var allView  = function(){ map.fitBounds(L.featureGroup(all).getBounds().pad(0.12)); };
-  var roadView = function(){ map.fitBounds(L.featureGroup(roadGrp).getBounds().pad(0.3)); };
-  document.getElementById('btn-city').onclick = homeView;
-  document.getElementById('btn-all').onclick  = allView;
-  document.getElementById('btn-road').onclick = roadView;
-  homeView();
-
-  // ---------- 실시간 날씨 ----------
-  var WMO = {
-    0:["☀️","맑음"],1:["🌤️","대체로 맑음"],2:["⛅","구름 조금"],3:["☁️","흐림"],
-    45:["🌫️","안개"],48:["🌫️","안개"],
-    51:["🌦️","약한 이슬비"],53:["🌦️","이슬비"],55:["🌦️","짙은 이슬비"],
-    61:["🌧️","약한 비"],63:["🌧️","비"],65:["🌧️","강한 비"],
-    66:["🌧️","진눈깨비"],67:["🌧️","진눈깨비"],
-    71:["❄️","약한 눈"],73:["❄️","눈"],75:["❄️","강한 눈"],77:["❄️","싸락눈"],
-    80:["🌦️","소나기"],81:["🌦️","소나기"],82:["🌦️","강한 소나기"],
-    85:["🌨️","눈소나기"],86:["🌨️","눈소나기"],
-    95:["⛈️","뇌우"],96:["⛈️","우박 뇌우"],99:["⛈️","우박 뇌우"]
-  };
-  function wmo(c){ return WMO[c] || ["🌡️","-"]; }
-  var DOW = ["일","월","화","수","목","금","토"];
-  var TRIP = {"2026-09-22":1,"2026-09-23":1,"2026-09-24":1,"2026-09-25":1};
-
-  var url = "https://api.open-meteo.com/v1/forecast?latitude=33.8416&longitude=132.7686"
-    + "&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m"
-    + "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max"
-    + "&timezone=Asia%2FTokyo&forecast_days=16";
-
-  fetch(url).then(function(r){ return r.json(); }).then(function(d){
-    // 현재
-    if(d.current){
-      var w = wmo(d.current.weather_code);
-      document.getElementById('wxnow-icon').textContent = w[0];
-      document.getElementById('wxnow-temp').textContent = Math.round(d.current.temperature_2m) + "° · " + w[1];
-      document.getElementById('wxnow-meta').textContent =
-        "마쓰야마 현재 · 습도 " + d.current.relative_humidity_2m + "% · 바람 " + Math.round(d.current.wind_speed_10m) + "km/h";
-    }
-    // 예보
-    var dd = d.daily, box = document.getElementById('wx-forecast'), note = document.getElementById('wx-note');
-    box.innerHTML = "";
-    var idx = [];
-    dd.time.forEach(function(t,i){ if(TRIP[t]) idx.push(i); });
-    var usingTrip = idx.length > 0;
-    if(!usingTrip){ idx = dd.time.map(function(_,i){return i;}).slice(0,4); }
-    idx.forEach(function(i){
-      var t = dd.time[i], w = wmo(dd.weather_code[i]);
-      var dt = new Date(t+"T00:00:00");
-      var pop = dd.precipitation_probability_max[i];
-      var el = document.createElement('div');
-      el.className = "card wx";
-      el.innerHTML = '<div class="day">'+DOW[dt.getDay()]+'요일</div>'
-        + '<div class="date tnum">'+(dt.getMonth()+1)+'/'+dt.getDate()+'</div>'
-        + '<div class="icon">'+w[0]+'</div>'
-        + '<div class="temp tnum">'+Math.round(dd.temperature_2m_max[i])+'° <span class="lo">/ '+Math.round(dd.temperature_2m_min[i])+'°</span></div>'
-        + '<div class="rain'+(pop>=50?' hi':'')+'">비 '+pop+'%</div>';
-      box.appendChild(el);
-    });
-    if(!usingTrip){
-      note.innerHTML = "<b>참고 —</b> 여행일(9/22~25) 예보는 <b>출발 약 2주 전부터</b> 표시돼요. 지금은 가장 가까운 4일 예보를 보여주는 중. 위 'LIVE'는 현재 실시간 값입니다.";
-    }
-  }).catch(function(e){
-    document.getElementById('wxnow-temp').textContent = "날씨를 불러오지 못했어요";
-    document.getElementById('wxnow-icon').textContent = "⚠️";
-    document.getElementById('wxnow-meta').textContent = "인터넷 연결을 확인하고 새로고침 해주세요";
-    document.getElementById('wx-forecast').innerHTML =
-      '<div id="wx-loading">오프라인 참고값 — 9/22 24°/20° · 9/23 26°/19°(비↑) · 9/24 27°/21°(맑음) · 9/25 28°/22°</div>';
-  });
-})();
-
-// ---------- 일자별 미니 지도 (동선) ----------
-(function(){
-  function miniMap(id, color, pts, line){
-    if(!document.getElementById(id)) return;
-    var m = L.map(id, {scrollWheelZoom:false, zoomControl:false, attributionControl:false});
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19}).addTo(m);
-    var lineCoords = (line || pts).map(function(p){ return [p[0], p[1]]; });
-    L.polyline(lineCoords, {color:color, weight:3, dashArray:"5,8", opacity:.85}).addTo(m);
-    pts.forEach(function(p, i){
-      var icon = L.divIcon({className:"npwrap", html:'<div class="np" style="background:'+color+'">'+(i+1)+'</div>', iconSize:[22,22], iconAnchor:[11,11]});
-      L.marker([p[0],p[1]], {icon:icon}).addTo(m).bindPopup('<b>'+(i+1)+'. '+p[2]+'</b>');
-    });
-    var fit = function(){ m.invalidateSize(); m.fitBounds(L.latLngBounds(lineCoords).pad(0.28)); };
-    fit();
-    setTimeout(fit, 250);
-  }
-  // Day 1 — 시내 (공항→히요리→성→반스이소→오카이도)
-  miniMap('mm-d1', '#0E6E70', [
-    [33.8272,132.6997,'마쓰야마공항'],[33.8399,132.7686,'히요리'],
-    [33.8457,132.7657,'마쓰야마성'],[33.8433,132.7648,'반스이소'],[33.8412,132.7690,'오카이도·이자카야']
-  ]);
-  // Day 2 — 우치코·시모나다 (히요리↔우치코↔시모나다, 왕복)
-  miniMap('mm-d2', '#7A4FBF', [
-    [33.8399,132.7686,'히요리(출발)'],[33.5389,132.6538,'우치코'],[33.6816,132.6300,'시모나다역(일몰)'],[33.6470,132.6160,'후타미 해변(노을)']
-  ], [[33.8399,132.7686],[33.5389,132.6538],[33.6816,132.6300],[33.6470,132.6160],[33.8399,132.7686]]);
-  // Day 3 — 도고 (이사니와→도고칸→본관→우나기)
-  miniMap('mm-d3', '#E0710C', [
-    [33.8515,132.7869,'이사니와 신사'],[33.8536,132.7855,'도고칸'],
-    [33.8519,132.7863,'도고온천 본관'],[33.8506,132.7846,'우나기 오구라']
-  ]);
-  // Day 4 — 출국 (도고칸→공항)
-  miniMap('mm-d4', '#6B7785', [
-    [33.8536,132.7855,'도고칸'],[33.8272,132.6997,'마쓰야마공항']
-  ]);
-})();
-
-// ---------- 맛집 지도 ----------
-(function(){
-  if(!document.getElementById('food-map')) return;
-  var FC = {local:'#D14D41', izakaya:'#E0710C', eel:'#8A5A2B', cafe:'#0E6E70', pick:'#E5397F', sunset:'#F2A65A'};
-  var FOODS = [
-    // 시내 (오카이도·긴텐가이·반초)
-    {n:'고시키 (타이메시·오색소면)', jp:'五志喜', lat:33.8410, lng:132.7670, cat:'local', a:'city', q:'五志喜 松山', note:'380년 노포 · 우와지마식 타이메시'},
-    {n:'카도야 (타이메시)', jp:'かどや', lat:33.8420, lng:132.7689, cat:'local', a:'city', q:'かどや 松山 大街道', note:'현지인도 줄 서는 도미밥 명가'},
-    {n:'아사히 (나베야키우동)', jp:'アサヒ', lat:33.8405, lng:132.7666, cat:'local', a:'city', q:'アサヒ 鍋焼きうどん 松山', note:'나베야키우동 노포 · 낮에만'},
-    {n:'코토리 (나베야키우동)', jp:'ことり', lat:33.8388, lng:132.7670, cat:'local', a:'city', q:'ことり 鍋焼きうどん 松山', note:'진한 국물의 냄비우동'},
-    {n:'미쓰하마야키', jp:'三津浜焼き', lat:33.8412, lng:132.7682, cat:'local', a:'city', q:'三津浜焼き 松山', note:'마쓰야마식 오코노미야키(철판)'},
-    {n:'⭐ 아미모토 별저', jp:'網元 別邸', lat:33.8412, lng:132.7693, cat:'pick', a:'city', q:'網元 別邸 松山 一番町', note:'혁누 추천 · 해산물 이자카야'},
-    {n:'⭐ 아즈마야 (야키토리)', jp:'炭火焼鳥 東屋', lat:33.8391, lng:132.7690, cat:'pick', a:'city', q:'炭火焼鳥 東屋 松山 二番町', note:'혁누 추천 · 숯불 야키토리'},
-    {n:'로벤토 본점', jp:'炉辺人', lat:33.8425, lng:132.7681, cat:'izakaya', a:'city', q:'炉辺人 松山', note:'원목 로바타야키 · 타베로그 상위'},
-    {n:'불독 (규카츠 카레)', jp:'ブルドッグ', lat:33.8398, lng:132.7687, cat:'izakaya', a:'city', q:'ブルドッグ 松山 カレー', note:'규카츠 카레 레트로 노포'},
-    {n:'오니쿠토 365 (야키니쿠)', jp:'お肉と365', lat:33.8422, lng:132.7700, cat:'izakaya', a:'city', q:'お肉と365 松山', note:'오늘의 와규 세트 가성비'},
-    {n:'우나이치 (장어)', jp:'うな一', lat:33.8400, lng:132.7662, cat:'eel', a:'city', q:'うな一 松山 銀天街', note:'긴텐가이 옆 장어 명가'},
-    {n:'아카렌가야 (레트로 킷사)', jp:'赤煉瓦屋', lat:33.8415, lng:132.7695, cat:'cafe', a:'city', q:'松山 赤煉瓦 珈琲', note:'빈티지·영화 같은 분위기'},
-    {n:'키리노모리 다이후쿠', jp:'霧の森', lat:33.8420, lng:132.7690, cat:'cafe', a:'city', q:'霧の森菓子工房 松山店', note:'통판 일본1위 화과자'},
-    // 도고
-    {n:'⭐ 우나기 오구라 (장어)', jp:'うなぎ おぐら', lat:33.8506, lng:132.7846, cat:'pick', a:'dogo', q:'うなぎ おぐら 道後', note:'혁누 추천 · 도고칸 근처'},
-    {n:'오이덴야 (산지직송 회)', jp:'おいでん家', lat:33.8516, lng:132.7857, cat:'izakaya', a:'dogo', q:'おいでん家 道後', note:'도고온천 본관 옆 · 가성비'},
-    {n:'봇짱 (도고 명물)', jp:'坊っちゃん', lat:33.8512, lng:132.7852, cat:'local', a:'dogo', q:'坊っちゃん 道後 商店街', note:'도고 아케이드 끝 유명집'},
-    {n:'유케무리 카페', jp:'湯けむりカフェ', lat:33.8525, lng:132.7852, cat:'cafe', a:'dogo', q:'道後 湯けむりカフェ', note:'120년 고민가 · 당고+젤라또'},
-    {n:'마치야 (고민가 카페)', jp:'町屋', lat:33.8515, lng:132.7860, cat:'cafe', a:'dogo', q:'道後 町屋 カフェ', note:'자가로스팅·정원 다다미방'},
-    {n:'⭐ 빌트모어 커피 (프렌치토스트!)', jp:'Biltmore Coffee', lat:33.8388, lng:132.7648, cat:'pick', a:'city', q:'Biltmore Coffee 松山 港町', note:'혁누 추천 · 프렌치토스트 꼭 추가'}
+  var FC={pick:'#E0533A',local:'#D14D41',izakaya:'#E1962F',eel:'#8A5A2B',cafe:'#2E7D74'};
+  var FCN={pick:'혁누추천',local:'향토·우동',izakaya:'이자카야·고기',eel:'장어',cafe:'카페·디저트'};
+  var FOODS=[
+    {n:'아미모토 별저',j:'網元別邸',lat:33.8412,lng:132.7693,cat:'pick',a:'city',q:'網元 別邸 松山 一番町',o:'혁누추천 · 해산물 이자카야'},
+    {n:'아즈마야',j:'炭火焼鳥 東屋',lat:33.8391,lng:132.7690,cat:'pick',a:'city',q:'炭火焼鳥 東屋 松山',o:'혁누추천 · 숯불 야키토리'},
+    {n:'우나기 오구라',j:'うなぎおぐら',lat:33.8506,lng:132.7846,cat:'pick',a:'dogo',q:'うなぎ おぐら 道後',o:'혁누추천 · 도고 장어'},
+    {n:'빌트모어 커피',j:'Biltmore Coffee',lat:33.8388,lng:132.7648,cat:'pick',a:'city',q:'Biltmore Coffee 松山 港町',o:'혁누추천 · 프렌치토스트 꼭!'},
+    {n:'고시키',j:'五志喜',lat:33.8410,lng:132.7670,cat:'local',a:'city',q:'五志喜 松山',o:'380년 노포 타이메시'},
+    {n:'카도야',j:'かどや',lat:33.8420,lng:132.7689,cat:'local',a:'city',q:'かどや 松山 大街道',o:'도미밥 명가, 웨이팅'},
+    {n:'아사히',j:'アサヒ',lat:33.8405,lng:132.7666,cat:'local',a:'city',q:'アサヒ 鍋焼きうどん 松山',o:'나베야키우동 · 낮에만'},
+    {n:'코토리',j:'ことり',lat:33.8388,lng:132.7670,cat:'local',a:'city',q:'ことり 鍋焼きうどん 松山',o:'나베야키우동'},
+    {n:'봇짱',j:'坊っちゃん',lat:33.8512,lng:132.7852,cat:'local',a:'dogo',q:'坊っちゃん 道後 商店街',o:'도고 명물'},
+    {n:'로벤토 본점',j:'炉辺人',lat:33.8425,lng:132.7681,cat:'izakaya',a:'city',q:'炉辺人 松山',o:'원목 로바타야키'},
+    {n:'불독',j:'ブルドッグ',lat:33.8398,lng:132.7687,cat:'izakaya',a:'city',q:'ブルドッグ 松山 カレー',o:'규카츠 카레 노포'},
+    {n:'오니쿠토365',j:'お肉と365',lat:33.8422,lng:132.7700,cat:'izakaya',a:'city',q:'お肉と365 松山',o:'와규 야키니쿠'},
+    {n:'오이덴야',j:'おいでん家',lat:33.8516,lng:132.7857,cat:'izakaya',a:'dogo',q:'おいでん家 道後',o:'도고 산지직송 회'},
+    {n:'우나이치',j:'うな一',lat:33.8400,lng:132.7662,cat:'eel',a:'city',q:'うな一 松山 銀天街',o:'긴텐가이 장어 명가'},
+    {n:'유케무리 카페',j:'湯けむりカフェ',lat:33.8525,lng:132.7852,cat:'cafe',a:'dogo',q:'道後 湯けむりカフェ',o:'120년 고민가·당고'},
+    {n:'마치야',j:'町屋',lat:33.8515,lng:132.7860,cat:'cafe',a:'dogo',q:'道後 町屋 カフェ',o:'고민가·정원 다다미'},
+    {n:'아카렌가야',j:'赤煉瓦屋',lat:33.8415,lng:132.7695,cat:'cafe',a:'city',q:'松山 赤煉瓦 珈琲',o:'레트로 킷사'},
+    {n:'키리노모리',j:'霧の森',lat:33.8420,lng:132.7690,cat:'cafe',a:'city',q:'霧の森菓子工房 松山店',o:'통판 1위 다이후쿠'}
   ];
-  var fmap = L.map('food-map', {scrollWheelZoom:false});
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom:19, attribution:'© OpenStreetMap'}).addTo(fmap);
-  var fcity=[], fdogo=[], fall=[];
-  FOODS.forEach(function(f){
-    var m = L.circleMarker([f.lat,f.lng], {radius:8, color:'#fff', weight:2, fillColor:FC[f.cat], fillOpacity:1}).addTo(fmap);
-    var g = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(f.q);
-    m.bindPopup('<b>'+f.n+'</b> <span class="jp">'+f.jp+'</span><br>'+f.note+'<br><a href="'+g+'" target="_blank" rel="noopener">구글맵 리뷰·위치 ↗</a>');
-    fall.push(m); (f.a==='dogo'?fdogo:fcity).push(m);
-  });
-  var fFit = function(grp){ fmap.invalidateSize(); fmap.fitBounds(L.featureGroup(grp).getBounds().pad(0.2)); };
-  document.getElementById('fm-city').onclick = function(){ fFit(fcity); };
-  document.getElementById('fm-dogo').onclick = function(){ fFit(fdogo); };
-  document.getElementById('fm-all').onclick  = function(){ fFit(fall); };
-  fFit(fcity);
-  setTimeout(function(){ fFit(fcity); }, 250);
-})();
-
-// ---------- 준비물 체크리스트 (localStorage 저장) ----------
-(function(){
-  var boxes = document.querySelectorAll('.chk input[type=checkbox]');
-  var bar = document.getElementById('chk-bar'), cnt = document.getElementById('chk-count');
-  if(!boxes.length) return;
-  function update(){
-    var done = 0;
-    boxes.forEach(function(b){ if(b.checked) done++; });
-    var pct = Math.round(done / boxes.length * 100);
-    if(bar) bar.style.width = pct + '%';
-    if(cnt) cnt.textContent = done + ' / ' + boxes.length + ' (' + pct + '%)';
-  }
-  boxes.forEach(function(b, i){
-    var k = 'mpk_chk_' + i;
-    try { if(localStorage.getItem(k) === '1') b.checked = true; } catch(e){}
-    b.addEventListener('change', function(){
-      try { localStorage.setItem(k, b.checked ? '1' : '0'); } catch(e){}
-      update();
-    });
-  });
-  var rst = document.getElementById('chk-reset');
-  if(rst) rst.addEventListener('click', function(){
-    boxes.forEach(function(b, i){
-      b.checked = false;
-      try { localStorage.removeItem('mpk_chk_' + i); } catch(e){}
-    });
-    update();
-  });
-  update();
-})();
-
-// ---------- 하단 탭바 + 음악 ----------
-(function(){
-  var tabs = document.querySelectorAll('.tab');
-  var ids = ['top','sec-map','sec-plan','sec-food','sec-music'];
-  tabs.forEach(function(t){
-    t.addEventListener('click', function(){
-      var id = t.getAttribute('data-t');
-      if(id==='top'){ window.scrollTo({top:0, behavior:'smooth'}); return; }
-      var el = document.getElementById(id);
-      if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
-    });
-  });
-  function spy(){
-    var cur = 'top';
-    ids.forEach(function(id){
-      var el = document.getElementById(id);
-      if(el && el.getBoundingClientRect().top <= 130) cur = id;
-    });
-    tabs.forEach(function(t){ t.classList.toggle('is-active', t.getAttribute('data-t')===cur); });
-  }
-  window.addEventListener('scroll', spy, {passive:true});
-  window.addEventListener('resize', spy); spy();
-
-  // 음악 (랜덤 → YouTube Music)
-  var SONGS = [
-    ['あいみょん','マリーゴールド','아이묭 · 마리골드'],
-    ['あいみょん','裸の心','아이묭 · 벌거벗은 마음'],
-    ['あいみょん','愛を伝えたいだとか','아이묭 · 사랑을 전하고 싶다든가'],
-    ['あいみょん','君はロックを聴かない','아이묭'],
-    ['嵐','Love so sweet','아라시'],
-    ['嵐','Happiness','아라시'],
-    ['嵐','カイト','아라시 · 카이토'],
-    ['嵐','Monster','아라시'],
-    ['藤井風','まつり','후지이 카제 · 마츠리'],
-    ['藤井風','死ぬのがいいわ','후지이 카제'],
-    ['藤井風','きらり','후지이 카제 · 키라리'],
-    ['YOASOBI','夜に駆ける','요아소비 · 밤을 달리다'],
-    ['YOASOBI','アイドル','요아소비 · 아이돌'],
-    ['YOASOBI','群青','요아소비'],
-    ['Official髭男dism','Pretender','오피셜히게단디즘'],
-    ['Official髭男dism','Subtitle','오피셜히게단디즘'],
-    ['King Gnu','白日','킹누'],
-    ['米津玄師','Lemon','요네즈 켄시 · 레몬'],
-    ['米津玄師','KICK BACK','요네즈 켄시'],
-    ['Vaundy','怪獣の花唄','바운디'],
-    ['LiSA','紅蓮華','리사 · 홍련화'],
-    ['宇多田ヒカル','First Love','우타다 히카루'],
-    ['スピッツ','チェリー','스핏츠 · 체리'],
-    ['back number','高嶺の花子さん','백넘버']
+  var DAYS=[
+    {n:1,date:'9.22 화',t:'도착 · 마쓰야마 시내',col:'#E0533A',
+     chips:['ICN 08:40→MYJ','공항 쿠폰북','히요리'],
+     slots:[['오전','MYJ 도착→인포메이션서 쿠폰북·무료셔틀(여권)→시내→짐→코메다 브런치'],['점심','오카이도 잇푸도 라멘 / 고시키 타이메시'],['오후','마쓰야마성(체어리프트!)→사카노우에 뮤지엄→반스이소'],['저녁','오카이도 쇼핑 · 이자카야 아미모토/아즈마야']],
+     pts:[[33.8272,132.6997,'공항'],[33.8399,132.7686,'히요리'],[33.8457,132.7657,'마쓰야마성'],[33.8433,132.7648,'반스이소'],[33.8412,132.7690,'오카이도']],
+     eats:['아미모토 별저','아즈마야','고시키']},
+    {n:2,date:'9.23 수',t:'러닝 · 우치코 · 시모나다',col:'#7A5AD1',
+     chips:['히요리','09:00 미용실','열차','시모나다 일몰'],
+     slots:[['04:00','러닝 42km → 복귀·샤워'],['09:00','미용실(~1h) → JR 이동'],['낮','우치코 옛거리 + 점심'],['오후','이요나다선 열차 → 시모나다 방면 (배차 1~2h 주의)'],['~18:00','시모나다역/후타미 해변 일몰 → 복귀·저녁']],
+     pts:[[33.8399,132.7686,'히요리'],[33.5389,132.6538,'우치코'],[33.6816,132.6300,'시모나다역'],[33.6470,132.6160,'후타미(노을)']],
+     line:[[33.8399,132.7686],[33.5389,132.6538],[33.6816,132.6300],[33.6470,132.6160],[33.8399,132.7686]],
+     eats:[]},
+    {n:3,date:'9.24 목',t:'도고온천 · 회복데이',col:'#2E7D74',
+     chips:['도고칸 체크인','본관 2층 개인실'],
+     slots:[['오전','이사니와 신사 · 감성카페(유케무리/마치야) → 도고칸 체크인'],['오후','도고온천 본관 2층 개인실 · 상점가 · 대관람차 구루린 · 미칸주스'],['저녁','우나기 오구라/오이덴야 · 유카타 야간산책']],
+     pts:[[33.8515,132.7869,'이사니와 신사'],[33.8536,132.7855,'도고칸'],[33.8519,132.7863,'도고온천 본관'],[33.8506,132.7846,'우나기 오구라']],
+     eats:['우나기 오구라','오이덴야','유케무리 카페']},
+    {n:4,date:'9.25 금',t:'출국',col:'#8A9089',
+     chips:['~8:20 무료셔틀','MYJ 11:15→ICN'],
+     slots:[['아침','도고 아침 족욕/조식 · 짐 정리'],['이동','공항 무료셔틀(시각 확인) → 9시까지 도착']],
+     pts:[[33.8536,132.7855,'도고칸'],[33.8272,132.6997,'공항']],
+     eats:[]}
   ];
-  function ytm(a,t){ return 'https://music.youtube.com/search?q=' + encodeURIComponent(a+' '+t); }
-  var list = document.getElementById('song-list');
-  if(list){
-    SONGS.forEach(function(s){
-      var a = document.createElement('a');
-      a.className = 'song'; a.href = ytm(s[0],s[1]); a.target = '_blank'; a.rel = 'noopener';
-      a.innerHTML = '<span class="sj">♪</span><span><span class="st">'+s[1]+'</span><br><span class="sa">'+s[2]+'</span></span>';
-      list.appendChild(a);
-    });
+  var PHR=[
+    ['g','🙋 우리 소개'],
+    ['한국에서 여행 왔어요','韓国から旅行に来ました','칸코쿠카라 료코-니 키마시타'],
+    ['둘이 사귄 지 3년 됐어요','付き合って3年です','츠키앗테 산넨데스'],
+    ['제가 두 살 연하예요','僕が2歳年下です','보쿠가 니사이 토시시타데스'],
+    ['같이 살고 있어요','一緒に住んでいます','잇쇼니 슨데이마스'],
+    ['저는 서버 개발자예요','僕はサーバーエンジニアです','보쿠와 사-바- 엔지니아데스'],
+    ['여자친구는 디자이너예요','彼女はデザイナーです','카노죠와 데자이나-데스'],
+    ['g','💬 스몰톡'],
+    ['감사합니다','ありがとうございます','아리가토- 고자이마스'],
+    ['저기요/실례합니다','すみません','스미마셍'],
+    ['맛있어요!','おいしいです！','오이시-데스'],
+    ['사진 찍어주실 수 있어요?','写真を撮ってもらえますか','샤신오 톳테 모라에마스카'],
+    ['g','🍽️ 주문·실전'],
+    ['이거 주세요','これください','코레 쿠다사이'],
+    ['추천이 뭐예요?','おすすめは何ですか','오스스메와 난데스카'],
+    ['얼마예요?','いくらですか','이쿠라데스카'],
+    ['카드 되나요?','カードは使えますか','카-도와 츠카에마스카'],
+    ['계산해 주세요','お会計お願いします','오카이케- 오네가이시마스'],
+    ['화장실 어디예요?','トイレはどこですか','토이레와 도코데스카']
+  ];
+  var CHK=[
+    ['📄 서류',['여권(유효 6개월+)','제주항공 e-티켓','숙소 예약확인','여행자보험','eSIM 설치확인','Visit Japan Web(입국·세관 QR)']],
+    ['💴 돈',['엔화 현금(50만원분)','해외결제 카드','동전지갑','국내 신분증']],
+    ['📱 전자기기',['보조배터리(기내)','110V A타입 어댑터','러닝워치+충전기','멀티충전기','이어폰']],
+    ['👕 의류',['반팔 3~4','얇은 겉옷','편한 바지','속옷·양말','편한 운동화','슬리퍼·모자']],
+    ['🏃 러닝',['러닝화','러닝복 상하','에너지젤','물집방지']],
+    ['💊 상비약',['소화·지사제','진통제','감기약','밴드','멀미약','파스']],
+    ['♨️ 온천·기타',['수건(도고 대여 유료)','우산·우비','에코백','목베개·안대','물티슈·마스크']]
+  ];
+  var SONGS=[['あいみょん','マリーゴールド','아이묭·마리골드'],['あいみょん','裸の心','아이묭'],['あいみょん','愛を伝えたいだとか','아이묭'],['嵐','Love so sweet','아라시'],['嵐','カイト','아라시·카이토'],['嵐','Happiness','아라시'],['藤井風','まつり','후지이 카제·마츠리'],['藤井風','死ぬのがいいわ','후지이 카제'],['藤井風','きらり','후지이 카제'],['YOASOBI','夜に駆ける','요아소비'],['YOASOBI','アイドル','요아소비·아이돌'],['YOASOBI','群青','요아소비'],['Official髭男dism','Pretender','히게단'],['Official髭男dism','Subtitle','히게단'],['King Gnu','白日','킹누'],['米津玄師','Lemon','요네즈 켄시'],['米津玄師','KICK BACK','요네즈 켄시'],['Vaundy','怪獣の花唄','바운디'],['LiSA','紅蓮華','리사'],['宇多田ヒカル','First Love','우타다 히카루'],['スピッツ','チェリー','스핏츠·체리'],['back number','高嶺の花子さん','백넘버']];
+
+  /* ---------- D-day + weather ---------- */
+  (function(){
+    var start=new Date(2026,8,22), end=new Date(2026,8,26), now=new Date();
+    var el=document.getElementById('dday'), d0=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+    var diff=Math.round((start-d0)/86400000);
+    if(diff>0) el.textContent='D-'+diff;
+    else if(now<end){ el.textContent='여행 '+(Math.floor((d0-start)/86400000)+1)+'일차'; }
+    else el.textContent='여행 종료';
+  })();
+  var WMO={0:['☀️','맑음'],1:['🌤️','대체로 맑음'],2:['⛅','구름 조금'],3:['☁️','흐림'],45:['🌫️','안개'],48:['🌫️','안개'],51:['🌦️','이슬비'],53:['🌦️','이슬비'],55:['🌦️','이슬비'],61:['🌧️','비'],63:['🌧️','비'],65:['🌧️','강한 비'],71:['❄️','눈'],73:['❄️','눈'],80:['🌦️','소나기'],81:['🌦️','소나기'],82:['🌦️','소나기'],95:['⛈️','뇌우'],96:['⛈️','뇌우'],99:['⛈️','뇌우']};
+  function wmo(c){return WMO[c]||['🌡️','-'];}
+  var DOW=['일','월','화','수','목','금','토'], TRIP={'2026-09-22':1,'2026-09-23':1,'2026-09-24':1,'2026-09-25':1};
+  fetch('https://api.open-meteo.com/v1/forecast?latitude=33.8416&longitude=132.7686&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FTokyo&forecast_days=16')
+    .then(function(r){return r.json();}).then(function(d){
+      if(d.current){var w=wmo(d.current.weather_code);
+        document.getElementById('wi').textContent=w[0];
+        document.getElementById('wt').textContent=Math.round(d.current.temperature_2m)+'° · '+w[1];
+        document.getElementById('wm').textContent='마쓰야마 · 습도 '+d.current.relative_humidity_2m+'% · 바람 '+Math.round(d.current.wind_speed_10m)+'km/h';}
+      var dd=d.daily, box=document.getElementById('fc'), idx=[];
+      dd.time.forEach(function(t,i){if(TRIP[t])idx.push(i);});
+      if(!idx.length) idx=[0,1,2,3];
+      box.innerHTML='';
+      idx.forEach(function(i){var w=wmo(dd.weather_code[i]),dt=new Date(dd.time[i]+'T00:00:00'),pop=dd.precipitation_probability_max[i];
+        var e=document.createElement('div');e.className='d';
+        e.innerHTML='<div class="dd">'+(dt.getMonth()+1)+'/'+dt.getDate()+' '+DOW[dt.getDay()]+'</div><div class="di">'+w[0]+'</div><div class="dt">'+Math.round(dd.temperature_2m_max[i])+'° <small>/'+Math.round(dd.temperature_2m_min[i])+'°</small></div><div class="dr'+(pop>=50?' hi':'')+'">비 '+pop+'%</div>';
+        box.appendChild(e);});
+    }).catch(function(){document.getElementById('wt').textContent='날씨 로드 실패';document.getElementById('wi').textContent='⚠️';});
+
+  /* ---------- maps ---------- */
+  function popHtml(n,j,q,o){return '<b>'+n+'</b> <span class="j">'+j+'</span>'+(o?'<br>'+o:'')+'<br><a href="'+gm(q)+'" target="_blank" rel="noopener">구글맵 ↗</a>';}
+  var ov;
+  function ensureOv(){
+    if(!ov){
+      ov=L.map('ov-map',{scrollWheelZoom:false});
+      L.tileLayer(TILE,{maxZoom:19,attribution:'© OSM'}).addTo(ov);
+      var main=[],all=[];
+      PLACES.forEach(function(p){var mk;
+        if(p.big){mk=L.marker([p.lat,p.lng],{icon:L.divIcon({className:'bigpin',html:'<div class="bp">'+p.big+'</div>',iconSize:[26,26],iconAnchor:[13,13]}),zIndexOffset:1000}).addTo(ov);mk.bindTooltip(p.n,{permanent:true,direction:'top',className:'lbl',offset:[0,-10]});}
+        else mk=L.circleMarker([p.lat,p.lng],{radius:7,color:'#fff',weight:2,fillColor:COL[p.c],fillOpacity:1}).addTo(ov);
+        mk.bindPopup(popHtml(p.n,p.j,p.q,''));all.push(mk);if(p.c!=='road')main.push(mk);});
+      L.polyline([[33.8399,132.7686],[33.5389,132.6538],[33.6816,132.6300],[33.8399,132.7686]],{color:'#7A5AD1',weight:2.5,dashArray:'5,8',opacity:.7}).addTo(ov);
+      ov._m=L.featureGroup(main).getBounds();ov._a=L.featureGroup(all).getBounds();
+      document.querySelectorAll('[data-ov]').forEach(function(b){b.addEventListener('click',function(){
+        document.querySelectorAll('[data-ov]').forEach(function(x){x.classList.remove('on');});b.classList.add('on');
+        ov.fitBounds(b.dataset.ov==='all'?ov._a:ov._m,{padding:[20,20]});});});
+    }
+    setTimeout(function(){ov.invalidateSize();ov.fitBounds(ov._m,{padding:[20,20]});},60);
   }
-  var roll = document.getElementById('music-roll');
-  var titleEl = document.getElementById('mn-title'), artistEl = document.getElementById('mn-artist'), playEl = document.getElementById('music-play');
-  var last = -1;
-  if(roll){
-    roll.addEventListener('click', function(){
-      var i; do { i = Math.floor(Math.random()*SONGS.length); } while(i===last && SONGS.length>1);
-      last = i; var s = SONGS[i];
-      titleEl.textContent = s[1];
-      artistEl.textContent = s[2];
-      playEl.href = ytm(s[0],s[1]);
-    });
+  var fmap,fg={};
+  function ensureFood(){
+    if(!fmap){
+      fmap=L.map('food-map',{scrollWheelZoom:false});
+      L.tileLayer(TILE,{maxZoom:19,attribution:'© OSM'}).addTo(fmap);
+      var city=[],dogo=[],all=[];
+      FOODS.forEach(function(f){var mk=L.circleMarker([f.lat,f.lng],{radius:8,color:'#fff',weight:2,fillColor:FC[f.cat],fillOpacity:1}).addTo(fmap);
+        mk.bindPopup(popHtml(f.n,f.j,f.q,f.o));all.push(mk);(f.a==='dogo'?dogo:city).push(mk);});
+      fg={city:L.featureGroup(city).getBounds(),dogo:L.featureGroup(dogo).getBounds(),all:L.featureGroup(all).getBounds()};
+      document.querySelectorAll('[data-fm]').forEach(function(b){b.addEventListener('click',function(){
+        document.querySelectorAll('[data-fm]').forEach(function(x){x.classList.remove('on');});b.classList.add('on');
+        fmap.fitBounds(fg[b.dataset.fm],{padding:[20,20]});});});
+    }
+    setTimeout(function(){fmap.invalidateSize();fmap.fitBounds(fg.city,{padding:[20,20]});},60);
   }
+  var pmap,player,curDay=0;
+  function ensurePlan(){
+    if(!pmap){pmap=L.map('plan-map',{scrollWheelZoom:false,zoomControl:false});L.tileLayer(TILE,{maxZoom:19}).addTo(pmap);}
+    setTimeout(function(){pmap.invalidateSize();drawDay();},60);
+  }
+  function drawDay(){
+    if(!pmap)return;
+    if(player)player.remove();player=L.featureGroup().addTo(pmap);
+    var d=DAYS[curDay],col=d.col,coords=(d.line||d.pts).map(function(p){return [p[0],p[1]];});
+    L.polyline(coords,{color:col,weight:3,dashArray:'5,8',opacity:.85}).addTo(player);
+    d.pts.forEach(function(p,i){L.marker([p[0],p[1]],{icon:L.divIcon({className:'',html:'<div class="np" style="background:'+col+'">'+(i+1)+'</div>',iconSize:[22,22],iconAnchor:[11,11]})}).addTo(player).bindPopup('<b>'+(i+1)+'. '+p[2]+'</b>');});
+    pmap.fitBounds(player.getBounds(),{padding:[24,24]});
+  }
+  function renderDay(i){
+    curDay=i;
+    document.querySelectorAll('.dt').forEach(function(t,x){t.classList.toggle('on',x===i);});
+    var d=DAYS[i];
+    var h='<div class="day-title">Day '+d.n+' · '+d.t+'</div><div class="day-date">'+d.date+'</div>';
+    h+='<div class="dchips">'+d.chips.map(function(c){return '<span class="pill">'+c+'</span>';}).join('')+'</div>';
+    h+='<div class="tl">'+d.slots.map(function(s){return '<div class="ti"><div class="tt">'+s[0]+'</div><div class="tx">'+s[1]+'</div></div>';}).join('')+'</div>';
+    document.getElementById('day-body').innerHTML=h;
+    // eats
+    var eb=document.getElementById('day-eats');
+    if(d.eats.length){
+      var rows=d.eats.map(function(name){var f=FOODS.filter(function(x){return x.n===name;})[0];if(!f)return '';
+        return '<a class="food pk" href="'+gm(f.q)+'" target="_blank" rel="noopener"><span class="fd" style="background:'+FC[f.cat]+'"></span><span><span class="fn">'+f.n+'<span class="j">'+f.j+'</span></span><span class="fno">'+f.o+'</span></span><span class="fg">↗</span></a>';}).join('');
+      eb.innerHTML='<div class="lbl2">그날 추천 맛집</div>'+rows;
+    } else eb.innerHTML='';
+    drawDay();
+  }
+  // day tabs
+  (function(){var dt=document.getElementById('daytabs');
+    DAYS.forEach(function(d,i){var b=document.createElement('button');b.className='dt'+(i===0?' on':'');
+      b.innerHTML='Day '+d.n+'<small>'+d.date+'</small>';b.addEventListener('click',function(){renderDay(i);});dt.appendChild(b);});
+    renderDay(0);
+  })();
+
+  /* ---------- eat list + filters ---------- */
+  var curFilter='all';
+  function renderFood(){
+    var list=document.getElementById('food-list'),cats=['all','pick','local','izakaya','eel','cafe'];
+    document.getElementById('food-filters').innerHTML=cats.map(function(c){return '<button class="mbtn'+(c===curFilter?' on':'')+'" data-f="'+c+'">'+(c==='all'?'전체':FCN[c])+'</button>';}).join('');
+    document.querySelectorAll('[data-f]').forEach(function(b){b.addEventListener('click',function(){curFilter=b.dataset.f;renderFood();});});
+    var arr=FOODS.filter(function(f){return curFilter==='all'||f.cat===curFilter;});
+    // picks first
+    arr.sort(function(a,b){return (a.cat==='pick'?0:1)-(b.cat==='pick'?0:1);});
+    list.innerHTML=arr.map(function(f){return '<a class="food'+(f.cat==='pick'?' pk':'')+'" href="'+gm(f.q)+'" target="_blank" rel="noopener"><span class="fd" style="background:'+FC[f.cat]+'"></span><span><span class="fn">'+f.n+'<span class="j">'+f.j+'</span></span><span class="fno">'+f.o+'</span></span><span class="fg">↗</span></a>';}).join('');
+  }
+  renderFood();
+
+  /* ---------- phrases ---------- */
+  (function(){var p=document.getElementById('phrases'),h='';
+    PHR.forEach(function(r){if(r[0]==='g'){h+='<div class="lbl2" style="margin-top:14px">'+r[1]+'</div>';}
+      else h+='<div class="ph"><div class="pk">'+r[0]+'</div><div class="pj">'+r[1]+'</div><div class="pr">'+r[2]+'</div></div>';});
+    p.innerHTML=h;})();
+
+  /* ---------- checklist ---------- */
+  (function(){var c=document.getElementById('chk'),h='';
+    CHK.forEach(function(g){h+='<h4>'+g[0]+'</h4>';g[1].forEach(function(it){h+='<label><input type="checkbox"><span>'+it+'</span></label>';});});
+    c.innerHTML=h;
+    var boxes=c.querySelectorAll('input'),fill=document.getElementById('cfill'),cnt=document.getElementById('ccount');
+    function up(){var done=0;boxes.forEach(function(b){if(b.checked)done++;});fill.style.width=Math.round(done/boxes.length*100)+'%';cnt.textContent=done+'/'+boxes.length;}
+    boxes.forEach(function(b,i){var k='mtsk_'+i;try{if(localStorage.getItem(k)==='1')b.checked=true;}catch(e){}
+      b.addEventListener('change',function(){try{localStorage.setItem(k,b.checked?'1':'0');}catch(e){}up();});});
+    document.getElementById('creset').addEventListener('click',function(){boxes.forEach(function(b,i){b.checked=false;try{localStorage.removeItem('mtsk_'+i);}catch(e){}});up();});
+    up();})();
+
+  /* ---------- music ---------- */
+  (function(){var s=document.getElementById('songs');
+    function ytm(a,t){return 'https://music.youtube.com/search?q='+encodeURIComponent(a+' '+t);}
+    s.innerHTML=SONGS.map(function(x){return '<a class="song" href="'+ytm(x[0],x[1])+'" target="_blank" rel="noopener"><span class="sj">♪</span><span><span class="st">'+x[1]+'</span><br><span class="sa">'+x[2]+'</span></span><span class="sg">↗</span></a>';}).join('');
+    var last=-1;document.getElementById('mroll').addEventListener('click',function(){var i;do{i=Math.floor(Math.random()*SONGS.length);}while(i===last&&SONGS.length>1);last=i;var x=SONGS[i];
+      document.getElementById('mt').textContent=x[1];document.getElementById('ma').textContent=x[2];document.getElementById('mplay').href=ytm(x[0],x[1]);});})();
 })();
 </script>
 </body>
