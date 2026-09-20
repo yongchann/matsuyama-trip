@@ -91,6 +91,19 @@
   .fc .dt small{color:var(--muted);font-weight:600}
   .fc .dr{font-size:.66rem;font-weight:700;color:var(--blue);margin-top:5px}
   .fc .dr.hi{color:var(--accent-ink)}
+  .fc .d{cursor:pointer;transition:border-color .15s,transform .08s}
+  .fc .d.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-weak)}
+  .fc .d:active{transform:scale(.97)}
+  .hourly{display:none;margin-top:11px}
+  .hourly.on{display:block;animation:vin .2s ease}
+  .hlabel{font-size:.78rem;font-weight:800;color:var(--muted);margin:0 4px 8px}
+  .hrow{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+  .hrow::-webkit-scrollbar{display:none}
+  .hc{flex:none;width:52px;text-align:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 4px;box-shadow:var(--sh)}
+  .hc .hh{font-size:.68rem;color:var(--muted);font-weight:700}
+  .hc .hi{font-size:1.15rem;margin:3px 0}
+  .hc .ht{font-weight:800;font-size:.87rem}
+  .hc .hp{font-size:.62rem;color:var(--blue);font-weight:700;margin-top:2px}
 
   /* today song (home) */
   .song1{display:flex;align-items:center;gap:12px;background:linear-gradient(120deg,var(--accent-weak),var(--card));
@@ -275,8 +288,9 @@
       </div>
     </div>
 
-    <div class="lbl">여행 기간 날씨</div>
+    <div class="lbl">여행 기간 날씨 <span style="font-weight:600;color:var(--muted)">· 날짜 탭 → 시간별</span></div>
     <div class="fc" id="fc"><div class="d"><div class="dd">…</div></div></div>
+    <div class="hourly" id="hourly"></div>
 
     <div class="lbl">오늘의 곡 🎧</div>
     <div class="song1">
@@ -605,8 +619,24 @@
   var WMO={0:['☀️','맑음'],1:['🌤️','대체로 맑음'],2:['⛅','구름 조금'],3:['☁️','흐림'],45:['🌫️','안개'],48:['🌫️','안개'],51:['🌦️','이슬비'],53:['🌦️','이슬비'],55:['🌦️','이슬비'],61:['🌧️','비'],63:['🌧️','비'],65:['🌧️','강한 비'],71:['❄️','눈'],80:['🌦️','소나기'],81:['🌦️','소나기'],82:['🌦️','소나기'],95:['⛈️','뇌우'],96:['⛈️','뇌우'],99:['⛈️','뇌우']};
   function wmo(c){return WMO[c]||['🌡️','-'];}
   var DOW=['일','월','화','수','목','금','토'], TRIP={'2026-09-22':1,'2026-09-23':1,'2026-09-24':1,'2026-09-25':1};
-  fetch('https://api.open-meteo.com/v1/forecast?latitude=33.8416&longitude=132.7686&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FTokyo&forecast_days=16')
+  var HOURLY=null, HSEL=null;
+  function renderHourly(date){
+    var wrap=document.getElementById('hourly');
+    document.querySelectorAll('#fc .d').forEach(function(x){x.classList.toggle('on',!!date&&x.dataset.date===date);});
+    if(!date||!HOURLY){wrap.className='hourly';wrap.innerHTML='';HSEL=null;return;}
+    var cells='';
+    HOURLY.time.forEach(function(t,i){
+      if(t.indexOf(date)!==0)return;var hh=parseInt(t.slice(11,13),10);if(hh%2)return;
+      var w=wmo(HOURLY.weather_code[i]),pp=HOURLY.precipitation_probability[i];
+      cells+='<div class="hc"><div class="hh">'+hh+'시</div><div class="hi">'+w[0]+'</div><div class="ht tnum">'+Math.round(HOURLY.temperature_2m[i])+'°</div><div class="hp">'+(pp==null?'-':pp+'%')+'</div></div>';
+    });
+    var dt=new Date(date+'T00:00:00');
+    wrap.innerHTML='<div class="hlabel">'+(dt.getMonth()+1)+'/'+dt.getDate()+' '+DOW[dt.getDay()]+'요일 · 시간별</div><div class="hrow">'+cells+'</div>';
+    wrap.className='hourly on';HSEL=date;
+  }
+  fetch('https://api.open-meteo.com/v1/forecast?latitude=33.8416&longitude=132.7686&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&hourly=temperature_2m,weather_code,precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FTokyo&forecast_days=16')
     .then(function(r){return r.json();}).then(function(d){
+      HOURLY=d.hourly;
       if(d.current){var w=wmo(d.current.weather_code);
         document.getElementById('wi').textContent=w[0];
         document.getElementById('wt').textContent=Math.round(d.current.temperature_2m)+'° · '+w[1];
@@ -615,9 +645,10 @@
       dd.time.forEach(function(t,i){if(TRIP[t])idx.push(i);});
       if(!idx.length)idx=[0,1,2,3];
       box.innerHTML='';
-      idx.forEach(function(i){var w=wmo(dd.weather_code[i]),dt=new Date(dd.time[i]+'T00:00:00'),pop=dd.precipitation_probability_max[i];
-        var e=document.createElement('div');e.className='d';
+      idx.forEach(function(i){var w=wmo(dd.weather_code[i]),date=dd.time[i],dt=new Date(date+'T00:00:00'),pop=dd.precipitation_probability_max[i];
+        var e=document.createElement('div');e.className='d';e.dataset.date=date;
         e.innerHTML='<div class="dd">'+(dt.getMonth()+1)+'/'+dt.getDate()+' '+DOW[dt.getDay()]+'</div><div class="di">'+w[0]+'</div><div class="dt tnum">'+Math.round(dd.temperature_2m_max[i])+'° <small>/'+Math.round(dd.temperature_2m_min[i])+'°</small></div><div class="dr'+(pop>=50?' hi':'')+'">비 '+pop+'%</div>';
+        e.addEventListener('click',function(){renderHourly(HSEL===date?null:date);});
         box.appendChild(e);});
     }).catch(function(){document.getElementById('wt').textContent='날씨 로드 실패';document.getElementById('wi').textContent='⚠️';});
 
