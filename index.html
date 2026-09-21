@@ -68,13 +68,34 @@
   .b-acc{color:var(--accent-ink);font-weight:800;}
 
   /* HERO */
-  .hero{position:relative;border-radius:22px;overflow:hidden;color:#fff;box-shadow:var(--sh2);margin-top:18px;
-    min-height:238px;display:flex;flex-direction:column;justify-content:flex-end;background:#2a2926;}
+  .hero{position:relative;border-radius:22px;overflow:hidden;color:#fff;box-shadow:var(--sh2);margin-top:16px;
+    min-height:164px;display:flex;flex-direction:column;justify-content:flex-end;background:#2a2926;}
   .hero-ph{position:absolute;inset:0;z-index:0}
   .hero-ph .ly{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity 1.6s ease}
   .hero-ph .ly.on{opacity:1}
-  .hero-sh{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(14,11,7,.08),rgba(14,11,7,.26) 44%,rgba(14,11,7,.80))}
-  .hero-c{position:relative;z-index:2;padding:92px 20px 18px}
+  .hero-sh{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(14,11,7,.05),rgba(14,11,7,.22) 44%,rgba(14,11,7,.78))}
+  .hero-c{position:relative;z-index:2;padding:60px 18px 16px}
+  .hero h1{font-size:2.1rem}
+
+  /* now card */
+  .nowcard{margin-top:14px;background:var(--card);border:1px solid var(--line);border-left:4px solid var(--accent);
+    border-radius:18px;box-shadow:var(--sh);padding:15px 16px}
+  .nowcard .nlbl{font-size:.66rem;font-weight:800;letter-spacing:.1em;color:var(--accent-ink);text-transform:uppercase}
+  .nowcard .nmain{display:flex;align-items:center;gap:12px;margin-top:7px}
+  .nowcard .nem{font-size:1.7rem;flex:none}
+  .nowcard .ndday{font-size:1.6rem;font-weight:900;color:var(--accent-ink);flex:none}
+  .nowcard .nt{font-weight:800;font-size:1.08rem;line-height:1.22}
+  .nowcard .ns{font-size:.82rem;color:var(--muted);margin-top:2px}
+  .nowcard .nnext{margin-top:11px;padding-top:10px;border-top:1px solid var(--line);font-size:.8rem;color:var(--muted)}
+  .nowcard .nnext b{color:var(--ink)}
+
+  /* compact weather */
+  .wmini{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:13px;
+    padding:9px 13px;box-shadow:var(--sh);font-size:.87rem;margin-bottom:2px}
+  .wmini .wmi-i{font-size:1.2rem;flex:none}
+  .wmini .wmi-t{font-weight:800;flex:none}
+  .wmini .wmi-m{color:var(--muted);font-size:.75rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+  .wmini .wmi-live{margin-left:auto;font-size:.58rem;font-weight:800;letter-spacing:.08em;color:var(--accent-ink);background:var(--accent-weak);border-radius:999px;padding:3px 8px;flex:none}
   .hero .hk{font-family:var(--jp);font-size:.72rem;letter-spacing:.16em;opacity:.92;text-shadow:0 1px 8px rgba(0,0,0,.5);}
   .hero h1{font-size:2.35rem;line-height:1;margin:7px 0 5px;letter-spacing:-.03em;text-shadow:0 2px 14px rgba(0,0,0,.45);}
   .hero .hd{font-size:.9rem;opacity:.96;font-weight:600;text-shadow:0 1px 8px rgba(0,0,0,.5);}
@@ -320,15 +341,13 @@
         <div class="hk">松山 · EHIME · 旅のしおり</div>
         <h1>마쓰야마</h1>
         <div class="hd">3박 4일 · 9.22(화) — 9.25(금)</div>
-        <div class="wnow">
-          <div class="t" id="wi">⏳</div>
-          <div><div class="wt" id="wt">불러오는 중</div><div class="wm" id="wm">마쓰야마 현재 날씨</div></div>
-          <div class="live">LIVE</div>
-        </div>
       </div>
     </div>
 
-    <div class="lbl">여행 기간 날씨 <span style="font-weight:600;color:var(--muted)">· 날짜 탭 → 시간별</span></div>
+    <div class="nowcard" id="nowcard"></div>
+
+    <div class="lbl">날씨 <span style="font-weight:600;color:var(--muted)">· 날짜 탭 → 시간별</span></div>
+    <div class="wmini"><span class="wmi-i" id="wi">⏳</span><b class="wmi-t" id="wt">불러오는 중</b><span class="wmi-m" id="wm">마쓰야마 현재</span><span class="wmi-live">LIVE</span></div>
     <div class="fc" id="fc"><div class="d"><div class="dd">…</div></div></div>
     <div class="hourly" id="hourly"></div>
 
@@ -687,6 +706,31 @@
     if(diff>0)el.textContent='D-'+diff;
     else if(now<end)el.textContent='여행 '+(Math.floor((d0-start)/86400000)+1)+'일차';
     else el.textContent='잘 다녀왔어요';
+  })();
+  (function(){
+    var nc=document.getElementById('nowcard');if(!nc)return;
+    var now=new Date();
+    var MS=[
+      [new Date(2026,8,21,18,0),'🚇','인천공항으로 이동','운서 · 디케이에어포트 호텔 체크인 → 저녁 한잔 🍺'],
+      [new Date(2026,8,22,5,0),'✈️','공항 가서 탑승 준비','ICN T1 · 08:40 마쓰야마행 · 여권/보조배터리 확인'],
+      [new Date(2026,8,22,10,30),'🛬','Day1 · 마쓰야마 도착','인포서 쿠폰북·무료셔틀 → 마쓰야마성 → 오카이도'],
+      [new Date(2026,8,23,4,0),'🌅','Day2 · 우치코·시모나다','미용실 → 특급 우치코 → 해안열차 시모나다 일몰'],
+      [new Date(2026,8,24,8,0),'♨️','Day3 · 도고온천 회복','도고칸 체크인 → 본관 2층 개인실 → 우나기'],
+      [new Date(2026,8,25,8,0),'🛫','Day4 · 출국','무료셔틀 → 공항 9시까지 · 11:15 마쓰야마 출발']
+    ];
+    var cur=-1;for(var i=0;i<MS.length;i++){if(MS[i][0]<=now)cur=i;}
+    var next=(cur+1<MS.length)?MS[cur+1]:null, h='';
+    if(cur<0){
+      var d0=new Date(now.getFullYear(),now.getMonth(),now.getDate()),diff=Math.round((new Date(2026,8,22)-d0)/86400000);
+      h='<div class="nlbl">여행까지</div><div class="nmain"><span class="ndday">D-'+diff+'</span><div><div class="nt">곧 마쓰야마 ✈️</div><div class="ns">다음 · '+MS[0][1]+' '+MS[0][2]+'</div></div></div>';
+    } else if(now>new Date(2026,8,25,14,0)){
+      h='<div class="nlbl">여행 종료</div><div class="nmain"><span class="nem">🍊</span><div><div class="nt">잘 다녀왔어요!</div><div class="ns">사진 보며 추억 곱씹기 🙂</div></div></div>';
+    } else {
+      var m=MS[cur];
+      h='<div class="nlbl">지금 · NOW</div><div class="nmain"><span class="nem">'+m[1]+'</span><div><div class="nt">'+m[2]+'</div><div class="ns">'+m[3]+'</div></div></div>';
+      if(next)h+='<div class="nnext">다음 · '+next[1]+' <b>'+next[2]+'</b></div>';
+    }
+    nc.innerHTML=h;
   })();
   var WMO={0:['☀️','맑음'],1:['🌤️','대체로 맑음'],2:['⛅','구름 조금'],3:['☁️','흐림'],45:['🌫️','안개'],48:['🌫️','안개'],51:['🌦️','이슬비'],53:['🌦️','이슬비'],55:['🌦️','이슬비'],61:['🌧️','비'],63:['🌧️','비'],65:['🌧️','강한 비'],71:['❄️','눈'],80:['🌦️','소나기'],81:['🌦️','소나기'],82:['🌦️','소나기'],95:['⛈️','뇌우'],96:['⛈️','뇌우'],99:['⛈️','뇌우']};
   function wmo(c){return WMO[c]||['🌡️','-'];}
