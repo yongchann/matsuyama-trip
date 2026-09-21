@@ -293,6 +293,8 @@
   .song .sa{color:var(--muted);font-size:.74rem}
   .song .sg{margin-left:auto;color:var(--muted);font-weight:800}
 
+  .reloadbtn{width:100%;margin-top:24px;background:var(--accent);color:#fff;border:none;border-radius:14px;padding:14px;font-weight:800;font-size:.92rem}
+  .reloadbtn:active{transform:scale(.98)}
   footer{color:var(--muted);font-size:.76rem;text-align:center;padding:24px 0 8px;line-height:1.7}
 
   /* tabbar */
@@ -464,6 +466,7 @@
       <div id="songs"></div>
     </div></details>
 
+    <button class="reloadbtn" onclick="location.replace(location.pathname+'?r='+Date.now())">↻ 최신 내용으로 새로고침</button>
     <footer>마쓰야마 여행 핸드북 · 旅のしおり<br>지도 © OpenStreetMap · 날씨 © Open-Meteo · 발음 © 브라우저 TTS</footer>
   </section>
 
