@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>룝빕 마쓰야마가요</title>
 <meta property="og:title" content="룝빕 마쓰야마가요">
 <meta property="og:description" content="마쓰야마 3박 4일 · 우리 여행 핸드북 🍊">
@@ -37,7 +37,8 @@
     --line:#2C2B26; --accent:#4FB488; --accent-ink:#4FB488; --accent-weak:#17271F;
     --sh:0 1px 2px rgba(0,0,0,.3),0 6px 16px rgba(0,0,0,.45); --sh2:0 14px 40px rgba(0,0,0,.6);
   }}
-  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+  .leaflet-container,.leaflet-container *{touch-action:none;}
   html,body{margin:0;}
   body{background:var(--bg);color:var(--ink);font-family:var(--f);font-size:15px;line-height:1.55;
     -webkit-font-smoothing:antialiased;position:relative;}
@@ -544,8 +545,8 @@
      pts:[[33.8272,132.6997,'공항'],[33.8399,132.7686,'히요리'],[33.8457,132.7657,'마쓰야마성'],[33.8412,132.7690,'오카이도']],
      eats:['아미모토 별저','아즈마야']},
     {n:2,date:'9.23 수',t:'우치코 · 시모나다 노을',col:'#7A5AD1',
-     chips:['오전 미용실','열차','시모나다 일몰'],
-     slots:[['오전','미용실(~1h) → JR로 이동'],['낮','우치코 옛거리 산책 + 점심'],['저녁','시모나다역/후타미 해변 노을 → 복귀']],
+     chips:['미용실','특급+보통열차','시모나다 일몰','시각표 필수'],
+     slots:[['오전','미용실(~1h) → JR 마쓰야마역. 화장실·간식(오니기리) 챙겨 탑승 (시모나다엔 편의점 X)'],['①이동','松山 → 内子(우치코) · 특급 우와카이 ~25분'],['낮','우치코 옛거리·우치코자 산책 + 점심'],['②이동','内子 → 向井原/伊予市 환승 → 해안 이요나다선 <b>보통열차</b>로 下灘 ⚠️특급·산악선은 시모나다 정차 X, 바다쪽 보통열차 필수'],['일몰','시모나다역/후타미 해변 노을 · <b>일몰 40분 전 도착편</b> (상·하행 각 하루 9편, 시각표 미리!)'],['복귀','下灘 → 松山 해안선 보통 ~50분, 어두워지기 직전 상행선']],
      pts:[[33.8399,132.7686,'히요리'],[33.5389,132.6538,'우치코'],[33.6816,132.6300,'시모나다역'],[33.6470,132.6160,'후타미(노을)']],
      line:[[33.8399,132.7686],[33.5389,132.6538],[33.6816,132.6300],[33.6470,132.6160],[33.8399,132.7686]],
      eats:[]},
