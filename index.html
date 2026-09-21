@@ -139,6 +139,21 @@
   .ph .pj{font-family:var(--jp);color:var(--accent-ink);font-size:.98rem;margin-top:1px}
   .ph .pr{color:var(--muted);font-size:.76rem;margin-top:1px}
   .phg{font-size:.82rem;font-weight:800;color:var(--ink);margin:16px 4px 8px}
+  /* flashcards */
+  .mini-btn{margin-left:auto;background:var(--card2);border:1px solid var(--line);border-radius:9px;padding:5px 10px;font-weight:800;font-size:.72rem;color:var(--ink)}
+  .flash{display:flex;gap:10px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none}
+  .flash::-webkit-scrollbar{display:none}
+  .fcard{flex:none;width:158px;height:112px;perspective:900px;cursor:pointer}
+  .fcard .inner{position:relative;width:100%;height:100%;transition:transform .5s cubic-bezier(.22,.61,.36,1);transform-style:preserve-3d}
+  .fcard.flipped .inner{transform:rotateY(180deg)}
+  .fcard .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;text-align:center}
+  .fcard .front{background:var(--card)}
+  .fcard .front .fq{font-weight:800;font-size:1rem;line-height:1.25}
+  .fcard .front .fh{font-size:.66rem;color:var(--muted);margin-top:8px}
+  .fcard .back{background:var(--accent-weak);transform:rotateY(180deg)}
+  .fcard .back .bj{font-family:var(--jp);font-weight:700;font-size:1.04rem;color:var(--ink);line-height:1.25}
+  .fcard .back .br{font-size:.77rem;color:var(--accent-ink);margin-top:4px}
+  .fcard .back .bspk{margin-top:8px;width:30px;height:30px;border-radius:50%;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:.92rem}
 
   /* quick */
   .quick{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -165,6 +180,12 @@
   .itip .itxt span{color:var(--muted);font-size:.76rem}
   .itip .ibtn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:8px 14px;font-weight:800;font-size:.82rem;flex:none}
   .itip .ix{background:none;border:none;color:var(--muted);font-size:1.05rem;padding:4px;flex:none}
+
+  /* pull to refresh */
+  #ptr{position:fixed;top:calc(env(safe-area-inset-top) + 6px);left:50%;z-index:3000;width:36px;height:36px;border-radius:50%;
+    background:var(--card);border:1px solid var(--line);box-shadow:var(--sh);display:flex;align-items:center;justify-content:center;
+    font-size:1.15rem;color:var(--accent-ink);opacity:0;transform:translate(-50%,-50px);transition:opacity .2s,transform .2s;pointer-events:none}
+  #ptr.spin{animation:spin .6s linear infinite}
 
   /* mission / ticket */
   .miss{background:var(--accent-weak);border:1px solid transparent;border-radius:18px;padding:15px 16px}
@@ -322,8 +343,8 @@
       </div>
     </div>
 
-    <div class="lbl">오늘 익혀둘 표현 <span style="font-weight:600;color:var(--muted)">· 탭하면 발음 재생 🔊</span></div>
-    <div class="stack" id="home-phrases"></div>
+    <div class="lbl" style="display:flex;align-items:center;gap:7px">익혀둘 표현 <span style="font-weight:600;color:var(--muted);font-size:.72rem">· 탭해서 뒤집기 · 🔊발음</span><button class="mini-btn" id="flash-shuffle">🔀 다른 표현</button></div>
+    <div class="flash" id="flash"></div>
 
     <div class="lbl">바로가기</div>
     <div class="quick">
@@ -462,7 +483,10 @@
   var TILE='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
   function gm(q){return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q);}
   function ytm(a,t){return 'https://music.youtube.com/search?q='+encodeURIComponent(a+' '+t);}
-  function speak(t){try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang='ja-JP';u.rate=.9;speechSynthesis.speak(u);}catch(e){}}
+  var jaVoice=null;
+  function loadVoices(){try{var vs=speechSynthesis.getVoices();jaVoice=vs.filter(function(v){return /ja([-_]|$)/i.test(v.lang);})[0]||vs.filter(function(v){return /japan/i.test(v.name);})[0]||null;}catch(e){}}
+  try{loadVoices();if(typeof speechSynthesis!=='undefined')speechSynthesis.addEventListener('voiceschanged',loadVoices);}catch(e){}
+  function speak(t){try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang='ja-JP';if(jaVoice)u.voice=jaVoice;u.rate=.92;speechSynthesis.speak(u);}catch(e){}}
 
   /* ---------- routing ---------- */
   var tabs=document.querySelectorAll('.tab'), views=document.querySelectorAll('.view');
@@ -802,14 +826,39 @@
 
   /* ---------- phrases (TTS) ---------- */
   function phraseRow(p){return '<div class="ph" data-ja="'+p[1]+'"><div class="spk">🔊</div><div style="min-width:0"><div class="pk">'+p[0]+'</div><div class="pj jp">'+p[1]+'</div><div class="pr">'+p[2]+'</div></div></div>';}
+  var FLASH=[
+    ['안녕하세요','こんにちは','콘니치와'],['감사합니다','ありがとうございます','아리가토- 고자이마스'],
+    ['죄송합니다 / 저기요','すみません','스미마셍'],['네 / 아니요','はい / いいえ','하이 / 이-에'],
+    ['얼마예요?','いくらですか','이쿠라데스카'],['이거 주세요','これください','코레 쿠다사이'],
+    ['계산해 주세요','お会計お願いします','오카이케- 오네가이시마스'],['맛있어요','おいしいです','오이시-데스'],
+    ['맛있었어요!','おいしかったです','오이시캇타데스'],['화장실 어디예요?','トイレはどこですか','토이레와 도코데스카'],
+    ['영어 되나요?','英語話せますか','에이고 하나세마스카'],['천천히 말해주세요','ゆっくり話してください','윳쿠리 하나시테 쿠다사이'],
+    ['추천이 뭐예요?','おすすめは何ですか','오스스메와 난데스카'],['생맥주 주세요','生ビールください','나마비-루 쿠다사이'],
+    ['건배!','乾杯','캄파이'],['한 잔 더 주세요','もう一杯ください','모- 잇파이 쿠다사이'],
+    ['물 주세요','お水ください','오미즈 쿠다사이'],['사진 찍어주세요','写真お願いします','샤신 오네가이시마스'],
+    ['같이 찍어요','一緒に撮りましょう','잇쇼니 토리마쇼-'],['괜찮아요','大丈夫です','다이죠-부데스'],
+    ['두 명이요','二人です','후타리데스'],['예약했어요','予約しました','요야쿠 시마시타'],
+    ['카드 되나요?','カード使えますか','카-도 츠카에마스카'],['포장돼요?','持ち帰りできますか','모치카에리 데키마스카'],
+    ['이거 뭐예요?','これは何ですか','코레와 난데스카'],['안 매운 걸로','辛くないものを','카라쿠나이 모노오'],
+    ['하나 더 주세요','もう一つください','모- 히토츠 쿠다사이'],['도와주세요','助けてください','타스케테 쿠다사이'],
+    ['잘 먹겠습니다','いただきます','이타다키마스'],['잘 먹었습니다','ごちそうさまでした','고치소-사마데시타'],
+    ['정말 좋네요','すごくいいですね','스고쿠 이-데스네'],['다음에 또 올게요','また来ます','마타 키마스']
+  ];
   (function(){
     var full=document.getElementById('phrases'),h='';
     PHR.forEach(function(p){if(p[0]==='g')h+='<div class="phg">'+p[1]+'</div>';else h+=phraseRow(p);});
     full.innerHTML=h;
-    var homeP=PHR.filter(function(p){return p[0]!=='g';});
-    var pick=[homeP[5],homeP[6],homeP[13]]; // 안녕/감사/생맥주
-    document.getElementById('home-phrases').innerHTML=pick.map(phraseRow).join('');
     document.body.addEventListener('click',function(e){var el=e.target.closest('.ph');if(el)speak(el.dataset.ja);});
+    var box=document.getElementById('flash');
+    function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t;}return a;}
+    function renderFlash(){box.innerHTML=shuffle(FLASH).slice(0,12).map(function(p){
+      return '<div class="fcard"><div class="inner"><div class="face front"><div class="fq">'+p[0]+'</div><div class="fh">탭해서 확인</div></div>'
+        +'<div class="face back" data-ja="'+p[1]+'"><div class="bj">'+p[1]+'</div><div class="br">'+p[2]+'</div><div class="bspk">🔊</div></div></div></div>';}).join('');}
+    renderFlash();
+    var sh=document.getElementById('flash-shuffle');if(sh)sh.addEventListener('click',renderFlash);
+    box.addEventListener('click',function(e){var card=e.target.closest('.fcard');if(!card)return;
+      if(e.target.closest('.bspk')){var b=card.querySelector('.back');speak(b.dataset.ja);return;}
+      card.classList.toggle('flipped');});
   })();
 
   /* ---------- checklist ---------- */
@@ -839,6 +888,21 @@
   var mrs=rnd(POOL);
   function setMus(s){document.getElementById('mt').textContent=s[1];document.getElementById('ma').textContent=s[2];document.getElementById('mplay').href=ytm(s[0],s[1]);}
   document.getElementById('mroll').addEventListener('click',function(){mrs=rnd(POOL,mrs);setMus(mrs);});
+})();
+</script>
+<script>
+/* pull-to-refresh (PWA에서 브라우저 새로고침 대체) */
+(function(){
+  var ind=document.createElement('div');ind.id='ptr';ind.textContent='↻';document.body.appendChild(ind);
+  var startY=0,cur=0,active=false;
+  function top(){return window.scrollY||document.documentElement.scrollTop||0;}
+  document.addEventListener('touchstart',function(e){if(top()<=0){startY=e.touches[0].clientY;active=true;cur=0;}else active=false;},{passive:true});
+  document.addEventListener('touchmove',function(e){if(!active)return;cur=e.touches[0].clientY-startY;
+    if(cur>0){var d=Math.min(cur,100);ind.style.opacity=Math.min(1,d/70);ind.style.transform='translate(-50%,'+(d-46)+'px) rotate('+(d*3)+'deg)';}
+    else{active=false;ind.style.opacity='0';ind.style.transform='translate(-50%,-50px)';}},{passive:true});
+  document.addEventListener('touchend',function(){if(!active)return;active=false;
+    if(cur>=70){ind.classList.add('spin');ind.style.opacity='1';ind.style.transform='translate(-50%,24px)';setTimeout(function(){location.reload();},160);}
+    else{ind.style.opacity='0';ind.style.transform='translate(-50%,-50px)';}},{passive:true});
 })();
 </script>
 </body>
